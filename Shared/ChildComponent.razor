@@ -1,0 +1,98 @@
+﻿@using HRMSv4.Shared
+@inject ILevelOrganization _lvlOrg
+
+<div class="position-relative mb-3">
+    <label for="exampleAddress2" class="form-label">@DynamicLabel</label>
+    <RadzenDropDown Placeholder="" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Change="@(args => AddComponent(lvlOrgITem2.Value))" Data=@_orgSubLevel @bind-Value="lvlOrgITem2.Value"
+                    TextProperty="Text" ValueProperty="Value" Class="w-100" />
+    @*                   <RadzenDropDown Placeholder="" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Change="@(() => OnClick.InvokeAsync(lvlOrgITem2.Value))" Data=@_orgSubLevel @bind-Value="lvlOrgITem2.Value"
+    TextProperty="Text" ValueProperty="Value" Class="w-100" />*@
+@*    @if (ChildList.Any())
+    {
+        <ul style="padding: unset; margin: unset;">
+            @foreach (var item in ChildList)
+            {
+                @item
+            }
+        </ul>
+    }*@
+
+</div>
+
+@code {
+    [Parameter]
+    public int selectedId { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+
+    private SharedLevelOrganization _mysharelvlOrg;
+
+    public List<RenderFragment> ChildList { get; set; }
+     RenderFragment RenderFragmentParent;
+
+    List<SelectListItems> _orgSubLevel = new List<SelectListItems>();
+    SelectListItems lvlOrgITem2 = new SelectListItems();
+
+    private string DynamicLabel = string.Empty;
+    private int parameterId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _orgSubLevel = await _lvlOrg.GetSubChildList(selectedId, 0, false);
+
+        if (_orgSubLevel != null)
+        {
+            int id = int.Parse(_orgSubLevel[1].Value);
+            var temp = await _lvlOrg.GetLabelTitle(id);
+
+            DynamicLabel = temp.Value;
+        }
+        _mysharelvlOrg = new SharedLevelOrganization();
+    }
+
+
+    //private async void AddComponentClick(string selectedChildId)
+    //{
+    //    _mysharelvlOrg.AddComponent(selectedChildId);
+    //}
+
+    public async void AddComponent(string selectedValue)
+    {
+        if (selectedValue == "All")
+        {
+            ChildList = new List<RenderFragment>();
+            this.StateHasChanged();
+        }
+        else
+        {
+            ChildList = new List<RenderFragment>();
+
+            parameterId = int.Parse(selectedValue);
+
+            if (parameterId > 0)
+            {
+                /* Check for Child Data */
+                _orgSubLevel = await _lvlOrg.GetSubChildList(parameterId, 0,false);
+
+                if (_orgSubLevel.Count > 0)
+                {
+                    ChildList.Add(CreateDynamicComponent());
+                    this.StateHasChanged();
+                }
+                else
+                {
+                    ChildList = new List<RenderFragment>();
+                    this.StateHasChanged();
+                }
+            }
+        }
+    }
+
+    RenderFragment CreateDynamicComponent() => builder =>
+       {
+           var seq = 0;
+           builder.OpenComponent(++seq, typeof(ChildComponent));
+           builder.AddAttribute(++seq, "selectedId", parameterId);
+           builder.CloseComponent();
+       };
+
+}

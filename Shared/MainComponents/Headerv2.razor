@@ -1,0 +1,828 @@
+﻿@using HRMSv4.Client.Interface.Auth
+@using HRMSv4.Client.Service
+@using System.Security.Claims
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared.Audit
+@using HRMSv4.Shared.SignalRData
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ICompanyProfile companyService
+@inject IHeader _header
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@using System.Threading
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+
+<style>
+    .timer {
+        font-size: 20px;
+        font-weight: 600;
+        margin-right: 10px;
+        margin-top: 16px;
+        font-family: monospace;
+    }
+</style>
+
+
+<CascadingValue Value="this">
+    <header class="primehr-header sticky-bar">
+        <div class="primehr-container">
+            <div class="main-header">
+                <div class="header-left">
+                    <div class="header-logo">
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (@context.User.IsInRole(RoleConstants.DefaultRole) || @context.User.IsInRole(RoleConstants.JobProviderRole))
+                                {
+                                    <a class="d-flex" href="/dashboard/administrator"><img alt="PrimeHR" src="images/primehr-logo.svg"></a>
+                                }
+                                else if (@context.User.IsInRole(RoleConstants.EmployeeRole) || @context.User.IsInRole(RoleConstants.JobSeekerRole))
+                                {
+                                    <a class="d-flex" href="" @onclick="EmpNavigation"><img alt="PrimeHR" src="images/primehr-logo.svg"></a>
+                                }
+                                else if (@context.User.IsInRole(RoleConstants.HrManagerRole))
+                                {
+
+                                }
+                                else if (@context.User.IsInRole(RoleConstants.DefaultSuperAdmin))
+                                {
+                                    <a class="d-flex" href="/dashboard/super-admin"><img alt="PrimeHR" src="images/primehr-logo.svg"></a>
+                                }
+                                else
+                                {
+                                    <CustomNotFound />
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                @*<CustomNotFound />*@
+                            </NotAuthorized>
+                        </AuthorizeView>
+                        @if (CurrAbsoluteUrl != null)
+                        {
+                            @if (!CurrAbsoluteUrl.Contains("dashboard-employee"))
+                            {
+
+
+                            }
+                        }
+                    </div>
+                    <span class="primehr-btn btn-grey-small ml-10">Admin area</span>
+                </div>
+
+                <AuthorizeView Roles="Job Provider, Administrator, Super Administrator">
+                    <div class="header-search">
+                        <div class="box-search">
+                            <form action="" onclick="@HandleKeyPress">
+                                <input class="form-control input-search" type="text" @bind="@keyword" @onkeypress="HandleKeyPress" name="keyword" placeholder="Search">
+                            </form>
+                        </div>
+                    </div>
+                </AuthorizeView>
+
+                <div class="header-menu d-none d-md-block">
+                    <ul>
+                        <li><a href="#">Home </a></li>
+                        <li> <a href="#">About us </a></li>
+                        <li> <a href="#">Contact</a></li>
+                     </ul>
+                </div>
+                <div class="header-right">
+                    <div class="block-signin">
+                        <a class="primehr-btn btn-default icon-edit hover-up" href="#">Post Job</a>
+                        <div class="primehr-dropdown d-inline-block">
+                            <a class="primehr-btn btn-notify p-0 me-2" id="dropdownNotify" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                            <div tabindex="-1" role="menu" aria-hidden="true"
+                                 class="dropdown-menu-xl rm-pointers dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-menu-header mb-0">
+                                    <div class="dropdown-menu-header-inner bg-deep-blue">
+                                        <div class="menu-header-image opacity-1" style="background-image: url('images/dropdown-header/city3.jpg');"></div>
+                                        <div class="menu-header-content text-dark">
+                                            <h5 class="menu-header-title">Notifications</h5>
+                                            <h6 class="menu-header-subtitle">
+                                                You have
+                                                <b>1</b> unread messages
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="tabs-animated-shadow tabs-animated nav nav-justified tabs-shadow-bordered p-3">
+                                    <li class="nav-item">
+                                        <a role="tab" class="nav-link active" data-bs-toggle="tab" href="#tab-messages-header">
+                                            <span>Notifications</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a role="tab" class="nav-link" data-bs-toggle="tab" href="#tab-events-header">
+                                            <span>Events</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab-messages-header" role="tabpanel">
+                                        <div class="scroll-area-sm">
+                                            <div class="scrollbar-container">
+                                                <div class="p-3">
+                                                    <div class="notifications-box">
+                                                        <div class="">
+                                                            No notification found.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-events-header" role="tabpanel">
+                                        <div class="scroll-area-sm">
+                                            <div class="scrollbar-container">
+                                                <div class="p-3">
+                                                    <div class="vertical-without-time vertical-timeline vertical-timeline--animate vertical-timeline--one-column">
+                                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                                            <div>
+                                                                <span class="vertical-timeline-element-icon bounce-in">
+                                                                    <i class="badge badge-dot badge-dot-xl bg-success"></i>
+                                                                </span>
+                                                                <div class="vertical-timeline-element-content bounce-in">
+                                                                    <h4 class="timeline-title">All Hands Meeting</h4>
+                                                                    <p>
+                                                                        Lorem ipsum dolor sic amet, today at
+                                                                        <a href="javascript:void(0);">12:00 PM</a>
+                                                                    </p>
+                                                                    <span class="vertical-timeline-element-date"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                       
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item-divider nav-item"></li>
+                                    <li class="nav-item-btn text-center nav-item">
+                                        <button class="btn-shadow btn-wide btn-pill btn btn-focus btn-sm">View Latest Changes</button>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+
+
+                        
+                       
+
+                        <div class="member-login">
+                            <img alt="" src="images/page/dashboard/profile.png">
+                            
+                            <div class="info-member">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <strong class="color-brand-1">@context.User.Identity.Name</strong>
+                                    </Authorized>
+                                    <NotAuthorized>
+                                        <strong class="color-brand-1">Not LogIn</strong>
+                                    </NotAuthorized>
+                                </AuthorizeView>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <a class="font-xs color-text-paragraph-2" id="dropdownProfile" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">@userRole</a>
+                                    </Authorized>
+                                    <NotAuthorized>
+                                        <a class="font-xs color-text-paragraph-2" id="dropdownProfile" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">No role Available</a>
+                                    </NotAuthorized>
+                                </AuthorizeView>
+                                <div class="btn-group">
+                                    <a data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="p-0 btn">
+
+                                        <!--   <img width="25" class="rounded-circle" src="@ImgUrl" alt="" />-->
+                                        <i class="fa fa-angle-down ms-2 opacity-8"></i>
+                                    </a>
+                                    <div tabindex="-1" role="menu" aria-hidden="true" class="rm-pointers dropdown-menu-lg dropdown-menu dropdown-menu-right">
+                                        <div class="dropdown-menu-header">
+                                            <div class="dropdown-menu-header-inner bg-info">
+                                                <div class="menu-header-image opacity-2" style="background-image: url('images/dropdown-header/city3.jpg');"></div>
+                                                <div class="menu-header-content text-start">
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <!-- Avatar Here-->
+                                                                @if (!string.IsNullOrWhiteSpace(ImgUrl))
+                                                                {
+                                                                    <img width="25" class="rounded-circle" src="@ImgUrl" alt="" />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <img width="25" class="rounded-circle" src="/images/page/dashboard/profile.png" alt="" />
+                                                                }
+                                                            </div>
+                                                            <AuthorizeView>
+                                                                <Authorized>
+                                                                    <div class="widget-content-left">
+                                                                        <div class="widget-heading">@context.User.FindFirst(ClaimTypes.Name).Value</div>
+                                                                        @*@context.User.Identity.Name*@
+                                                                        <div class="widget-subheading opacity-8">@userRole</div>
+                                                                    </div>
+                                                                </Authorized>
+                                                                <NotAuthorized>
+                                                                    <div class="widget-content-left">
+                                                                        <div class="widget-heading"> Not LogIn</div>
+                                                                        <div class="widget-subheading opacity-8">No role Available</div>
+                                                                    </div>
+                                                                </NotAuthorized>
+                                                            </AuthorizeView>
+                                                            <div class="widget-content-right me-2">
+                                                                @*<NavLink href="javascript: void(0);" @onclick="Signout" style="z-index: 999999;">Mag work ka</NavLink>*@
+                                                                @*<button @onclick="(() => Signout())">testbutton</button>*@
+                                                                <button @onclick="(() => Signout())" class="btn-pill btn-shadow btn-shine btn btn-focus">Logout</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="scroll-area-xs" style="height: 200px;">
+                                            <div class="scrollbar-container ps">
+                                                <ul class="nav flex-column">
+                                                    <li class="nav-item-header nav-item">Activity</li>
+                                                    @if (isCompany && (userRole == HRMSv4.Shared.Audit.RoleConstants.JobProviderRole || userRole == HRMSv4.Shared.Audit.RoleConstants.DefaultRole))
+                                                    {
+
+                                                        <li class="nav-item">
+                                                            <a href="javascript:void(0);" @onclick="ShowModalV2" class="nav-link">
+                                                                <i class="nav-link-icon pe-7s-config"></i>
+                                                                <span>System parameters</span>
+                                                            </a>
+                                                        </li>
+
+                                                        @*                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="ShowModal" class="nav-link">
+                                                    <i class="nav-link-icon pe-7s-config"></i>
+                                                    <span>System parameters</span>
+                                                    </a>
+                                                    </li>*@
+
+
+                                                        <li class="nav-item">
+                                                            <a href="javascript:void(0);" @onclick="() => HrPolicy()" class="nav-link">
+                                                                <i class="nav-link-icon pe-7s-bookmarks"></i>
+                                                                <span>Human Resource Policy</span>
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    else if (userRole == HRMSv4.Shared.Audit.RoleConstants.DefaultSuperAdmin)
+                                                    {
+
+                                                        <li class="nav-item">
+                                                            <a href="javascript:void(0);" @onclick="ShowModal" class="nav-link">
+                                                                <i class="nav-link-icon pe-7s-config"></i>
+                                                                <span>System parameters</span>
+                                                            </a>
+                                                        </li>
+
+
+                                                        <li class="nav-item">
+                                                            <a href="javascript:void(0);" @onclick="() => HrPolicy()" class="nav-link">
+                                                                <i class="nav-link-icon pe-7s-bookmarks"></i>
+                                                                <span>Human Resource Policy</span>
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    <li class="nav-item">
+                                                        <a href="javascript:void(0);" @onclick="() => ChangePassword()" class="nav-link">
+                                                            <i class="nav-link-icon pe-7s-unlock"></i>
+                                                            <span>Change Password</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item-divider mb-0 nav-item"></li>
+                                        </ul>
+                                        <div class="grid-menu grid-menu-2col">
+                                            <div class="g-0 row">
+                                                <div class="col-sm-6 pl-4">
+                                                    <button @onclick="@(()=>_navigation.NavigateTo("/Mailbox"))" class="btn-icon-vertical btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-warning">
+                                                        <i class="pe-7s-chat icon-gradient bg-amy-crisp btn-icon-wrapper mb-2"></i>
+                                                        Message Inbox
+                                                    </button>
+                                                </div>
+                                                <div class="col-sm-6 pr-4">
+                                                    <button class="btn-icon-vertical btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-danger">
+                                                        <i class="pe-7s-ticket icon-gradient bg-love-kiss btn-icon-wrapper mb-2"></i>
+                                                        <b>Support Tickets</b>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>
+    <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+        <div class="mobile-header-wrapper-inner">
+            <div class="mobile-header-content-area">
+                <div class="perfect-scroll">
+                    <div class="mobile-search mobile-header-border mb-30">
+                        <form action="#">
+                            <input type="text" placeholder="Search…"><i class="fi-rr-search"></i>
+                        </form>
+                    </div>
+                    <div class="mobile-menu-wrap mobile-header-border">
+                        <!-- mobile menu start-->
+                        <nav>
+                            <ul class="main-menu">
+                                <li>
+                                    <a class="dashboard2 active" href="/dashboard/administrator"><img src="images/page/dashboard/dashboard.svg" alt="PrimeHR"><span class="name">Dashboard</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-staffing-list"><img src="images/page/dashboard/candidates.svg" alt="PrimeHR"><span class="name">Recruitment</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-paperevaluation"><img src="images/page/dashboard/recruiters.svg" alt="PrimeHR"><span class="name">Selection</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/placement-newemployees"><img src="images/page/dashboard/jobs.svg" alt="PrimeHR"><span class="name">Placement</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-paperevaluation"><img src="images/page/dashboard/tasks.svg" alt="PrimeHR"><span class="name">Learning and Development</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="#"><img src="images/page/dashboard/profiles.svg" alt="PrimeHR"><span class="name">Performance Management</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-noticestepincr"><img src="images/page/dashboard/cv-manage.svg" alt="PrimeHR"><span class="name">Rewards and Recognition</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/masterdata-employee"><img src="images/page/dashboard/settings.svg" alt="PrimeHR"><span class="name">HR Management</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/tk-employeeschedules"><img src="images/page/dashboard/authentication.svg" alt="PrimeHR"><span class="name">Time keeping</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-payrolldate"><img src="images/page/dashboard/candidates.svg" alt="PrimeHR"><span class="name">Payroll</span></a>
+                                </li>
+                                <li>
+                                    <a class="dashboard2" href="/module-paperevaluation"><img src="images/page/dashboard/logout.svg" alt="PrimeHR"><span class="name">Reports</span></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="mobile-account">
+                        <h6 class="mb-10">Your Account</h6>
+                        <ul class="mobile-menu font-heading">
+                            <li><a href="#">Profile</a></li>
+                            <li><a href="#">Work Preferences</a></li>
+                            <li><a href="#">Account Settings</a></li>
+                            <li><a href="page-signin.html">Sign Out</a></li>
+                        </ul>
+                        <div class="mb-15 mt-15"> <a class="primehr-btn btn-default icon-edit hover-up" href="post-job.html">Post Job</a></div>
+                    </div>
+                    <div class="site-copyright">Copyright 2022 &copy; PrimeHR. <br>Designed by Nspire.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</CascadingValue>
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    private string userRole { get; set; }
+    private string ImgUrl { get; set; }
+
+    private bool _hideTextLogo { get; set; } = true;
+
+    private string? CurrUrl = null;
+    private string? CurrAbsoluteUrl = null;
+    private string userId = string.Empty;
+    private string keyword = string.Empty;
+    private bool isCompany = false;
+
+    private int NotificationCount { get; set; } = 0;
+
+    private string theTime;
+    Timer aTimer;
+
+    public HRMSv4.Shared.OnBoarding.SystemParameterViewModel parameterModel = new HRMSv4.Shared.OnBoarding.SystemParameterViewModel();
+    private HRMSv4.Client.Shared.Modals.ProfileModal compModal = new HRMSv4.Client.Shared.Modals.ProfileModal();
+    List<HRMSv4.Shared.Notification.NoticeHistoryLog> _nofication = new List<HRMSv4.Shared.Notification.NoticeHistoryLog>();
+
+    static public bool isImageExists(int empId, string fileName)
+    {
+        bool result = false;
+
+        var imgLocation = Path.Combine("Uploads/Employees", "Avatar");
+
+        var pathToSave = Path.Combine(imgLocation, Convert.ToString(empId));
+
+        if (File.Exists(pathToSave + "/" + fileName))
+        {
+            result = true;
+        }
+        else
+        {
+            result = false;
+        }
+        return result;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string paramId = string.Empty;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+        var EmpIdEncrypt = await localStorage.GetItemAsync<string>(">>redd");
+
+        HubConnection.On<SignalRCarrier>("RequestProfileUpdate", async survey =>
+        {
+            NotificationCount = NotificationCount + 1;
+            StateHasChanged();
+        });
+
+        string isGender = user.FindFirst(c => c.Type.Contains("gender"))?.Value;
+
+        if (!string.IsNullOrWhiteSpace(await localStorage.GetItemAsync<string>(">>redd")))
+        {
+            if (!string.IsNullOrWhiteSpace(EmpIdEncrypt))
+            {
+                paramId = _crypto.ConvertHexToString(EmpIdEncrypt, System.Text.Encoding.Unicode);
+            }
+
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                if (isGender == "FEMALE")
+                {
+                    ImgUrl = "images/avatars/avatar_women_gray.svg";
+                }
+                else
+                {
+                    ImgUrl = "images/avatars/default-avatar-grey.png";
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(paramId))
+                {
+                    if (isImageExists(int.Parse(paramId), LoginAvatar))
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                    else
+                    {
+                        ImgUrl = "Uploads/Employees/Avatar/" + int.Parse(paramId) + "/" + LoginAvatar;
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(LoginAvatar))
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                    else
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                if (isGender == "FEMALE")
+                {
+                    ImgUrl = "images/avatars/avatar_women_gray.svg";
+                }
+                else
+                {
+                    ImgUrl = "images/avatars/default-avatar-grey.png";
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(paramId))
+                {
+                    if (isImageExists(int.Parse(paramId), LoginAvatar))
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                    else
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(LoginAvatar))
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(isGender))
+                        {
+                            if (isGender.ToLower() == "male")
+                            {
+                                ImgUrl = "images/avatars/default-avatar.png";
+                            }
+                            else
+                            {
+                                ImgUrl = "images/avatars/avatar_women_white.svg";
+                            }
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/default-avatar-grey.png";
+                        }
+                    }
+                }
+            }
+        }
+
+        userRole = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        CurrUrl = _navigation.Uri.ToString();
+        CurrAbsoluteUrl = _navigation.ToAbsoluteUri(CurrUrl).ToString();
+
+        //aTimer = new Timer(Tick, null, 0, 1000);
+        if (userRole.ToLower() != "job seeker" && userRole.ToLower() != "employee")
+        {
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            parameterModel = new SystemParameterViewModel();
+            parameterModel = await companyService.Get(userId);
+
+            isCompany = parameterModel.IsCompany.HasValue ? parameterModel.IsCompany.Value : false;
+
+            if (isCompany && (parameterModel.PsgcCode == null || parameterModel.PsgcCode == ""))
+            {
+                await ShowModal();
+            }
+        }
+
+
+        this.StateHasChanged();
+    }
+
+    private void HandleclickTextLogo()
+    {
+        if (!_hideTextLogo)
+        {
+            _hideTextLogo = true;
+        }
+        else
+        {
+            _hideTextLogo = false;
+        }
+        StateHasChanged();
+    }
+
+    private void Tick(object _)
+    {
+        theTime = DateTime.Now.ToLongTimeString();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        HubConnection.Remove("RequestProfileUpdate");
+        aTimer?.Dispose();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            _navigation.NavigateTo("/");
+        }
+    }
+
+    async Task ShowNotification()
+    {
+        /* Get List of Notificaiton */
+        /* May error please check */
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        //_nofication = await _header.NotificationList(0);
+
+        StateHasChanged();
+    }
+
+    async Task Signout()
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you leaving?",
+                Text = "Are you sure want to log out? All your unsaved data will be lost.",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            await _authInterfaceService.Logout(userId);
+        }
+    }
+
+    async Task ShowModal()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+
+        var resultForm = Modal.Show<ProfileModal>("Company Profile", options);
+
+        var result = await resultForm.Result;
+
+        await UpdateCompanyAvatar();
+    }
+
+    async Task ShowModalV2()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+
+        var resultForm = Modal.Show<HRMSv4.Client.Shared.MainComponents.Profile.ProfileModalv2>("Company Profile", options);
+
+        var result = await resultForm.Result;
+
+        await UpdateCompanyAvatar();
+    }
+
+    void HrPolicy()
+    {
+        _navigation.NavigateTo("/policies");
+    }
+
+    void ChangePassword()
+    {
+        var parameters = new ModalParameters();
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.ChangePasswordModal.userId), userId);
+
+        Modal.Show<HRMSv4.Client.Shared.Modals.ChangePasswordModal>("Change Password", parameters, options);
+    }
+
+    void HandleKeyPress(KeyboardEventArgs args)
+    {
+        if (args.Key.Equals("Enter"))
+        {
+            _navigation.NavigateTo("/search?keyword=" + keyword);
+        }
+    }
+
+    void HandleCloseSearch()
+    {
+        switch (userRole)
+        {
+            case RoleConstants.DefaultRole:
+                _navigation.NavigateTo("dashboard-administrator");
+                break;
+            case RoleConstants.EmployeeRole:
+                _navigation.NavigateTo($"dashboard-employee/{userId}");
+                break;
+        }
+    }
+
+    async void EmpNavigation(MouseEventArgs e)
+    {
+        var beforeUrlEncoded = await localStorage.GetItemAsync<string>(">>redd");
+
+        if (!string.IsNullOrWhiteSpace(beforeUrlEncoded))
+        {
+            if (userRole == RoleConstants.EmployeeRole)
+            {
+                _navigation.NavigateTo($"/dashboard/employee/{beforeUrlEncoded}");
+
+            }
+            else
+            {
+                _navigation.NavigateTo($"/dashboard/applicant/{beforeUrlEncoded}");
+            }
+        }
+    }
+
+    public async void UpdateAvatar()
+    {
+        string paramId = string.Empty;
+
+        //localStorage.SetItem("arvin", value);
+
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+        var EmpIdEncrypt = await localStorage.GetItemAsync<string>(">>redd");
+
+        if (!string.IsNullOrWhiteSpace(EmpIdEncrypt))
+        {
+            //string DecodedUrl = string.Empty;
+            //string replacement = "ItIsSlashReplacement";
+            //DecodedUrl = EmpIdEncrypt.Replace(replacement, "/");
+
+            paramId = _crypto.ConvertHexToString(EmpIdEncrypt, System.Text.Encoding.Unicode);
+            //await Crypto.DecryptAsync(DecodedUrl);
+        }
+
+        //string DecodeImg = await Crypto.DecryptAsync(ImgEncrypt);
+
+        if (!string.IsNullOrWhiteSpace(LoginAvatar))
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                ImgUrl = "images/avatars/" + LoginAvatar;
+            }
+            else
+            {
+                ImgUrl = "Uploads/Employees/Avatar/" + int.Parse(paramId) + "/" + LoginAvatar;
+            }
+            /* Note that the following line is necessary because otherwise
+            Blazor would not recognize the state change and not refresh the UI */
+            await InvokeAsync(() =>
+              {
+                  StateHasChanged();
+              });
+        }
+    }
+
+    public async Task UpdateCompanyAvatar()
+    {
+        string paramId = string.Empty;
+
+
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+
+        //string DecodeImg = await Crypto.DecryptAsync(ImgEncrypt);
+
+        if (!string.IsNullOrWhiteSpace(LoginAvatar))
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                ImgUrl = "images/avatars/" + LoginAvatar;
+            }
+            else
+            {
+                ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+            }
+            /* Note that the following line is necessary because otherwise
+            Blazor would not recognize the state change and not refresh the UI */
+            await InvokeAsync(() =>
+              {
+                  StateHasChanged();
+              });
+        }
+    }
+}
+

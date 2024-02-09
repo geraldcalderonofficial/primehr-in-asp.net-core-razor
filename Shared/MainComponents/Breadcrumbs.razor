@@ -1,0 +1,109 @@
+﻿@inject NavigationManager NavigationManager
+@using HRMSv4.Client.Shared.Modals
+@using Radzen
+@using Radzen.Blazor
+<div class="app-page-title app-page-title-simple">
+    <div class="page-title-wrapper">
+        <div class="col-md-12 p-2">
+            <RadzenHeading Icon="accessible" Size="H4" Text="@HeaderText" Class="mb-2" />
+            <RadzenBreadCrumb class="page-title-subheading opacity-10" itemref="_items">
+                <div class="row">
+                    <RadzenBreadCrumbItem Icon="home" Path="/" Text="Home" Style="width: unset !important;" />
+                    <RadzenBreadCrumbItem Path="@("/" + Path)" Text="@Text" Style="width: unset !important;" />
+                </div>
+            </RadzenBreadCrumb>
+        </div>
+
+        <div class="page-title-actions">
+            @if (CurrAbsoluteUrl.Contains("masterdata-employee"))
+            {
+                //data-bs-toggle="modal" data-bs-target="#employeeModal"
+                @*                <button type="button" class="btn btn-dark" title="Add new employee" @onclick="@(() => Modal.Show<EmployeeModal>("New Employee"))">
+                    <i class="fa fa-users"></i> + New Applicant
+                    </button>*@
+            }
+            else if (CurrAbsoluteUrl.Contains("module-plantilla"))
+            {
+                @*<div class="page-title-actions">
+
+                    <div class="d-inline-block dropdown">
+                        <button type="button" aria-haspopup="true" aria-expanded="false"
+                            data-bs-toggle="dropdown" class="mb-2 me-2 dropdown-toggle btn btn-primary">
+                            Menu
+                        </button>
+                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu-lg dropdown-menu">
+                            <div class="grid-menu grid-menu-2col">
+                                <div class="g-0 row">
+                                    <div class="col-sm-6 col-xl-6">
+                                        <button class="btn-icon-vertical btn-transition btn btn-outline-primary" @onclick="@(()=>Modal.Show<ScrapBuildPlantillaModal>("Scrap and Build Plantilla Item"))">
+                                            <i class="pe-7s-note2 btn-icon-wrapper"></i>
+                                            Scrap and build
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-6">
+                                        <button class="btn-icon-vertical btn-transition btn btn-outline-primary" @onclick="@(()=>Modal.Show<RequestAppointmentModal>("Request Appointment"))">
+                                            <i class="pe-7s-upload btn-icon-wrapper"></i>
+                                            Request Appointment
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-6">
+                                        <button class="btn-icon-vertical btn-transition btn btn-outline-primary" @onclick="@(()=>Modal.Show<OpenJobVacancyModal>("Open Job Vacancy"))">
+                                            <i class="pe-7s-id btn-icon-wrapper"></i>
+                                            Open Job Vacancy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+            }
+            else
+            {
+
+            }
+        </div>
+    </div>
+</div>
+@code {
+    /// Title
+    [Parameter]
+    public string HeaderText { get; set; }
+
+    /// Title
+    [Parameter]
+    public string Text { get; set; }
+
+    /// An optional Link to be rendendered
+    [Parameter]
+    public string Path { get; set; }
+
+    /// An optional Icon to be rendered
+    [Parameter]
+    public string Icon { get; set; }
+
+   // private List<RadzenBreadCrumb> _items = new List<RadzenBreadCrumb>
+   //   {
+   //   new RadzenBreadCrumbItem(),
+   //   new RadzenBreadCrumbItem(),
+   //   new RadzenBreadCrumbItem()
+   //};
+
+    private string? CurrUrl = null;
+    private string? CurrAbsoluteUrl = null;
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CurrUrl = NavigationManager.Uri.ToString();
+        CurrAbsoluteUrl = NavigationManager.ToAbsoluteUri(CurrUrl).ToString();
+        //Console.WriteLine("Your currenly here : " + CurrAbsoluteUrl);
+    }
+
+    void employeeModal()
+    {
+        var options = new ModalOptions { ContentScrollable = true };
+        Modal.Show<HRMSv4.Client.Shared.Modals.EmployeeModals.EmployeeModal>("New Employee", options);
+    }
+}

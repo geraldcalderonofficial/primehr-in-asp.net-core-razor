@@ -1,0 +1,47 @@
+﻿<h3>SlidingMenuBox</h3>
+
+<style>
+    .menu {
+        position: fixed;
+        top: 4.3em;
+        height: 87.5vh;
+        right: -400px;
+        width: 400px;
+        background-color: #212529;
+        transition: right 0.6s;
+        z-index: 10;
+    }
+
+        .menu.open {
+            right: 0;
+        }
+
+    .containter {
+        width: 100%;
+        padding-right: 1rem;
+        padding-left: 1rem;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 1rem;
+    }
+
+    .main-content {
+        display: inline-block;
+        curs or: pointer;
+        padding: 2px;
+        margin-right: 3px;
+        mar gin-left: 3px;
+        font -weight: bold;
+    }
+</style>
+
+<div id="menubox" class="menu scrollbar-container ps @(isOpen)">
+    <div class="container">
+        @*insert details here*@
+    </div>
+
+</div>
+
+@code {
+    string isOpen = "";//put string open to show and empty string to hide
+}

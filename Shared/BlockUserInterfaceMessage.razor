@@ -1,0 +1,23 @@
+﻿@using HRMSv4.Client.Service.BlockUIService
+
+
+@inject IBlockInternalService InternalService
+
+<div id="@_id" style="display: none;">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private readonly string _id = $"BlockUIMessage-{Guid.NewGuid():N}";
+
+    protected override void OnInitialized()
+    {
+        InternalService.Add(Name, _id);
+    }
+}

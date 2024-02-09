@@ -1,0 +1,14 @@
+﻿@using HRMSv4.Client.Service.BlockUIService
+
+@inject IBlockUserInterfaceService Service
+<div id="@Service.ElementId">
+    @ChildContent
+</div>
+
+@code {
+    private string _elementId = $"BlockUI-{Guid.NewGuid():N}";
+    private bool _block = false;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

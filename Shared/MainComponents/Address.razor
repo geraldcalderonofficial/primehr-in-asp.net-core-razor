@@ -1,0 +1,331 @@
+﻿@page "/CascadingDropdown"
+@using HRMSv4.Shared.Address
+@using System.Web.Mvc
+@inject IAddress _address
+
+
+@if (isRow)
+{
+    <div class="col-md-12">
+        <EditForm Model="@CascadingDropdown">
+            <div class="card">
+     
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-md-4">
+
+                            <label for="Region">Region</label>
+                            <InputSelect id="Region" class="form-control" ValueExpression="@(() => CascadingDropdown.RegCode)" Value="@CascadingDropdown.RegCode" ValueChanged="@((string value) => OnRegionChange(value))">
+                                @foreach (var reg in CascadingDropdown.ListofRegions)
+                                {
+                                    <option value="@reg.Value">@reg.Text</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => CascadingDropdown.RegCode)" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="Province">Province</label>
+                            <InputSelect id="Province" class="form-control" ValueExpression="@(() => CascadingDropdown.ProvCode)" Value="@CascadingDropdown.ProvCode" ValueChanged="@((string value) => OnProvinceChange(value))">
+
+                                @if (CascadingDropdown.ListofProvince != null)
+                                {
+                                    @foreach (var state in CascadingDropdown.ListofProvince)
+                                    {
+                                        <option value="@state.Value">@state.Text</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => CascadingDropdown.ProvCode)" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="City">City</label>
+                            <InputSelect id="City" class="form-control" ValueExpression="@(() => CascadingDropdown.CityCode)" Value="@CascadingDropdown.CityCode" ValueChanged="@((string value) => OnCityChange(value))">
+
+                                @if (CascadingDropdown.ListofCities != null)
+                                {
+                                    @foreach (var state in CascadingDropdown.ListofCities)
+                                    {
+                                        <option value="@state.Value">@state.Text</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => CascadingDropdown.BrgyCode)" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="Barangay">Barangay</label>
+                            <InputSelect id="Barangay" class="form-control" ValueExpression="@(() => CascadingDropdown.BrgyCode)" Value="@CascadingDropdown.BrgyCode" ValueChanged="@((string value) => OnBarangayChange(value))">
+
+                                @if (CascadingDropdown.ListofBarangay != null)
+                                {
+                                    @foreach (var state in CascadingDropdown.ListofBarangay)
+                                    {
+                                        <option value="@state.Value">@state.Text</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => CascadingDropdown.BrgyCode)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+else
+{
+    <div class="col-md-12">
+        <EditForm Model="@CascadingDropdown">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group col-md-4">
+                        <label for="Region">Region</label>
+                        <InputSelect id="Region" class="form-control" ValueExpression="@(() => CascadingDropdown.RegCode)" Value="@CascadingDropdown.RegCode" ValueChanged="@((string value) => OnRegionChange(value))">
+                            @foreach (var reg in CascadingDropdown.ListofRegions)
+                            {
+                                <option value="@reg.Value">@reg.Text</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => CascadingDropdown.RegCode)" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="Province">Province</label>
+                        <InputSelect id="Province" class="form-control" ValueExpression="@(() => CascadingDropdown.ProvCode)" Value="@CascadingDropdown.ProvCode" ValueChanged="@((string value) => OnProvinceChange(value))">
+
+                            @if (CascadingDropdown.ListofProvince != null)
+                            {
+                                @foreach (var state in CascadingDropdown.ListofProvince)
+                                {
+                                    <option value="@state.Value">@state.Text</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => CascadingDropdown.ProvCode)" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="City">City</label>
+                        <InputSelect id="City" class="form-control" ValueExpression="@(() => CascadingDropdown.CityCode)" Value="@CascadingDropdown.CityCode" ValueChanged="@((string value) => OnCityChange(value))">
+
+                            @if (CascadingDropdown.ListofCities != null)
+                            {
+                                @foreach (var state in CascadingDropdown.ListofCities)
+                                {
+                                    <option value="@state.Value">@state.Text</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => CascadingDropdown.BrgyCode)" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="Barangay">Barangay</label>
+                        <InputSelect id="Barangay" class="form-control" ValueExpression="@(() => CascadingDropdown.BrgyCode)" Value="@CascadingDropdown.BrgyCode" ValueChanged="@((string value) => OnBarangayChange(value))">
+
+                            @if (CascadingDropdown.ListofBarangay != null)
+                            {
+                                @foreach (var state in CascadingDropdown.ListofBarangay)
+                                {
+                                    <option value="@state.Value">@state.Text</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => CascadingDropdown.BrgyCode)" />
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> RegionChanged { get; set; }
+    [Parameter]
+    public EventCallback<string> ProvinceChanged { get; set; }
+    [Parameter]
+    public EventCallback<string> CityChanged { get; set; }
+    [Parameter]
+    public EventCallback<string> BarangayChanged { get; set; }
+    //[Parameter]
+    public bool isRow { get; set; } = true;
+    protected PsgcCascadingDropdown CascadingDropdown { get; set; } = new PsgcCascadingDropdown();
+    [Parameter]
+    public string psgcCode { get; set; } = "";
+
+    protected override async void OnInitialized()
+    {
+        CascadingDropdown.ListofRegions = await _address.RegionList();
+        CascadingDropdown.RegCode = "";
+
+        if (psgcCode != "")
+        {
+            string reg = psgcCode.Substring(0, 2) + "00000000";
+            string prov = reg != "1300000000" ? psgcCode.Substring(0, 5) + "00000" : psgcCode.Substring(0, 5) + "0000";
+            string city = reg != "1300000000" ? psgcCode.Substring(0, 7) + "000" : psgcCode.Substring(0, 7) + "00";
+            string bgy = psgcCode;
+
+            if (reg != "00")
+            {
+                CascadingDropdown.RegCode = reg;
+                await OnRegionChange(CascadingDropdown.RegCode);
+                CascadingDropdown.ProvCode = prov;
+                await OnProvinceChange(CascadingDropdown.ProvCode);
+                CascadingDropdown.CityCode = city;
+                await OnCityChange(CascadingDropdown.CityCode);
+                CascadingDropdown.BrgyCode = bgy;
+
+                //string bgyCode = psgcCode.Substring(8, 10);
+
+                //if (bgyCode != "000")
+                //{
+
+                    await OnBarangayChange(CascadingDropdown.BrgyCode);
+
+                //}
+               
+                this.StateHasChanged();
+            }
+
+        }
+
+        //CascadingDropdown.ListofProvince = new List<SelectListItem>()
+        //    {
+        //        new SelectListItem()
+        //        {
+        //            Text = "Select",
+        //            Value = ""
+        //        }
+        //    };
+
+        //CascadingDropdown.ProvCode = "";
+
+        //CascadingDropdown.ListofProvince = new List<SelectListItem>()
+        //{
+        //    new SelectListItem()
+        //    {
+        //        Text = "Select",
+        //        Value = ""
+        //    }
+        //};
+
+        //await OnRegionChange(psgcCode);
+
+        this.StateHasChanged();
+    }
+
+    protected async void FormSubmitted()
+    {
+        var selectedCountry = CascadingDropdown.RegCode;
+        var selectedState = CascadingDropdown.ProvCode;
+        var selectCity = CascadingDropdown.CityCode;
+        var selectBarangay = CascadingDropdown.BrgyCode;
+    }
+
+    async Task OnRegionChange(string value)
+    {
+        if (value != null)
+        {
+            CascadingDropdown.RegCode = value.ToString();
+            CascadingDropdown.ProvCode = "";
+            CascadingDropdown.CityCode = "";
+            CascadingDropdown.BrgyCode = "";
+            CascadingDropdown.ListofProvince = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Text = "Select",
+                        Value = ""
+                    }
+                };
+            CascadingDropdown.ListofCities = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Text = "Select",
+                        Value = ""
+                    }
+                };
+
+            CascadingDropdown.ListofBarangay = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Text = "Select",
+                        Value = ""
+                    }
+                };
+
+            CascadingDropdown.ListofProvince = await _address.ProvinceList(CascadingDropdown.RegCode);
+
+            psgcCode = value;
+
+            this.StateHasChanged();
+        }
+        await RegionChanged.InvokeAsync(value.ToString());
+    }
+
+    async Task OnProvinceChange(string value)
+    {
+        if (value != null)
+        {
+            //CascadingDropdown.RegCode = "";
+            CascadingDropdown.ListofCities = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Text = "Select",
+                        Value = ""
+                    }
+                };
+
+            CascadingDropdown.ListofBarangay = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Text = "Select",
+                        Value = ""
+                    }
+                };
+
+            CascadingDropdown.ProvCode = value.ToString();
+            var provList =  await _address.CityList(CascadingDropdown.ProvCode);
+            CascadingDropdown.ListofCities = await _address.CityList(CascadingDropdown.ProvCode);
+
+            psgcCode = value;
+            this.StateHasChanged();
+        }
+        await ProvinceChanged.InvokeAsync(value.ToString());
+    }
+
+    async Task OnCityChange(string value)
+    {
+        if (value != null)
+            //CascadingDropdown.RegCode = "";
+            //CascadingDropdown.ProvCode = "";
+            CascadingDropdown.CityCode = value.ToString();
+        CascadingDropdown.ListofBarangay = await _address.BarangayList(CascadingDropdown.CityCode);
+
+        psgcCode = value;
+
+        this.StateHasChanged();
+        await CityChanged.InvokeAsync(value.ToString());
+    }
+
+    async Task OnBarangayChange(string value)
+    {
+        if (value != null)
+        {
+            CascadingDropdown.BrgyCode = value.ToString();
+
+            psgcCode = value;
+        }
+        await BarangayChanged.InvokeAsync(value.ToString());
+    }
+
+    /* Parent */
+    //<Address @bind-Password="regionCode" />
+    //@code
+    //{
+    //    private string regionCode;
+    //}
+}

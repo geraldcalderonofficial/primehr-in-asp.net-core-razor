@@ -1,0 +1,601 @@
+﻿@page "/"
+@using HRMSv4.Shared.Audit
+@layout EmptyLayout
+@inject IJSRuntime _js
+@inject IJobVacancies service
+@inject IJobCategory categoryService
+@inject IEmploymentStatus statusService
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IAuthenticationService _AuthenticationService;
+
+<style>
+    body {
+        overflow: auto;
+    }
+
+    #arvinHeader {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        background-color: transparent;
+        transition: all 0.4s ease;
+        z-index: 10 !important;
+    }
+
+        #arvinHeader.sticky {
+            background-color: #3f6ad8;
+            z-index: 10 !important;
+        }
+
+    .overlay2 {
+        background-color: #000 !important;
+        width: 100%;
+        height: 100%;
+        opacity: 0.7;
+        z-index: 2 !important;
+    }
+
+    .carousel-fade .carousel-item.active, .carousel-fade .carousel-item-next.carousel-item-start, .carousel-fade .carousel-item-prev.carousel-item-end {
+        z-index: 1;
+        opacity: 0.7 !important;
+    }
+
+    .carousel-caption2 {
+        position: absolute;
+        z-index: 99999;
+        bottom: 1.25rem;
+        left: 15%;
+        padding-top: 1.25rem;
+        /*padding-bottom: 1.25rem;*/
+        color: #fff;
+        text-align: center;
+        top: 50%;
+        color: #FFFFFF;
+    }
+
+    .utf_main_banner_area2 {
+        height: 100vh;
+        min-height: 550px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .utf_home_form_one2 {
+        margin-top: 20px;
+        background: rgba(255,255,255,0.2);
+        padding: 7px;
+        border-radius: 40px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .container2 {
+        width: 80%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .padd-0 {
+        padding: 0px;
+    }
+
+    .input-group-button {
+        border-top-right-radius: 22px;
+        border-bottom-right-radius: 22px;
+    }
+
+    .form-control-lg {
+        border-radius: 4.3rem;
+    }
+
+    .link {
+        color: #FFFFFF !important;
+    }
+
+    .overlay {
+        position: relative;
+        z-index: 0;
+    }
+
+        .overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: .6;
+            /* !!! */
+            z-index: -1;
+        }
+
+    .box {
+        height: 100vh;
+        min-height: 550px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-align: center;
+        color: white;
+        background-image: url('/images/slider1.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        border-bottom-width: 1px;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-right: 0.5rem;
+        height: 5.5rem;
+    }
+
+        .card-header.card-header-tab .card-header-title {
+            white-space: inherit;
+        }
+
+</style>
+<div   @ref="top" class="app-container app-theme-white body-tabs-shadow ">
+    <div class="app-header" id="arvinHeader">
+        @*style="position:sticky!important; top: 0;z-index: 10;"*@
+        <a href="javascript:void(0)" @onclick="(() => GoTop())">
+            <div class="app-header__logo">
+                <div class="logo-src">
+                    @*<img class="d-none d-sm-block" src="MainLayout/images/logo/PrimeHRLabel.svg" style="height: 50px; width: 150px; margin-left: 60px; margin-right: 15px;">*@
+                </div>
+                @*<span class="d-none d-sm-block" style="font-family:Courier; color:white; font-size: 30px; font-weight:600; margin-left: 60px;">PRIMEHR.PH</span>*@
+            </div>
+        </a>
+        <div class="app-header__mobile-menu">
+            <div>
+            </div>
+        </div>
+        <div class="app-header__menu">
+            <span>
+                <button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                    <span class="btn-icon-wrapper">
+                        <i class="fa fa-ellipsis-v fa-w-6"></i>
+                    </span>
+                </button>
+            </span>
+        </div>
+        <div class="app-header__content">
+            <div class="app-header-left">
+            </div>
+            <div class="app-header-right">
+                <ul class="header-megamenu nav font-change">
+                    <li class="nav-item">
+                        <a href="tel:0919-730-7006" class="nav-link link">
+                            <i class="nav-link-icon fa fa-phone link"></i>
+                            Call us now
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/login" class="nav-link link">
+                            <i class="nav-link-icon fa fa-lock link"></i>
+                            Login
+                        </a>
+                    </li>
+                    <li class="btn-group nav-item">
+                        <a href="/applicant" class="nav-link link" aria-expanded="false">
+                            <i class="nav-link-icon fa fa-user link"></i>
+                            Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="utf_main_banner_area2" style="background-image:url('/MainLayout/images/slider1.jpg'); background-repeat:no-repeat; background-size:cover" data-overlay="8">*@
+    <div class="box overlay">
+        <div class="container2">
+            <div class="col-md-8 col-sm-10">
+                <div class="caption cl-white home_two_slid">
+                    <h2>Search and apply for current job openings with <span class="theme-cl">NSPIRE</span></h2>
+                    <!-- <p>Trending Jobs Keywords: <span class="trending_key"><a href="#">Web Designer</a></span> <span class="trending_key"><a href="#">Web Developer</a></span> <span class="trending_key"><a href="#">IOS Developer</a></span> <span class="trending_key"><a href="#">Android Developer</a></span></p> -->
+                </div>
+                <form>
+                    <fieldset class="utf_home_form_one2 col-sm-12">
+                        <div class="col-md-12 col-sm-12 padd-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control-lg form-control" placeholder="Search..." style="border-radius:4.3rem,0,0,4.3rem !important" @bind-value="searchTxt" @onkeydown="@Enter" />
+                                <a style="width:80px;" type="button" class="btn btn-primary input-group-button" @onclick="async eventArgs => { await ScrollToView();}"><i class="mt-2 pe-7s-search"></i></a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+    <section @ref="_scrollToView"></section>
+    <div class="app-main__outer" style="margin: 50px;">
+        <section id="secBody" class="padd-top-80 padd-bot-80" mt-5>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-sm-5">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5 class="card-title">Filter</h5>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search..." @bind-value="searchTxt" @onkeydown="@Enter">
+                                    @*<input type="text" class="form-control" placeholder="Search..." @bind-value="searchTxt" @onkeydown="@Enter">*@
+
+                                    <a class="btn btn-link" href=""><i class="pe-7s-search" @onclick="Search"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="accordion" class="accordion-wrapper mb-3">
+                            <div class="card">
+                                <div id="headingOne" class="card-header mb-0">
+                                    <div class="card-header-title">
+                                        <h5 class="card-title">Employment Status</h5>
+                                    </div>
+                                    <div class="btn-actions-pane-right text-capitalize">
+                                        <button class="mb-2 me-2 btn-icon btn-icon-only btn-pill btn btn-sm btn-light" data-bs-toggle="collapse" data-bs-target="#collapseOne1">
+                                            <i class="fa fa-plus btn-icon-wrapper"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div data-parent="#accordion" id="collapseOne1" aria-labelledby="headingOne" class="collapse" style="">
+                                    <div class="card-body">
+                                        <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical"
+                                                               Change=@(args => OnChange(args, "RadioButtonList with items from data"))
+                                                               Data="@statusList" TextProperty="EmploymentStatusName" ValueProperty="EmploymentStatusId" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div id="headingZero" class="card-header mb-0">
+                                    <div class="card-header-title">
+                                        <h5 class="card-title">Job Categories</h5>
+                                    </div>
+                                    <div class="btn-actions-pane-right text-capitalize">
+                                        <button class="mb-2 me-2 btn-icon btn-icon-only btn-pill btn btn-sm btn-light" data-bs-toggle="collapse" data-bs-target="#collapseZero">
+                                            <i class="fa fa-plus btn-icon-wrapper"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div data-parent="#accordion" id="collapseZero" aria-labelledby="headingZero" class="collapse" style="">
+                                    <div class="card-body">
+                                        <RadzenRadioButtonList @bind-Value=@value2 TValue="int" Orientation="Orientation.Vertical"
+                                                               Change=@(args => OnChange2(args, "RadioButtonList with items from data"))
+                                                               Data="@jcList" TextProperty="Category" ValueProperty="JobCategoryId" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Start Job List -->
+                    <div class="col-md-9 col-sm-7">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-12 col-xs-12 browse_job_tlt">
+                                <h4 class="job_vacancie mt-2 ">@jobResults Jobs &amp; Vacancies</h4>
+                            </div>
+                            <div class="col-md-8 col-sm-12 col-xs-12 ">
+                                <div class="row float-end">
+                                    <div class="col-auto mt-2">
+                                    </div>
+
+                                    <div class="col-auto">
+                                        <select class="wide form-control">
+                                            <option value="5">5 Per Page</option>
+                                            <option value="10" selected>10 Per Page</option>
+                                            <option value="20">20 Per Page</option>
+                                            <option value="30">30 Per Page</option>
+                                            <option value="50">50 Per Page</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Single Verticle job -->
+                        <div class="job-verticle-list mt-3">
+                            <div class="row">
+                                <div class="col-lg-12 col-xg-12 col-sm-12 mx-auto">
+                                    @if (jobPosts.Jobs != null)
+                                    {
+                                        @if (jobPosts.Jobs.Count() > 0)
+                                        {
+                                            foreach (var item in jobPosts.Jobs)
+                                            {
+                                                <div class="mb-3 card">
+                                                    <div class="card-header-tab card-header">
+                                                        <div class="card-header-title font-size-lg text-capitalize fw-normal">
+                                                            <div class="widget-content p-0">
+                                                                <div class="widget-content-wrapper">
+                                                                    <div class="widget-content-left me-3">
+                                                                        <div class="widget-content-left">
+                                                                            <div class="font-icon-wrapper font-icon-lg">
+                                                                                <i class="pe-7s-portfolio icon-gradient bg-plum-plate"></i>
+                                                                            </div>
+                                                                            @*<i width="40" class="pe-7s-portfolio icon-gradient bg-happy-itmeo"></i>*@
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="widget-content-left flex2">
+                                                                        <div class="widget-heading">@item.Position</div>
+                                                                        <div class="widget-subheading opacity-7">@item.OrganizationalLevel</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="widget-right">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="pt-2 pb-0 card-body">
+                                                        <div class="row mb-3">
+                                                            <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                <ul class="todo-list-wrapper list-group list-group-flush">
+                                                                    <li class="list-group-item">
+                                                                        <div class="widget-content p-0">
+                                                                            @*<div class="widget-content-wrapper">*@
+                                                                            <div class="widget-content-left">
+                                                                                <div class="form-group row">
+                                                                                    <div class="col-sm-3 col-form-label widget-subheading">Plantilla Item:</div>
+                                                                                    <div class="col-sm-9 widget-heading mt-2">
+                                                                                        G58726
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <div class="col-sm-3 col-form-label widget-subheading">Status:</div>
+                                                                                    <div class="col-sm-9 widget-heading mt-2">
+                                                                                        @item.EmploymentStatus
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <div class="col-sm-3 col-form-label widget-subheading">Category</div>
+                                                                                    <div class="col-sm-9 widget-heading mt-2">
+                                                                                        @item.JobCategory
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="form-group row">
+                                                                                    <div class="col-sm-3 col-form-label widget-subheading"> Closing Date:</div>
+                                                                                    <div class="col-sm-9 widget-heading mt-2">
+                                                                                        @item.ClosingDate
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            @*</div>*@
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div class="col-lg-2 col-md-12 col-sm-12 text-center">
+                                                                <div class="">
+                                                                    <div class="p-1">
+                                                                        <button class="btn-icon-vertical btn-transition-text btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-primary w-100" @onclick="(args => Apply(item.JobVacancyId))">
+                                                                            Apply Now
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="p-1">
+                                                                        <button class="btn-icon-vertical btn-transition-text btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-secondary w-100" @onclick="(args => showJobDetail(item.JobVacancyId))">
+                                                                            View Job
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <label class="text-muted">
+                                                No available job vacancy.
+                                            </label>
+                                        }
+
+                                        <!-- START Pagination -->
+                                        <nav aria-label="Page navigation">
+                                            <ul class="pagination pagination-reset justify-content-center">
+                                                @if (jobPosts.PageCount > 1)
+                                                {
+                                                    <li class="@(jobPosts.CurrentPageIndex  == 1 ? "page-item disabled" : "page-item")">
+                                                        <a class="page-link" href="javascript:PreviousClick(@jobPosts.CurrentPageIndex);" tabindex="-1">Previous</a>
+                                                    </li>
+
+                                                    for (int i = 1; i <= jobPosts.PageCount; i++)
+                                                    {
+                                                        <li class="@(i == jobPosts.CurrentPageIndex ? "page-item active" : "page-item")">
+                                                            <a class="page-link" href="javascript:PagerClick(@i);">@i</a>
+                                                        </li>
+                                                    }
+                                                    <li class="@(jobPosts.CurrentPageIndex  == jobPosts.PageCount ? "page-item disabled" : "page-item")">
+                                                        <a class="page-link" href="javascript:NextClick(@jobPosts.CurrentPageIndex);" tabindex="-1">Next</a>
+                                                    </li>
+                                                }
+
+                                            </ul>
+                                        </nav>
+                                        <!-- END Pagination -->
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Row -->
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="app-wrapper-footer" style="background-image:url('/images/city_bg3.png'); background-position:bottom center; background-repeat:no-repeat; background-size:contain; height:240px">
+    <div class="app-footer">
+        <div class="app-footer-center" style="margin-top: 15px;">
+            <div class="text-center">
+                Copyright ©2022 Nspire, <a href="https://www.primehr.ph">PrimeHR v4</a> ®
+                @{
+                    Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                    <b>Build : @string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)</b>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    List<JobCategoryListview> jcList = new List<JobCategoryListview>();
+    IEnumerable<EmploymentStatusListview> statusList;
+    IEnumerable<JobVacancyListView> jvList;
+    JobPostingListView jobPosts = new JobPostingListView();
+    int pageIndex = 10;
+    int value = 0;
+    int value2 = 0;
+    string searchTxt = "";
+
+    int jobResults = 0;
+    private ElementReference top;
+    //protected override async void OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        jobPosts = await service.JobPosts(1, 0, 0, null, null);
+    //    }
+    //}
+
+    private ElementReference _scrollToView;
+    private async Task ScrollToView()
+    {
+        //await _scrollToView.ScrollToElementAsync();
+        var result = Task.Run(async () => await _scrollToView.ScrollToElementAsync()).IsCompleted;
+
+        jobPosts = await service.JobPosts(1, value, value2, null, searchTxt);
+        jobResults = jobPosts.Jobs.Count();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        jcList = await categoryService.GetFilter();
+        statusList = await statusService.GetFilter();
+        //jvList = await service.GetList("0");
+        jobPosts = await service.JobPosts(1, 0, 0, null, null);
+        jobResults = jobPosts.Jobs.Count();
+
+        /* If there is existing token then direct to login or dashboard */
+        var token = localStorage.GetItem<string>("authToken");
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                switch (role)
+                {
+                    case RoleConstants.DefaultRole or RoleConstants.JobProviderRole:
+                        _navigation.NavigateTo("/dashboard/administrator");
+                        break;
+                    case RoleConstants.EmployeeRole or RoleConstants.JobSeekerRole:
+
+                        var beforeUrlEncoded = localStorage.GetItem<string>(">>redd");
+                        if (!string.IsNullOrWhiteSpace(beforeUrlEncoded))
+                        {
+                            if (role == RoleConstants.EmployeeRole)
+                            {
+                                _navigation.NavigateTo($"/dashboard/employee/{beforeUrlEncoded}");
+                            }
+                            else
+                            {
+                                _navigation.NavigateTo($"/dashboard/applicant/{beforeUrlEncoded}");
+                            }
+                        }
+                        else
+                        {
+                            //localStorage.Clear();
+                        }
+                        break;
+                    default:
+                        _navigation.NavigateTo("/dashboard/super-admin");
+                        break;
+                }
+            }
+        }
+
+        _js.InvokeAsync<bool>("preventBack");
+    }
+
+    async void GoTop()
+    {
+        _navigation.NavigateTo("/", true);
+    }
+
+    async void OnChange(int? value, string name)
+    {
+        jobPosts = await service.JobPosts(1, value.Value, value2, null, searchTxt);
+        jobResults = jobPosts.Jobs.Count();
+        StateHasChanged();
+    }
+
+    async void OnChange2(int? value2, string name)
+    {
+        jobPosts = await service.JobPosts(1, value, value2.Value, null, searchTxt);
+        jobResults = jobPosts.Jobs.Count();
+        StateHasChanged();
+    }
+
+    async void PageIndex(string asd)
+    {
+        var a = asd;
+    }
+
+    async Task showJobDetail(int JobVacancyId)
+    {
+        string url = $"/job-detail/{JobVacancyId}";
+        await _js.InvokeAsync<object>("open", url, "_blank");
+    }
+
+    async void Apply(int jvId)
+    {
+        /* Encrypt jobId */
+        var jobId = _crypto.ConvertStringToHex(jvId.ToString(), System.Text.Encoding.Unicode);
+        //await Crypto.EncryptAsync(jvId.ToString());
+        localStorage.SetItem("jobId", jobId.ToString());
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userRole = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            _navigation.NavigateTo("/login");
+        }
+    }
+
+    async void Search()
+    {
+        jobPosts = await service.JobPosts(1, value, value2, null, searchTxt);
+        jobResults = jobPosts.Jobs.Count();
+        //_navigation.NavigateTo($"{_navigation.BaseUri}#secBody");
+        StateHasChanged();
+    }
+
+    public async void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            jobPosts = await service.JobPosts(1, value, value2, null, searchTxt);
+            jobResults = jobPosts.Jobs.Count();
+            StateHasChanged();
+        }
+    }
+
+
+
+}

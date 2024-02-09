@@ -1,0 +1,192 @@
+﻿@inherits LayoutComponentBase
+<!--<div class="app-container app-theme-white body-tabs-shadow">
+    <div class="app-container">
+        <div id="MainBg" class="h-100" style="background-image: url('/MainLayout/images/companybg.jpg'); background-size:cover">
+            <div class="d-flex h-100 justify-content-center align-items-center">
+                <div class="mx-auto app-login-box col-md-12">
+                      @Body 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+
+<style>
+    body {
+        background:#ffffff!important;
+    }
+
+    .main {
+        display: block;
+        margin-top: 0;
+    }
+
+    a {
+        color: #05264E !important;
+    }
+
+    .btn.btn-default {
+        color: #ffffff !important;
+        background-color: #05264E;
+        padding: 10px 25px;
+    }
+
+        .btn.btn-default:hover {
+            background-color: #3466aa;
+            transform: translateY(-2px);
+            transition: 0.2s;
+        }
+
+    ul.mobile-menu.font-heading {
+        padding-left: 0;
+    }
+
+    .footer .footer-bottom {
+        border-top: 1px solid #E0E6F7!important;
+        padding: 30px 0px;
+        color: #4F5E64;
+        font-size: 14px;
+    }
+</style>
+
+<link rel="stylesheet" href="/css/style.css" type="text/css" />
+
+<header class="header sticky-bar" style="background:transparent; border-bottom: none;">
+    <div class="container">
+        <div class="main-header">
+            <div class="header-left">
+                <div class="header-logo"><a class="d-flex" href="/test-home"><img alt="" src="images/primehr-logo.svg"></a></div>
+            </div>
+            <div class="header-nav">
+                <nav class="prime-nav-main-menu">
+                    <ul class="prime-main-menu">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li>
+                            <a href="#">Services</a>
+                            <ul class="sub-menu">
+                                <li><a href="#">Services 1</a></li>
+                                <li><a href="#">Services 2</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </nav>
+                <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>
+            </div>
+            <div class="header-right">
+                <div class="block-signin">
+                    <a class="text-link-bd-btom hover-up" href="/applicant">Register</a>
+                    <a class="btn btn-default btn-shadow ml-40 hover-up" href="/login">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-content-area">
+            <div class="perfect-scroll">
+                <div class="mobile-search mobile-header-border mb-30">
+                    <form action="#">
+                        <input type="text" placeholder="Search…"><i class="fi-rr-search"></i>
+                    </form>
+                </div>
+                <div class="mobile-menu-wrap mobile-header-border">
+                    <!-- mobile menu start-->
+                    <nav>
+                        <ul class="mobile-menu font-heading">
+                            <li>
+                                <a href="/test-home">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#">Services</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#">Services 1</a></li>
+                                    <li><a href="#">Services 2</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Contact Us</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="mobile-menu font-heading">
+                            <li><a href="/applicant">Register</a></li>
+                            <li><a href="/login">Login</a></li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-content-area">
+            <div class="perfect-scroll">
+                <div class="mobile-search mobile-header-border mb-30">
+                    <form>
+                        <input type="text" placeholder="Search…"><i class="fi-rr-search"></i>
+                    </form>
+                </div>
+                <div class="mobile-menu-wrap mobile-header-border">
+                    <!-- mobile menu start-->
+                    <nav>
+                        <ul class="mobile-menu font-heading">
+                            <li>
+                                <a href="/test-home">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#">Services</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#">Services 1</a></li>
+                                    <li><a href="#">Services 2</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Contact Us</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="mobile-menu font-heading">
+                            <li><a href="/applicant">Register</a></li>
+                            <li><a href="/login">Login</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<main class="main">
+    <section class="section-box mb-100">
+        @Body
+    </section>
+</main>
+<footer class="footer mt-0" style="background:transparent; border-top: none;">
+    <div class="container">
+        <div class="footer-bottom mt-50 border-0">
+            <div class="row">
+                <div class="col-md-6"><span class="font-xs color-text-paragraph">Copyright ©2023 Nspire, <a href="https://www.primehr.ph">PrimeHR v4</a> All Right Reserved</span></div>
+                <div class="col-md-6 text-md-end text-start">
+                    <div class="footer-social"><a class="font-xs color-text-paragraph" href="#">Privacy Policy</a><a class="font-xs color-text-paragraph mr-30 ml-30" href="#">Terms &amp; Conditions</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+@code {
+    
+}

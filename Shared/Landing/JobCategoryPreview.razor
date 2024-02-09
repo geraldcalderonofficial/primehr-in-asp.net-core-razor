@@ -1,0 +1,27 @@
+﻿@inject IJobCategory jobcategory
+
+@foreach (var item in categories)
+{
+    <div class="col-md-3 col-sm-6">
+        <a href="browse-job.html" title="">
+            <div class="utf_category_box_area">
+                <div class="utf_category_desc">
+                    <div class="utf_category_icon"> <i class="ti-briefcase" aria-hidden="true"></i> </div>
+                    <div class="category-detail utf_category_desc_text">
+                        <h4>@item.Category</h4>
+                        <p>@item.JobOpeningCount Jobs</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+}
+
+@code {
+    List<JobCategoryListview> categories = new List<JobCategoryListview>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await jobcategory.GetCategory();
+    }
+}

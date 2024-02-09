@@ -1,0 +1,213 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Pages\NewFolder\**" />
+    <Content Remove="Pages\NewFolder\**" />
+    <EmbeddedResource Remove="Pages\NewFolder\**" />
+    <None Remove="Pages\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\Scripts\jbox\main.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\armcharts5-script.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\charts\Animated.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\charts\index.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\charts\xy.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\jquery.circliful.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\magnific-popup.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\perfect-scrollbar.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\select2.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\swiper-bundle.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\plugins\waypoints.js" />
+    <Content Remove="wwwroot\Scripts\jbox\vendor\bootstrap.bundle.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\vendor\jquery-3.6.0.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\vendor\jquery-migrate-3.3.0.min.js" />
+    <Content Remove="wwwroot\Scripts\jbox\vendor\modernizr-3.6.0.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\armcharts5-script.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\charts\Animated.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\charts\index.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\charts\xy.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\jquery.circliful.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\magnific-popup.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\perfect-scrollbar.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\select2.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\swiper-bundle.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\plugins\waypoints.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\vendor\bootstrap.bundle.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\vendor\jquery-3.6.0.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\vendor\jquery-migrate-3.3.0.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\Scripts\jbox\vendor\modernizr-3.6.0.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Blazored.Modal" Version="6.0.1" />
+    <PackageReference Include="BlockUI.Blazor" Version="1.0.0" />
+    <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.3.0" />
+    <PackageReference Include="DevExpress.Blazor" Version="22.1.4" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="22.1.4" />
+    <PackageReference Include="EntityFrameworkCore.DataEncryption" Version="3.0.1" />
+    <PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
+    <PackageReference Include="Majorsoft.Blazor.Components.Common.JsInterop" Version="1.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="PSC.Blazor.Components.Chartjs" Version="6.0.12" />
+    <PackageReference Include="Quick.AspNetCore.Components.Web.Extensions" Version="6.0.2" />
+    <PackageReference Include="Radzen.Blazor" Version="4.3.5" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+    <PackageReference Include="Toolbelt.Blazor.HttpClientInterceptor" Version="10.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\HRMSv4.Shared.csproj" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <Content Update="Shared\Modals\EmployeeModals\EmployeeWorkExperienceModal.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="wwwroot\MainLayout\images\logo.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interface\Modules\" />
+    <Folder Include="Interface\Rsp\" />
+    <Folder Include="Pages\Payroll\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Service\Modules\" />
+    <Folder Include="wwwroot\Uploads\Employees\FaceImage\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
+    <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+    <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\README.md" />
+    <None Include="wwwroot\Scripts\chart.js" />
+    <None Include="wwwroot\Scripts\dx-analytics-core.min.js" />
+    <None Include="wwwroot\Scripts\dx-webdocumentviewer.min.js" />
+    <None Include="wwwroot\Scripts\dx.all.debug.js" />
+    <None Include="wwwroot\Scripts\dx.all.js" />
+    <None Include="wwwroot\Scripts\icons\dxicons.woff2" />
+    <None Include="wwwroot\Scripts\icons\dxiconsios.woff2" />
+    <None Include="wwwroot\Scripts\icons\dxiconsmaterial.woff2" />
+    <None Include="wwwroot\Scripts\index.js" />
+    <None Include="wwwroot\Scripts\jbox\.DS_Store" />
+    <None Include="wwwroot\Scripts\jbox\armcharts5-script.js" />
+    <None Include="wwwroot\Scripts\jbox\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\Scripts\jbox\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\Scripts\jbox\charts\.DS_Store" />
+    <None Include="wwwroot\Scripts\jbox\charts\Animated.js" />
+    <None Include="wwwroot\Scripts\jbox\charts\index.js" />
+    <None Include="wwwroot\Scripts\jbox\charts\xy.js" />
+    <None Include="wwwroot\Scripts\jbox\counterup.js" />
+    <None Include="wwwroot\Scripts\jbox\custom-parallax.js" />
+    <None Include="wwwroot\Scripts\jbox\images-loaded.js" />
+    <None Include="wwwroot\Scripts\jbox\isotope.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery-3.6.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery-migrate-3.3.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery-ui.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.circliful.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.countdown.min.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.elevatezoom.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.syotimer.min.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.theia.sticky.js" />
+    <None Include="wwwroot\Scripts\jbox\jquery.vticker-min.js" />
+    <None Include="wwwroot\Scripts\jbox\leaflet.js" />
+    <None Include="wwwroot\Scripts\jbox\magnific-popup.js" />
+    <None Include="wwwroot\Scripts\jbox\main-admin.js" />
+    <None Include="wwwroot\Scripts\jbox\main.js" />
+    <None Include="wwwroot\Scripts\jbox\modernizr-3.6.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\perfect-scrollbar.js" />
+    <None Include="wwwroot\Scripts\jbox\perfect-scrollbar.min.js" />
+    <None Include="wwwroot\Scripts\jbox\perfect-scrollbar.min.js.map" />
+    <None Include="wwwroot\Scripts\jbox\plugins\armcharts5-script.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\charts\Animated.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\charts\index.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\charts\xy.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\jquery.circliful.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\magnific-popup.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\perfect-scrollbar.min.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\select2.min.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\swiper-bundle.min.js" />
+    <None Include="wwwroot\Scripts\jbox\plugins\waypoints.js" />
+    <None Include="wwwroot\Scripts\jbox\scrollup.js" />
+    <None Include="wwwroot\Scripts\jbox\select2.min.js" />
+    <None Include="wwwroot\Scripts\jbox\slick.js" />
+    <None Include="wwwroot\Scripts\jbox\swiper-bundle.min.js" />
+    <None Include="wwwroot\Scripts\jbox\TweenMax.min.js" />
+    <None Include="wwwroot\Scripts\jbox\vendor\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\Scripts\jbox\vendor\jquery-3.6.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\vendor\jquery-migrate-3.3.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\vendor\modernizr-3.6.0.min.js" />
+    <None Include="wwwroot\Scripts\jbox\waypoints.js" />
+    <None Include="wwwroot\Scripts\jbox\wow.js" />
+    <None Include="wwwroot\Scripts\jquery-ui.min.js" />
+    <None Include="wwwroot\Scripts\js\app.js" />
+    <None Include="wwwroot\Scripts\js\blockui.js" />
+    <None Include="wwwroot\Scripts\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\Scripts\js\calendar.js" />
+    <None Include="wwwroot\Scripts\js\carousel-slider.js" />
+    <None Include="wwwroot\Scripts\js\charts\apex-charts.js" />
+    <None Include="wwwroot\Scripts\js\charts\apex-series.js" />
+    <None Include="wwwroot\Scripts\js\charts\chartjs.js" />
+    <None Include="wwwroot\Scripts\js\charts\charts-sparklines.js" />
+    <None Include="wwwroot\Scripts\js\charts\chartsjs-utils.js" />
+    <None Include="wwwroot\Scripts\js\circle-progress.js" />
+    <None Include="wwwroot\Scripts\js\clickAndPositionHandler.js" />
+    <None Include="wwwroot\Scripts\js\count-up.js" />
+    <None Include="wwwroot\Scripts\js\demo.js" />
+    <None Include="wwwroot\Scripts\js\form-components\clipboard.js" />
+    <None Include="wwwroot\Scripts\js\form-components\datepicker.js" />
+    <None Include="wwwroot\Scripts\js\form-components\form-validation.js" />
+    <None Include="wwwroot\Scripts\js\form-components\form-wizard.js" />
+    <None Include="wwwroot\Scripts\js\form-components\input-mask.js" />
+    <None Include="wwwroot\Scripts\js\form-components\input-select.js" />
+    <None Include="wwwroot\Scripts\js\form-components\range-slider.js" />
+    <None Include="wwwroot\Scripts\js\form-components\textarea-autosize.js" />
+    <None Include="wwwroot\Scripts\js\form-components\toggle-switch.js" />
+    <None Include="wwwroot\Scripts\js\form-wizard.js" />
+    <None Include="wwwroot\Scripts\js\guided-tours.js" />
+    <None Include="wwwroot\Scripts\js\image-crop.js" />
+    <None Include="wwwroot\Scripts\js\jquery.blockUI.js" />
+    <None Include="wwwroot\Scripts\js\jquery.min.js" />
+    <None Include="wwwroot\Scripts\js\jquery.smartWizard.min.js" />
+    <None Include="wwwroot\Scripts\js\ladda-loading.js" />
+    <None Include="wwwroot\Scripts\js\maps.js" />
+    <None Include="wwwroot\Scripts\js\metisMenu.js" />
+    <None Include="wwwroot\Scripts\js\perfect-scrollbar.js" />
+    <None Include="wwwroot\Scripts\js\rating.js" />
+    <None Include="wwwroot\Scripts\js\Script.js" />
+    <None Include="wwwroot\Scripts\js\scrollbar.js" />
+    <None Include="wwwroot\Scripts\js\sticky-elements.js" />
+    <None Include="wwwroot\Scripts\js\sweet-alerts.js" />
+    <None Include="wwwroot\Scripts\js\tables.js" />
+    <None Include="wwwroot\Scripts\js\toastr.js" />
+    <None Include="wwwroot\Scripts\js\treeview.js" />
+    <None Include="wwwroot\Scripts\knockout-latest.debug.js" />
+    <None Include="wwwroot\Scripts\knockout-latest.js" />
+    <None Include="wwwroot\Scripts\script.js" />
+  </ItemGroup>
+
+</Project>

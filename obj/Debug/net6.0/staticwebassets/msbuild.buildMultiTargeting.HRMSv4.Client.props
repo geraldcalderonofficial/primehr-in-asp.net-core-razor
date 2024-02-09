@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\HRMSv4.Client.props" />
+</Project>

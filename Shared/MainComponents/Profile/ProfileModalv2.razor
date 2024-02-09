@@ -1,0 +1,666 @@
+﻿@using DevExpress.Blazor
+@inject ICompanyProfile companyService
+@inject IAddress PsgcAddress
+@inject ILevel levelService
+@inject IRecruitmentPlan recruitmentPlanService
+
+<style>
+    .blazored-modal {
+        display: flex;
+        z-index: 102;
+        flex-direction: column;
+        background-color: #fff;
+        border-radius: 4px;
+        border: 1px solid #fff;
+        padding: 1.5rem;
+        box-shadow: 0 2px 2px rgb(0 0 0 / 25%);
+        height: 600px;
+        width: 1000px;
+    }
+
+</style>
+
+<!-- formwizard-modal3 -->
+<div class="">
+    <Wizard Id="MainWiz">
+        <div class="row">
+            <WizardStep Name="First Step">
+                <div id="step-122">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Company Name</label>
+                                    <DxTextBox CssClass="cw-320" NullText="Enter company name" @bind-Text="parameterModel.CompanyName" SizeMode="SizeMode.Medium" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Telephone No.</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="(000) 000-0000" @bind-Value="parameterModel.CompanyTelephone" SizeMode="SizeMode.Medium" NullText="(000) 000-0000" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Cellphone No.</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="(000) 000-0000" @bind-Value="parameterModel.CompanyCellphone" SizeMode="SizeMode.Medium" NullText="(000) 000-0000" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">SSS No.</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="00-0000000-0" @bind-Value="parameterModel.SssNo" SizeMode="SizeMode.Medium" NullText="00-0000000-0" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Philhealth No.</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="00-000000000-0" @bind-Value="parameterModel.PhilhealthNo" SizeMode="SizeMode.Medium" NullText="00-000000000-0" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">TIN</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="000-000-000-000" @bind-Value="parameterModel.TinNo" SizeMode="SizeMode.Medium" NullText="000-000-000-000" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Bank Account</label>
+                                    <DxMaskedInput CssClass="cw-320" Mask="0000-0000-00" @bind-Value="parameterModel.BankNo" SizeMode="SizeMode.Medium" NullText="0000-0000-00" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Company Website</label>
+                                    <DxTextBox CssClass="cw-320" NullText="Enter company website" @bind-Text="parameterModel.CompanyWebsite" SizeMode="SizeMode.Medium" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </WizardStep>
+            <WizardStep Name="2nd Step">
+                <div id="step-122">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Region</label>
+                                    <DxComboBox Id="cmbRegion1" NullText="Select a region..."
+                                                Data="@regions" SizeMode="SizeMode.Medium"
+                                                FilteringMode="@FilteringMode"
+                                                @bind-Value="@region1"
+                                                TextFieldName="@nameof(SelectListItems.Text)"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                CssClass="cw-480"
+                                                SelectedItemChanged="@((SelectListItems itm) => RegionSelectionChanged(itm.Value, itm.Text))" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Province</label>
+                                    <DxComboBox Id="cmbProvince1" NullText="Select a province..."
+                                                Data="@provinces" SizeMode="SizeMode.Medium"
+                                                FilteringMode="@FilteringMode"
+                                                @bind-Value="@province1"
+                                                TextFieldName="@nameof(SelectListItems.Text)"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                CssClass="cw-480"
+                                                SelectedItemChanged="@((SelectListItems itm) => ProvinceSelectionChanged(itm.Value, itm.Text))" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">City</label>
+                                    <DxComboBox Id="cmbMunicipality1" NullText="Select a city/municipality..."
+                                                Data="@municipalities" SizeMode="SizeMode.Medium"
+                                                FilteringMode="@FilteringMode"
+                                                @bind-Value="@municipality1"
+                                                TextFieldName="@nameof(SelectListItems.Text)"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                CssClass="cw-480"
+                                                SelectedItemChanged="@((SelectListItems itm) => MunicipalitySelectionChanged(itm.Value, itm.Text))" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="position-relative mb-3">
+                                    <label class="form-label" for="exampleEmail55">Barangay</label>
+                                    <DxComboBox Id="cmbBarangay1" NullText="Select a barangay..."
+                                                Data="@barangays" SizeMode="SizeMode.Medium"
+                                                FilteringMode="@FilteringMode"
+                                                @bind-Value="@barangay1"
+                                                TextFieldName="@nameof(SelectListItems.Text)"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                CssClass="cw-480"
+                                                SelectedItemChanged="@((SelectListItems itm) => BarangaySelectionChanged(itm.Value, itm.Text))" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </WizardStep>
+            <WizardStep Name="Final Step">
+                <div id="step-322">
+                    <div class="card-body">
+                        <h5 class="card-title">Levels</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <DxTreeView Data="@colAllTags" SelectionChanged="@SelectionChanged" AllowSelectNodes="true">
+                                    <DataMappings>
+                                        <DxTreeViewDataMapping Text="Name" Key="LevelId" ParentKey="ParentId" />
+                                    </DataMappings>
+                                </DxTreeView>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="widget-content p-0">
+                                            <div class="widget-content-wrapper">
+                                                <div style="margin-left: 53px !important">
+                                                    <h4>Selected level: @selectedLevel.Name</h4>
+                                                </div>
+                                                @if (selectedLevel.LevelId != 0)
+                                                {
+                                                    <div class="widget-content-right widget-content-actions" hidden="@hideActions">
+                                                        <button data-toggle="tooltip" data-placement="left" title="Add" class="btn-icon btn-icon-only btn btn-info btn-sm" @onclick="@(args => ShowRenameInputLvl())">
+
+                                                            <i class="fa fa-plus btn-icon-wrapper"></i>
+                                                        </button>
+                                                        <button data-toggle="tooltip" data-placement="left" title="Rename" class="btn-icon btn-icon-only btn btn-primary btn-sm" @onclick="@(args => ShowInputLvl())">
+                                                            <i class="fa fa-edit btn-icon-wrapper"></i>
+                                                        </button>
+                                                        <button data-toggle="tooltip" data-placement="left" title="Delete" class="me-1 btn-icon btn-icon-only btn btn-danger btn-sm" @onclick="@(args => DeleteLevel())">
+                                                            <i class="fa fa-trash btn-icon-wrapper"></i>
+                                                        </button>
+                                                    </div>
+
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row col-12">
+                                        <div class="ml-4">
+                                            <DxTextBox CssClass="cw-320" hidden=@HideInputLevel @bind-Text="childLevelModel.Name" SizeMode="SizeMode.Medium" />
+                                            <div hidden="@hideControls" class="float-end mt-2">
+                                                <button class="mb-2 me-2 btn-transition btn btn-outline-info" @onclick="@(args => UpdateChildLevel())" hidden="@HideUpdateLevel">Rename</button>
+                                                <button class="mb-2 me-2 btn-transition btn btn-outline-secondary" @onclick="@(args => AddChildLevel())" hidden="@HideSaveLevel">Add Sub Level</button>
+                                                <button class="mb-2 me-2 btn-transition btn btn-outline-danger" @onclick="@(args => CancelUpdateLevel())" hidden="@HideCancel">Cancel</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer col-12" hidden ="true;">
+                        <div class="row float-end col-md-6">
+                            <button class="btn btn-primary col" onclick="@Save(parameterModel)">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+            </WizardStep>
+        </div>
+    </Wizard>
+</div>
+@code {
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    SystemParameterViewModel parameterModel = new SystemParameterViewModel();
+
+    private List<SelectListItems> regions { get; set; } = new List<SelectListItems>();
+    private List<SelectListItems> provinces { get; set; } = new List<SelectListItems>();
+    private List<SelectListItems> municipalities { get; set; } = new List<SelectListItems>();
+    private List<SelectListItems> barangays { get; set; } = new List<SelectListItems>();
+
+    SelectListItems region1 { get; set; }
+    SelectListItems province1 { get; set; }
+    SelectListItems municipality1 { get; set; }
+    SelectListItems barangay1 { get; set; }
+
+    string tempReg { get; set; }
+
+    string selectedRegion { get; set; }
+    string selectedProvince { get; set; }
+    string selectedMunicipality { get; set; }
+    string selectedBarangay { get; set; }
+
+    string selectedcp1 { get; set; }
+
+    DataGridFilteringMode FilteringMode { get; set; } = DataGridFilteringMode.StartsWith;
+    IEnumerable<HRMSv4.Shared.OnBoarding.Level> levels;
+
+    private List<Level> colAllTags { get; set; } = new List<Level>();
+
+    Level selectedLevel = new Level();
+
+    string userId = "";
+
+    HRMSv4.Shared.OnBoarding.Level childLevelModel = new HRMSv4.Shared.OnBoarding.Level();
+    private bool HideInputLevel { get; set; } = true;
+
+    //levels
+    private bool hideActions { get; set; } = false;
+    private bool hideControls { get; set; } = true;
+    private bool HideUpdateLevel { get; set; } = false;
+    private bool HideSaveLevel { get; set; } = false;
+    private bool HideCancel { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        regions = await PsgcAddress.RegionPsgc();
+        levels = await levelService.GetAll();
+
+        colAllTags = levels.ToList();
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        parameterModel = new SystemParameterViewModel();
+        parameterModel = await companyService.Get(userId);
+
+        //psgc
+        if (parameterModel.PsgcCode != null)
+        {
+            //recruitmentPlanService
+
+            var faith = await PsgcAddress.GetPsgcForEdit(parameterModel.PsgcCode);
+
+            if (faith.RegionCode != "")
+            {
+                provinces = await PsgcAddress.ProvincePsgc(faith.RegionCode);
+                region1 = regions.FirstOrDefault(a => a.Value == faith.RegionCode);
+                selectedcp1 = faith.RegionCode;
+            }
+            if (faith.ProvinceCode != "")
+            {
+                municipalities = await PsgcAddress.CityPsgc(faith.ProvinceCode);
+                province1 = provinces.FirstOrDefault(a => a.Value == faith.ProvinceCode);
+                selectedcp1 = faith.ProvinceCode;
+            }
+            if (faith.MunicipalCode != "")
+            {
+                barangays = await PsgcAddress.BarangayPsgc(faith.MunicipalCode);
+                municipality1 = municipalities.FirstOrDefault(a => a.Value == faith.MunicipalCode);
+                selectedcp1 = faith.MunicipalCode;
+            }
+            if (faith.BarangayCode != "")
+            {
+                barangay1 = barangays.FirstOrDefault(a => a.Value == faith.BarangayCode);
+                selectedcp1 = faith.BarangayCode;
+            }
+        }
+    }
+
+    async Task CancelUpdateLevel()
+    {
+
+        HideInputLevel = true;
+        hideActions = false;
+        hideControls = true;
+        HideUpdateLevel = false;
+        HideSaveLevel = false;
+        HideCancel = false;
+        //selectedLevel = null;
+        //selectedLevel.Name = "";
+
+        selectedLevel = new Level();
+
+        StateHasChanged();
+    }
+
+    async Task AddChildLevel()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+
+        if (selectedLevel.LevelId == 0)
+        {
+            await _Swal.FireAsync("Warning", "Please select a level", "warning");
+            return;
+        }
+        var subLevelCount = await levelService.GetChildLevelsCount(selectedLevel.LevelId);
+
+        if (subLevelCount > 10)
+        {
+            await _Swal.FireAsync("Warning", "Child level already exceeded", "warning");
+            return;
+        }
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you want to save it?",
+                Text = "Please check information before Submiting!",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            childLevelModel.ParentId = selectedLevel.LevelId;
+            childLevelModel.CreatedBy = userId;
+            await levelService.Add(childLevelModel);
+            levels = await levelService.GetAll();
+            colAllTags = levels.ToList();
+            await _Swal.FireAsync("Success", "You have successfully added a record.", "success");
+            await CancelUpdateLevel();
+            StateHasChanged();
+
+        }
+    }
+
+    async Task UpdateChildLevel()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        if (selectedLevel.LevelId == 0)
+        {
+            await _Swal.FireAsync("Warning", "Please select a level", "warning");
+            return;
+        }
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you want to save it?",
+                Text = "Please check information before Submiting!",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            childLevelModel.LevelId = selectedLevel.LevelId;
+            childLevelModel.UpdatedBy = userId;
+            await levelService.Update(childLevelModel);
+            levels = await levelService.GetAll();
+
+            colAllTags = levels.ToList();
+
+            await _Swal.FireAsync("Success", "You have successfully updated a record.", "success");
+            await CancelUpdateLevel();
+            StateHasChanged();
+
+        }
+    }
+
+    async Task DeleteLevel()
+    {
+        if (selectedLevel.LevelId == 0)
+        {
+            await _Swal.FireAsync("Warning", "Please select a level", "warning");
+            return;
+        }
+
+
+        //if (selectedNodeLevel.Children.Count() > 0)
+        //{
+        //    await _Swal.FireAsync("Warning", selectedNodeLevel.NodeName + " sub levels detected", "warning");
+        //    return;
+        //}
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            res = await levelService.Delete(selectedLevel.LevelId);
+
+            if (res.StatusCode == 200)
+            {
+                levels = await levelService.GetAll();
+                colAllTags = levels.ToList();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+                StateHasChanged();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", res.Value, "error");
+            }
+        }
+
+
+    }
+
+
+
+    async Task ShowInputLvl()
+    {
+
+        if (selectedLevel.LevelId == 0)
+        {
+            await _Swal.FireAsync("Warning", "Please select a level", "warning");
+            return;
+        }
+
+
+        HideInputLevel = false;
+        hideActions = true;
+        hideControls = false;
+        HideUpdateLevel = false;
+        HideSaveLevel = true;
+        HideCancel = false;
+
+        StateHasChanged();
+    }
+
+    async Task ShowRenameInputLvl()
+    {
+
+        if (selectedLevel.LevelId == 0)
+        {
+            await _Swal.FireAsync("Warning", "Please select a level", "warning");
+            return;
+        }
+
+        HideInputLevel = false;
+        hideActions = true;
+        hideControls = false;
+        HideUpdateLevel = true;
+        HideSaveLevel = false;
+        HideCancel = false;
+
+
+        StateHasChanged();
+    }
+
+    protected void SelectionChanged(TreeViewNodeEventArgs e)
+    {
+        selectedLevel = e.NodeInfo.DataItem as Level;
+        StateHasChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    async Task RegionSelectionChanged(string Regcode, string txt)
+    {
+        if (Regcode != null || Regcode != "")
+        {
+
+            provinces = new List<SelectListItems>();
+            provinces = await PsgcAddress.ProvincePsgc(Regcode);
+
+            selectedRegion = txt;
+
+            region1 = regions.Where(a => a.Text == txt && a.Value == Regcode).FirstOrDefault();
+            selectedcp1 = Regcode;
+
+           
+
+            StateHasChanged();
+        }
+        else
+        {
+            provinces = null;
+        }
+        province1 = null;
+        municipality1 = null;
+        barangay1 = null;
+
+        StateHasChanged();
+    }
+
+    string tempProv { get; set; }
+
+    async Task ProvinceSelectionChanged(string Provcode, string txt)
+    {
+
+        if (Provcode != null || Provcode != "")
+        {
+            municipalities = new List<SelectListItems>();
+            municipalities = await PsgcAddress.CityPsgc(Provcode);
+
+            selectedProvince = txt;
+
+            if (tempProv != Provcode)
+            {
+                province1 = provinces.FirstOrDefault(a => a.Value == Provcode);
+                tempProv = Provcode;
+                selectedcp1 = Provcode;
+
+
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            municipalities = null;
+        }
+
+        municipality1 = null;
+        barangay1 = null;
+
+        StateHasChanged();
+
+    }
+
+    string tempMun { get; set; }
+
+    async Task MunicipalitySelectionChanged(string Muncode, string txt)
+    {
+        if (Muncode != null || Muncode != "")
+        {
+            barangays = new List<SelectListItems>();
+            barangays = await PsgcAddress.BarangayPsgc(Muncode);
+
+
+            selectedMunicipality = txt;
+
+            if (tempMun != Muncode)
+            {
+                municipality1 = municipalities.FirstOrDefault(a => a.Value == Muncode);
+                tempMun = Muncode;
+                selectedcp1 = Muncode;
+                StateHasChanged();
+            }
+
+        }
+        else
+        {
+            barangays = null;
+        }
+
+        barangay1 = null;
+
+        StateHasChanged();
+    }
+
+    string tempBar { get; set; }
+
+    async Task BarangaySelectionChanged(string BarCode, string txt)
+    {
+        if (BarCode != null || BarCode != "")
+        {
+            selectedBarangay = txt;
+
+            if (tempMun != BarCode)
+            {
+                barangay1 = barangays.FirstOrDefault(a => a.Value == BarCode);
+                tempBar = BarCode;
+                selectedcp1 = BarCode;
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task Save(SystemParameterViewModel paramko)
+    {
+        if (paramko.PsgcCode == null || paramko.PsgcCode == "")
+        {
+            await _Swal.FireAsync("Warning", "Company Address is Required", "warning");
+            return;
+        }
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you want to save it?",
+                Text = "Please check information before Submitting!",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            //paramko.Region = selectedRegion != null && selectedRegion != "" ? selectedRegion : paramko.Region;
+            //paramko.Province = selectedProvince != null && selectedProvince != "" ? selectedProvince : paramko.Province;
+            //paramko.CityOrMunicipality = selectedMunicipality != null && selectedMunicipality != "" ? selectedMunicipality : paramko.CityOrMunicipality;
+
+            paramko.PsgcCode = selectedcp1;
+            paramko.Region = selectedcp1.Substring(0,2);
+            paramko.Province = selectedcp1.Substring(2,3);
+            paramko.CityOrMunicipality = selectedcp1.Substring(5,2);
+            paramko.Barangay = selectedcp1.Substring(7, 2);
+
+            paramko.UserId = userId;
+
+            var res = await companyService.Update(paramko);
+
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", "You have successfully updated the company profile.", "success");
+                await ModalInstance.CloseAsync();
+                _navigation.NavigateTo("dashboard/administrator", true);
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops", res.Value, "warning");
+                return;
+
+            }
+
+           
+        }
+
+    }
+
+}

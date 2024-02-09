@@ -1,0 +1,687 @@
+﻿@using HRMSv4.Client.Interface.Auth
+@using HRMSv4.Client.Service
+@using System.Security.Claims
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared.Audit
+@using HRMSv4.Shared.SignalRData
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ICompanyProfile companyService
+@inject IHeader _header
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@using System.Threading
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject HubConnection HubConnection
+
+<style>
+    .timer {
+        font-size: 20px;
+        font-weight: 600;
+        margin-right: 10px;
+        margin-top: 16px;
+        font-family: monospace;
+    }
+</style>
+<CascadingValue Value="this">
+    <div class="app-header__logo">
+        <AuthorizeView>
+            <Authorized>
+                @if (@context.User.IsInRole(RoleConstants.DefaultRole) || @context.User.IsInRole(RoleConstants.JobProviderRole))
+                {
+                    <a href="/dashboard/administrator"><div class="logo-src"></div></a>
+                }
+                else if (@context.User.IsInRole(RoleConstants.EmployeeRole) || @context.User.IsInRole(RoleConstants.JobSeekerRole))
+                {
+                    <a href="" @onclick="EmpNavigation"><div class="logo-src"></div></a>
+                }
+                else if (@context.User.IsInRole(RoleConstants.HrManagerRole))
+                {
+
+                }
+                else if (@context.User.IsInRole(RoleConstants.DefaultSuperAdmin))
+                {
+                    <a href="/dashboard/super-admin"><div class="logo-src"></div></a>
+                }
+                else
+                {
+                    <CustomNotFound />
+                }
+            </Authorized>
+            <NotAuthorized>
+                @*<CustomNotFound />*@
+            </NotAuthorized>
+        </AuthorizeView>
+        @*<img hidden=@_hideTextLogo class="d-none d-sm-block" src="MainLayout/images/logo/PrimeHRLabel.svg" style="height: 50px; width: 150px; margin-left: 10px; margin-right: 15px;">*@
+        @if (CurrAbsoluteUrl != null)
+        {
+            @if (!CurrAbsoluteUrl.Contains("dashboard-employee"))
+            {
+                <div class="header__pane ms-auto">
+                    <div>
+                        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+        @*<span class="d-none d-sm-block" style="font-family:Courier; color:black; font-size: 30px; font-weight:600;">PRIMEHR.PH</span>*@
+    </div>
+
+    <div class="app-header__mobile-menu">
+        <div>
+            <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="app-header__menu">
+        <span>
+            <button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                <span class="btn-icon-wrapper">
+                    <i class="fa fa-ellipsis-v fa-w-6"></i>
+                </span>
+            </button>
+        </span>
+    </div>
+
+    <div class="app-header__content">
+        <div class="app-header-left">
+            <AuthorizeView Roles="Job Provider, Administrator, Super Administrator">
+                <div class="search-wrapper">
+                    <div class="input-holder">
+                        <input type="text" @bind="@keyword" @onkeypress="HandleKeyPress" class="search-input" placeholder="Type to search">
+                        <button class="search-icon" onclick="@HandleKeyPress">
+                            <span></span>
+                        </button>
+                    </div>
+                    <button class="btn-close" onclick="@HandleCloseSearch"></button>
+                </div>
+            </AuthorizeView>
+        </div>
+        <div class="app-header-right">
+            <div class="header-dots">
+                <NotificationComponent></NotificationComponent>
+            </div>
+            <div class="widget-content p-0">
+                <div class="widget-content-wrapper">
+                    <div class="widget-content-left">
+                        <div class="btn-group">
+                            <a data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="p-0 btn">
+                                <img width="42" class="rounded-circle" src="@ImgUrl" alt="" />
+                                <i class="fa fa-angle-down ms-2 opacity-8"></i>
+                            </a>
+                            <div tabindex="-1" role="menu" aria-hidden="true" class="rm-pointers dropdown-menu-lg dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-menu-header">
+                                    <div class="dropdown-menu-header-inner bg-info">
+                                        <div class="menu-header-image opacity-2" style="background-image: url('images/dropdown-header/city3.jpg');"></div>
+                                        <div class="menu-header-content text-start">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <!-- Avatar Here-->
+                                                        @if (!string.IsNullOrWhiteSpace(ImgUrl))
+                                                        {
+                                                            <img width="42" class="rounded-circle" src="@ImgUrl" alt="" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <img width="42" class="rounded-circle" src="images/avatars/default-avatar-grey.png" alt="" />
+                                                        }
+                                                    </div>
+                                                    <AuthorizeView>
+                                                        <Authorized>
+                                                            <div class="widget-content-left">
+                                                                <div class="widget-heading">@context.User.FindFirst(ClaimTypes.Name).Value</div>
+                                                                @*@context.User.Identity.Name*@
+                                                                <div class="widget-subheading opacity-8">@userRole</div>
+                                                            </div>
+                                                        </Authorized>
+                                                        <NotAuthorized>
+                                                            <div class="widget-content-left">
+                                                                <div class="widget-heading"> Not LogIn</div>
+                                                                <div class="widget-subheading opacity-8">No role Available</div>
+                                                            </div>
+                                                        </NotAuthorized>
+                                                    </AuthorizeView>
+                                                    <div class="widget-content-right me-2">
+                                                        @*<NavLink href="javascript: void(0);" @onclick="Signout" style="z-index: 999999;">Mag work ka</NavLink>*@
+                                                        @*<button @onclick="(() => Signout())">testbutton</button>*@
+                                                        <button @onclick="(() => Signout())" class="btn-pill btn-shadow btn-shine btn btn-focus">Logout</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="scroll-area-xs" style="height: 200px;">
+                                    <div class="scrollbar-container ps">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item-header nav-item">Activity</li>
+                                            @if (isCompany && (userRole == HRMSv4.Shared.Audit.RoleConstants.JobProviderRole || userRole == HRMSv4.Shared.Audit.RoleConstants.DefaultRole))
+                                            {
+
+                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="ShowModalV2" class="nav-link">
+                                                        <i class="nav-link-icon pe-7s-config"></i>
+                                                        <span>System parameters</span>
+                                                    </a>
+                                                </li>
+
+@*                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="ShowModal" class="nav-link">
+                                                        <i class="nav-link-icon pe-7s-config"></i>
+                                                        <span>System parameters</span>
+                                                    </a>
+                                                </li>*@
+
+
+                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="() => HrPolicy()" class="nav-link">
+                                                        <i class="nav-link-icon pe-7s-bookmarks"></i>
+                                                        <span>Human Resource Policy</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else if (userRole == HRMSv4.Shared.Audit.RoleConstants.DefaultSuperAdmin)
+                                            {
+
+                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="ShowModal" class="nav-link">
+                                                        <i class="nav-link-icon pe-7s-config"></i>
+                                                        <span>System parameters</span>
+                                                    </a>
+                                                </li>
+
+
+                                                <li class="nav-item">
+                                                    <a href="javascript:void(0);" @onclick="() => HrPolicy()" class="nav-link">
+                                                        <i class="nav-link-icon pe-7s-bookmarks"></i>
+                                                        <span>Human Resource Policy</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                            <li class="nav-item">
+                                                <a href="javascript:void(0);" @onclick="() => ChangePassword()" class="nav-link">
+                                                    <i class="nav-link-icon pe-7s-unlock"></i>
+                                                    <span>Change Password</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item-divider mb-0 nav-item"></li>
+                                </ul>
+                                <div class="grid-menu grid-menu-2col">
+                                    <div class="g-0 row">
+                                        <div class="col-sm-6 pl-4">
+                                            <button @onclick="@(()=>_navigation.NavigateTo("/Mailbox"))" class="btn-icon-vertical btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-warning">
+                                                <i class="pe-7s-chat icon-gradient bg-amy-crisp btn-icon-wrapper mb-2"></i>
+                                                Message Inbox
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-6 pr-4">
+                                            <button class="btn-icon-vertical btn-transition btn-transition-alt pt-2 pb-2 btn btn-outline-danger">
+                                                <i class="pe-7s-ticket icon-gradient bg-love-kiss btn-icon-wrapper mb-2"></i>
+                                                <b>Support Tickets</b>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="widget-content-left  ms-3 header-user-info">
+                                <div class="widget-heading"> @context.User.Identity.Name</div>
+                                <div class="widget-subheading"> @userRole</div>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="widget-content-left  ms-3 header-user-info">
+                                <div class="widget-heading"> Not LogIn</div>
+                                <div class="widget-subheading"> No role Available</div>
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+</CascadingValue>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    private string userRole { get; set; }
+    private string ImgUrl { get; set; }
+
+    private bool _hideTextLogo { get; set; } = true;
+
+    private string? CurrUrl = null;
+    private string? CurrAbsoluteUrl = null;
+    private string userId = string.Empty;
+    private string keyword = string.Empty;
+    private bool isCompany = false;
+
+    private int NotificationCount { get; set; } = 0;
+
+    private string theTime;
+    Timer aTimer;
+
+    public HRMSv4.Shared.OnBoarding.SystemParameterViewModel parameterModel = new HRMSv4.Shared.OnBoarding.SystemParameterViewModel();
+    private HRMSv4.Client.Shared.Modals.ProfileModal compModal = new HRMSv4.Client.Shared.Modals.ProfileModal();
+    List<HRMSv4.Shared.Notification.NoticeHistoryLog> _nofication = new List<HRMSv4.Shared.Notification.NoticeHistoryLog>();
+
+    static public bool isImageExists(int empId, string fileName)
+    {
+        bool result = false;
+
+        var imgLocation = Path.Combine("Uploads/Employees", "Avatar");
+
+        var pathToSave = Path.Combine(imgLocation, Convert.ToString(empId));
+
+        if (File.Exists(pathToSave + "/" + fileName))
+        {
+            result = true;
+        }
+        else
+        {
+            result = false;
+        }
+        return result;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string paramId = string.Empty;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+        var EmpIdEncrypt = await localStorage.GetItemAsync<string>(">>redd");
+
+        HubConnection.On<SignalRCarrier>("RequestProfileUpdate", async survey =>
+        {
+            NotificationCount = NotificationCount + 1;
+            StateHasChanged();
+        });
+
+        string isGender = user.FindFirst(c => c.Type.Contains("gender"))?.Value;
+
+        if (!string.IsNullOrWhiteSpace(await localStorage.GetItemAsync<string>(">>redd")))
+        {
+            if (!string.IsNullOrWhiteSpace(EmpIdEncrypt))
+            {
+                paramId = _crypto.ConvertHexToString(EmpIdEncrypt, System.Text.Encoding.Unicode);
+            }
+
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                if (isGender == "FEMALE")
+                {
+                    ImgUrl = "images/avatars/avatar_women_gray.svg";
+                }
+                else
+                {
+                    ImgUrl = "images/avatars/default-avatar-grey.png";
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(paramId))
+                {
+                    if (isImageExists(int.Parse(paramId), LoginAvatar))
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                    else
+                    {
+                        ImgUrl = "Uploads/Employees/Avatar/" + int.Parse(paramId) + "/" + LoginAvatar;
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(LoginAvatar))
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                    else
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                if (isGender == "FEMALE")
+                {
+                    ImgUrl = "images/avatars/avatar_women_gray.svg";
+                }
+                else
+                {
+                    ImgUrl = "images/avatars/default-avatar-grey.png";
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(paramId))
+                {
+                    if (isImageExists(int.Parse(paramId), LoginAvatar))
+                    {
+                        if (isGender.ToLower() == "male")
+                        {
+                            ImgUrl = "images/avatars/default-avatar.png";
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/avatar_women_white.svg";
+                        }
+                    }
+                    else
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(LoginAvatar))
+                    {
+                        ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(isGender))
+                        {
+                            if (isGender.ToLower() == "male")
+                            {
+                                ImgUrl = "images/avatars/default-avatar.png";
+                            }
+                            else
+                            {
+                                ImgUrl = "images/avatars/avatar_women_white.svg";
+                            }
+                        }
+                        else
+                        {
+                            ImgUrl = "images/avatars/default-avatar-grey.png";
+                        }
+                    }
+                }
+            }
+        }
+
+        userRole = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        CurrUrl = _navigation.Uri.ToString();
+        CurrAbsoluteUrl = _navigation.ToAbsoluteUri(CurrUrl).ToString();
+
+        //aTimer = new Timer(Tick, null, 0, 1000);
+        if (userRole.ToLower() != "job seeker" && userRole.ToLower() != "employee")
+        {
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            parameterModel = new SystemParameterViewModel();
+            parameterModel = await companyService.Get(userId);
+
+            isCompany = parameterModel.IsCompany.HasValue ? parameterModel.IsCompany.Value : false;
+
+            if (isCompany && (parameterModel.PsgcCode == null || parameterModel.PsgcCode == ""))
+            {
+                await ShowModal();
+            }
+        }
+
+
+        this.StateHasChanged();
+    }
+
+    private void HandleclickTextLogo()
+    {
+        if (!_hideTextLogo)
+        {
+            _hideTextLogo = true;
+        }
+        else
+        {
+            _hideTextLogo = false;
+        }
+        StateHasChanged();
+    }
+
+    private void Tick(object _)
+    {
+        theTime = DateTime.Now.ToLongTimeString();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        HubConnection.Remove("RequestProfileUpdate");
+        aTimer?.Dispose();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            _navigation.NavigateTo("/");
+        }
+    }
+
+    async Task ShowNotification()
+    {
+        /* Get List of Notificaiton */
+        /* May error please check */
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        //_nofication = await _header.NotificationList(0);
+
+        StateHasChanged();
+    }
+
+    async Task Signout()
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you leaving?",
+                Text = "Are you sure want to log out? All your unsaved data will be lost.",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            await _authInterfaceService.Logout(userId);
+        }
+    }
+
+    async Task ShowModal()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+
+        var resultForm = Modal.Show<ProfileModal>("Company Profile", options);
+
+        var result = await resultForm.Result;
+
+        await UpdateCompanyAvatar();
+    }
+
+    async Task ShowModalV2()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+
+        var resultForm = Modal.Show<HRMSv4.Client.Shared.MainComponents.Profile.ProfileModalv2>("Company Profile", options);
+
+        var result = await resultForm.Result;
+
+        await UpdateCompanyAvatar();
+    }
+
+    void HrPolicy()
+    {
+        _navigation.NavigateTo("/policies");
+    }
+
+    void ChangePassword()
+    {
+        var parameters = new ModalParameters();
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.ChangePasswordModal.userId), userId);
+
+        Modal.Show<HRMSv4.Client.Shared.Modals.ChangePasswordModal>("Change Password", parameters, options);
+    }
+
+    void HandleKeyPress(KeyboardEventArgs args)
+    {
+        if (args.Key.Equals("Enter"))
+        {
+            _navigation.NavigateTo("/search?keyword=" + keyword);
+        }
+    }
+
+    void HandleCloseSearch()
+    {
+        switch (userRole)
+        {
+            case RoleConstants.DefaultRole:
+                _navigation.NavigateTo("dashboard-administrator");
+                break;
+            case RoleConstants.EmployeeRole:
+                _navigation.NavigateTo($"dashboard-employee/{userId}");
+                break;
+        }
+    }
+
+    async void EmpNavigation(MouseEventArgs e)
+    {
+        var beforeUrlEncoded = await localStorage.GetItemAsync<string>(">>redd");
+
+        if (!string.IsNullOrWhiteSpace(beforeUrlEncoded))
+        {
+            if (userRole == RoleConstants.EmployeeRole)
+            {
+                _navigation.NavigateTo($"/dashboard/employee/{beforeUrlEncoded}");
+
+            }
+            else
+            {
+                _navigation.NavigateTo($"/dashboard/applicant/{beforeUrlEncoded}");
+            }
+        }
+    }
+
+    public async void UpdateAvatar()
+    {
+        string paramId = string.Empty;
+
+        //localStorage.SetItem("arvin", value);
+
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+        var EmpIdEncrypt = await localStorage.GetItemAsync<string>(">>redd");
+
+        if (!string.IsNullOrWhiteSpace(EmpIdEncrypt))
+        {
+            //string DecodedUrl = string.Empty;
+            //string replacement = "ItIsSlashReplacement";
+            //DecodedUrl = EmpIdEncrypt.Replace(replacement, "/");
+
+            paramId = _crypto.ConvertHexToString(EmpIdEncrypt, System.Text.Encoding.Unicode);
+            //await Crypto.DecryptAsync(DecodedUrl);
+        }
+
+        //string DecodeImg = await Crypto.DecryptAsync(ImgEncrypt);
+
+        if (!string.IsNullOrWhiteSpace(LoginAvatar))
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                ImgUrl = "images/avatars/" + LoginAvatar;
+            }
+            else
+            {
+                ImgUrl = "Uploads/Employees/Avatar/" + int.Parse(paramId) + "/" + LoginAvatar;
+            }
+            /* Note that the following line is necessary because otherwise
+            Blazor would not recognize the state change and not refresh the UI */
+            await InvokeAsync(() =>
+              {
+                  StateHasChanged();
+              });
+        }
+    }
+
+    public async Task UpdateCompanyAvatar()
+    {
+        string paramId = string.Empty;
+
+
+        var LoginAvatar = await localStorage.GetItemAsync<string>("ImageName");
+
+        //string DecodeImg = await Crypto.DecryptAsync(ImgEncrypt);
+
+        if (!string.IsNullOrWhiteSpace(LoginAvatar))
+        {
+            if (LoginAvatar == "default-avatar-grey.png")
+            {
+                ImgUrl = "images/avatars/" + LoginAvatar;
+            }
+            else
+            {
+                ImgUrl = "Uploads/Companies/Avatar/" + LoginAvatar;
+            }
+            /* Note that the following line is necessary because otherwise
+            Blazor would not recognize the state change and not refresh the UI */
+            await InvokeAsync(() =>
+              {
+                  StateHasChanged();
+              });
+        }
+    }
+}

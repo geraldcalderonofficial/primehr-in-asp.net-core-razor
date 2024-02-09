@@ -1,0 +1,1641 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = HRMSv4.Client
+build_property.RootNamespace = HRMSv4.Client
+build_property.ProjectDir = C:\Users\Shuji\OneDrive\Documents\hrmsv4New\HRMSv4\Client\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Shuji\OneDrive\Documents\hrmsv4New\HRMSv4\Client
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/Applicant.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cQXBwbGljYW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/ChangePassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cQ2hhbmdlUGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/ConfirmEmail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cQ29uZmlybUVtYWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/EmployeeInvited.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cRW1wbG95ZWVJbnZpdGVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cRm9yZ290UGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/ForgotRequestMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cRm9yZ290UmVxdWVzdE1lc3NhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/RegistrationSuccess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cUmVnaXN0cmF0aW9uU3VjY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Authentication/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aGVudGljYXRpb25cX0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/Administrator.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEFkbWluaXN0cmF0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/Employee.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/201Files.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFwyMDFGaWxlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Awards.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxBd2FyZHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/BasicInfo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxCYXNpY0luZm8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/CharacterReferences.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxDaGFyYWN0ZXJSZWZlcmVuY2VzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/CommunityService.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxDb21tdW5pdHlTZXJ2aWNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Educational.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFZHVjYXRpb25hbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Eligibility.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbGlnaWJpbGl0eS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/EmployeeAllowance.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbXBsb3llZUFsbG93YW5jZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/EmployeeDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbXBsb3llZURhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/EmployeeLeaves.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbXBsb3llZUxlYXZlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/EmployeeLoans.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbXBsb3llZUxvYW5zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/EmployeeScheduleLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFbXBsb3llZVNjaGVkdWxlTG9ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Experience.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxFeHBlcmllbmNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Jobapplication.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxKb2JhcHBsaWNhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/LeaveApplicationContent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxMZWF2ZUFwcGxpY2F0aW9uQ29udGVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/LeaveApplicationTable.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxMZWF2ZUFwcGxpY2F0aW9uVGFibGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/LocatorSlipContent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxMb2NhdG9yU2xpcENvbnRlbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/LocatorSlipTable.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxMb2NhdG9yU2xpcFRhYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/PerformanceEvaluation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxQZXJmb3JtYW5jZUV2YWx1YXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/PermissionToLeave.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxQZXJtaXNzaW9uVG9MZWF2ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/PermissionToLeaveTable.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxQZXJtaXNzaW9uVG9MZWF2ZVRhYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Premiums.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxQcmVtaXVtcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Relatives.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxSZWxhdGl2ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/ServiceRecord.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxTZXJ2aWNlUmVjb3JkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/TrainingSeminars.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxUcmFpbmluZ1NlbWluYXJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/TravelOrder.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxUcmF2ZWxPcmRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/EmployeeContent/Violation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEVtcGxveWVlQ29udGVudFxWaW9sYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/SearchResults.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXFNlYXJjaFJlc3VsdHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/SuperAdmin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXFN1cGVyQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Dashboard/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXF9JbXBvcnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iRGV0YWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/BrowseJobs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEJyb3dzZUpvYnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/JobCategory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEpvYkNhdGVnb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/JobDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEpvYkRldGFpbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/JobDetailV2.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEpvYkRldGFpbFYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/Jobs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEpvYnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/JobPortal/JobsV2.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iUG9ydGFsXEpvYnNWMi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailBox.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQm94LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailContent/Detail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQ29udGVudFxEZXRhaWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailContent/Inbox.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQ29udGVudFxJbmJveC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailContent/Sent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQ29udGVudFxTZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailContent/SentDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQ29udGVudFxTZW50RGV0YWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Mail/MailContent/Trash.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFpbFxNYWlsQ29udGVudFxUcmFzaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/AllowanceType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxBbGxvd2FuY2VUeXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/AuditTrail/AuditTrail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxBdWRpdFRyYWlsXEF1ZGl0VHJhaWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/AuditTrail/AuditTrailSub.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxBdWRpdFRyYWlsXEF1ZGl0VHJhaWxTdWIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Competency.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxDb21wZXRlbmN5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Course.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxDb3Vyc2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/CscEligibilities.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxDc2NFbGlnaWJpbGl0aWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Disability.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxEaXNhYmlsaXR5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ECEmployee.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFQ0VtcGxveWVlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Employee.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFbXBsb3llZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/EmployeeDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFbXBsb3llZURldGFpbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/EmploymentStatus.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFbXBsb3ltZW50U3RhdHVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Ethnicity.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFdGhuaWNpdHkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamContent/ExamAnswers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtQ29udGVudFxFeGFtQW5zd2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamContent/ExamDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtQ29udGVudFxFeGFtRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamContent/ExamList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtQ29udGVudFxFeGFtTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamContent/ExamResult.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtQ29udGVudFxFeGFtUmVzdWx0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamContent/ExamSubject.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtQ29udGVudFxFeGFtU3ViamVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/ExamManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxFeGFtTWFuYWdlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/JobCategory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxKb2JDYXRlZ29yeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/LeaveType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxMZWF2ZVR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/OrganizationalLevel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxPcmdhbml6YXRpb25hbExldmVsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Payroll/Clusters.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxQYXlyb2xsXENsdXN0ZXJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Payroll/Holiday.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxQYXlyb2xsXEhvbGlkYXkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Position.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxQb3NpdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/RateType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxSYXRlVHlwZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Role.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxSb2xlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/SalaryGrade.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxTYWxhcnlHcmFkZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/Training.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxUcmFpbmluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/TravelOrder.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxUcmF2ZWxPcmRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Masterdata/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFzdGVyZGF0YVxfSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/BackgroundInvestigation/BgForApplicants.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxCZ0ZvckFwcGxpY2FudHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/BackgroundInvestigation/BgInvestigationQuestion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxCZ0ludmVzdGlnYXRpb25RdWVzdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/BackgroundInvestigation/Investigation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxJbnZlc3RpZ2F0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/Component.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXENvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/ExamProgress.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXEV4YW1Qcm9ncmVzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/FinalResult.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXEZpbmFsUmVzdWx0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/IntroBak.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXEludHJvQmFrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/Psychological.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXFBzeWNob2xvZ2ljYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Exam/QuestionnaireBak.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xFeGFtXFF1ZXN0aW9ubmFpcmVCYWsucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/Leave.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeaveApplication.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVBcHBsaWNhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeaveCredit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVDcmVkaXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeaveManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeaveMonetization.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVNb25ldGl6YXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeavePermission.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVQZXJtaXNzaW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LeavePermissionTable.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTGVhdmVQZXJtaXNzaW9uVGFibGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/HrManagement/LocatorSlip.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xIck1hbmFnZW1lbnRcTG9jYXRvclNsaXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/JobVacancy/Applicants.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xKb2JWYWNhbmN5XEFwcGxpY2FudHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/JobVacancy/JobVacancy.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xKb2JWYWNhbmN5XEpvYlZhY2FuY3kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/JobVacancy/ManageApplicant.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xKb2JWYWNhbmN5XE1hbmFnZUFwcGxpY2FudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/NonPlantilla.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xOb25QbGFudGlsbGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/Deductions.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXERlZHVjdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/DeductionType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXERlZHVjdGlvblR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/DragComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXERyYWdDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/EmployeeAllowance.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXEVtcGxveWVlQWxsb3dhbmNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/EmployeeDeduction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXEVtcGxveWVlRGVkdWN0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/EmployeeLoan.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXEVtcGxveWVlTG9hbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/EmployeePremium.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXEVtcGxveWVlUHJlbWl1bS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/EmployeeWithholdingTax.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXEVtcGxveWVlV2l0aGhvbGRpbmdUYXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/LoanType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXExvYW5UeXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/Payroll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXFBheXJvbGwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/PayrollDates.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXFBheXJvbGxEYXRlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/PayrollProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXFBheXJvbGxQcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Payroll/SpecialPayroll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQYXlyb2xsXFNwZWNpYWxQYXlyb2xsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Demotion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcRGVtb3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/NewEmployees.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcTmV3RW1wbG95ZWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Promotion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUHJvbW90aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Reappointment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUmVhcHBvaW50bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Reclassification.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUmVjbGFzc2lmaWNhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/ReElection.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUmVFbGVjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Reemployment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUmVlbXBsb3ltZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Renewal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcUmVuZXdhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/SalaryAdjustment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcU2FsYXJ5QWRqdXN0bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Separation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcU2VwYXJhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/StepIncrement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcU3RlcEluY3JlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Placement/Transfer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFjZW1lbnRcVHJhbnNmZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Plantilla.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFudGlsbGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/PlantillaRecordEntries.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xQbGFudGlsbGFSZWNvcmRFbnRyaWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/ArPlan/AnnualRecruitmentPlan.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxBclBsYW5cQW5udWFsUmVjcnVpdG1lbnRQbGFuLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/ArPlan/RecruitmentPlanDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxBclBsYW5cUmVjcnVpdG1lbnRQbGFuRGV0YWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/ArPlan/RpApproaches.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxBclBsYW5cUnBBcHByb2FjaGVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/ArPlan/RpCandidates.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxBclBsYW5cUnBDYW5kaWRhdGVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/ArPlan/RpTargetPositions.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxBclBsYW5cUnBUYXJnZXRQb3NpdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/Staffing/StaffingList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxTdGFmZmluZ1xTdGFmZmluZ0xpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Recruitment/Staffing/StaffingPlan.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZWNydWl0bWVudFxTdGFmZmluZ1xTdGFmZmluZ1BsYW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/RewardsRecognition/NoticeStepIncrement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xSZXdhcmRzUmVjb2duaXRpb25cTm90aWNlU3RlcEluY3JlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/ApplicantEvaluation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cQXBwbGljYW50RXZhbHVhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/CrEval/CrQuestion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cQ3JFdmFsXENyUXVlc3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/CrEval/CrQuestionType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cQ3JFdmFsXENyUXVlc3Rpb25UeXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/CrEval/DigitalEvaluation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cQ3JFdmFsXERpZ2l0YWxFdmFsdWF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/CrEval/Intro.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cQ3JFdmFsXEludHJvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/Interview/ApplicantCompetency.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XEFwcGxpY2FudENvbXBldGVuY3kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/Interview/ApplicantInterview.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XEFwcGxpY2FudEludGVydmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/Interview/CompetencyComponents/CoreComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XENvbXBldGVuY3lDb21wb25lbnRzXENvcmVDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/Interview/CompetencyComponents/FunctionalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XENvbXBldGVuY3lDb21wb25lbnRzXEZ1bmN0aW9uYWxDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/Interview/CompetencyComponents/LeadershipComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XENvbXBldGVuY3lDb21wb25lbnRzXExlYWRlcnNoaXBDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/OverallResult/OverallResult.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cT3ZlcmFsbFJlc3VsdFxPdmVyYWxsUmVzdWx0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/OverallResult/OverallResultCriteria.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cT3ZlcmFsbFJlc3VsdFxPdmVyYWxsUmVzdWx0Q3JpdGVyaWEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/PaperEvaluation/Evaluation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cUGFwZXJFdmFsdWF0aW9uXEV2YWx1YXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/PaperEvaluation/PaperEvaluation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cUGFwZXJFdmFsdWF0aW9uXFBhcGVyRXZhbHVhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/PaperEvaluation/PaperEvaluationApplicant.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cUGFwZXJFdmFsdWF0aW9uXFBhcGVyRXZhbHVhdGlvbkFwcGxpY2FudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Selection/PaperEvaluation/PaperEvaluationTemplateItem.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xTZWxlY3Rpb25cUGFwZXJFdmFsdWF0aW9uXFBhcGVyRXZhbHVhdGlvblRlbXBsYXRlSXRlbS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/Workforce/Workplans.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xXb3JrZm9yY2VcV29ya3BsYW5zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Modules/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW9kdWxlc1xfSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/Application.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcQXBwbGljYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/AppliedPremiums.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcQXBwbGllZFByZW1pdW1zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/General.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcR2VuZXJhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/Holidays.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcSG9saWRheXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/JobApplication.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcSm9iQXBwbGljYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/Leave.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcTGVhdmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/Multiplier.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcTXVsdGlwbGllci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/StepIncrement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcU3RlcEluY3JlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Content/TimeKeeping.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XENvbnRlbnRcVGltZUtlZXBpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Policy/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5XEluZGV4LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Reports/EmployeeMasterList/EmployeeMasterList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xFbXBsb3llZU1hc3Rlckxpc3RcRW1wbG95ZWVNYXN0ZXJMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Reports/Viewer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xWaWV3ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/DeviceDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRGV2aWNlRGV0YWlscy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Fragment/ApprovedLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRnJhZ21lbnRcQXBwcm92ZWRMb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Fragment/EmployeeLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRnJhZ21lbnRcRW1wbG95ZWVMb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Fragment/FaceScannerLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRnJhZ21lbnRcRmFjZVNjYW5uZXJMb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Fragment/SubEmployeeLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRnJhZ21lbnRcU3ViRW1wbG95ZWVMb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Fragment/SubFaceScannerLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcRnJhZ21lbnRcU3ViRmFjZVNjYW5uZXJMb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Logs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcTG9ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Schedule/EmployeeSchedule.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcU2NoZWR1bGVcRW1wbG95ZWVTY2hlZHVsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Schedule/ScheduleManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcU2NoZWR1bGVcU2NoZWR1bGVNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Schedule/WeeklyScheduleTemplate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcU2NoZWR1bGVcV2Vla2x5U2NoZWR1bGVUZW1wbGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/Timekeeping/Stations.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGltZWtlZXBpbmdcU3RhdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/BlockUserInterface.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEJsb2NrVXNlckludGVyZmFjZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/BlockUserInterfaceMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEJsb2NrVXNlckludGVyZmFjZU1lc3NhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/BusyIndicator.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEJ1c3lJbmRpY2F0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/ChildComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENoaWxkQ29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/EmptyLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEVtcHR5TGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Landing/Banner.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExhbmRpbmdcQmFubmVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Landing/Footer.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExhbmRpbmdcRm9vdGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Landing/HeaderNav.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExhbmRpbmdcSGVhZGVyTmF2LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Landing/JobCategoryPreview.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExhbmRpbmdcSm9iQ2F0ZWdvcnlQcmV2aWV3LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/LoadingScreen.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvYWRpbmdTY3JlZW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/LoginLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvZ2luTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Address.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEFkZHJlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Breadcrumbs.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEJyZWFkY3J1bWJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Fab.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEZhYi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Footer.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEZvb3Rlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Footerv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEZvb3RlcnYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Header.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEhlYWRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Headerv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXEhlYWRlcnYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/NotificationComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXE5vdGlmaWNhdGlvbkNvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Profile/ProfileModalv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFByb2ZpbGVcUHJvZmlsZU1vZGFsdjIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Profile/Wizard.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFByb2ZpbGVcV2l6YXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Profile/WizardStep.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFByb2ZpbGVcV2l6YXJkU3RlcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Sidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFNpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/Sidebarv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFNpZGViYXJ2Mi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainComponents/SlidingMenuBox.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5Db21wb25lbnRzXFNsaWRpbmdNZW51Qm94LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/AllowanceTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBbGxvd2FuY2VUeXBlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/AnnualLeaveCreditsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBbm51YWxMZWF2ZUNyZWRpdHNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApplicantsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHBsaWNhbnRzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/AppointmentCSFORM33B.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHBvaW50bWVudENTRk9STTMzQi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/AppointmentMain/AppointmentsReportMainModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHBvaW50bWVudE1haW5cQXBwb2ludG1lbnRzUmVwb3J0TWFpbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/AppointmentModalTemporary.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHBvaW50bWVudE1vZGFsVGVtcG9yYXJ5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveDemotionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlRGVtb3Rpb25Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveNewEmployeeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlTmV3RW1wbG95ZWVNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApprovePromotionEmployee.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlUHJvbW90aW9uRW1wbG95ZWUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveReappointmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlUmVhcHBvaW50bWVudE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveReelectionEmployee.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlUmVlbGVjdGlvbkVtcGxveWVlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveReemploymentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlUmVlbXBsb3ltZW50TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ApproveSalaryAdjustment.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xBcHByb3ZlU2FsYXJ5QWRqdXN0bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/BackgroundInvestigation/BgFinal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxCZ0ZpbmFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/BackgroundInvestigation/BgIntro.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxCZ0ludHJvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/BackgroundInvestigation/BgQuestionnaire.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xCYWNrZ3JvdW5kSW52ZXN0aWdhdGlvblxCZ1F1ZXN0aW9ubmFpcmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/BgInvestigationReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xCZ0ludmVzdGlnYXRpb25SZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ChangePasswordModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDaGFuZ2VQYXNzd29yZE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CharacterReference/CrFinal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDaGFyYWN0ZXJSZWZlcmVuY2VcQ3JGaW5hbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CharacterReference/CrIntro.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDaGFyYWN0ZXJSZWZlcmVuY2VcQ3JJbnRyby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CharacterReference/CrQuestionnaire.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDaGFyYWN0ZXJSZWZlcmVuY2VcQ3JRdWVzdGlvbm5haXJlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CompetencyComponents/AddLevelModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDb21wZXRlbmN5Q29tcG9uZW50c1xBZGRMZXZlbE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CompetencyComponents/CompetencyModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDb21wZXRlbmN5Q29tcG9uZW50c1xDb21wZXRlbmN5TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/CrQuestionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xDclF1ZXN0aW9uTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/DailyTimeRecord/DailyTimeRecord02Modal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xEYWlseVRpbWVSZWNvcmRcRGFpbHlUaW1lUmVjb3JkMDJNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/DailyTimeRecord/EmployeeDailyTimeRecordModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xEYWlseVRpbWVSZWNvcmRcRW1wbG95ZWVEYWlseVRpbWVSZWNvcmRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EffectivityDateModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFZmZlY3Rpdml0eURhdGVNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/CharacterReferenceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xDaGFyYWN0ZXJSZWZlcmVuY2VNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/CommunityServiceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xDb21tdW5pdHlTZXJ2aWNlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/EducationalAttainmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xFZHVjYXRpb25hbEF0dGFpbm1lbnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/EducationalAttainmentModalV2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xFZHVjYXRpb25hbEF0dGFpbm1lbnRNb2RhbFYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/EmployeeEligibilitiesModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xFbXBsb3llZUVsaWdpYmlsaXRpZXNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/EmployeeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xFbXBsb3llZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/EmployeeWorkExperienceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xFbXBsb3llZVdvcmtFeHBlcmllbmNlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/FamilyMember.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xGYW1pbHlNZW1iZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/PdsAssistance.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xQZHNBc3Npc3RhbmNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/RequestProfileUpdateModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xSZXF1ZXN0UHJvZmlsZVVwZGF0ZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeModals/ServiceRecordPrintModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZU1vZGFsc1xTZXJ2aWNlUmVjb3JkUHJpbnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeePremModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZVByZW1Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/EmployeeSelectionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFbXBsb3llZVNlbGVjdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Examination/FinalResultComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFeGFtaW5hdGlvblxGaW5hbFJlc3VsdENvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Examination/Intro.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFeGFtaW5hdGlvblxJbnRyby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Examination/QuestionnaireModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFeGFtaW5hdGlvblxRdWVzdGlvbm5haXJlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Examination/Questionnairev2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xFeGFtaW5hdGlvblxRdWVzdGlvbm5haXJldjIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/HtmlEditorModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xIdG1sRWRpdG9yTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/JobVacancyApplyModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xKb2JWYWNhbmN5QXBwbHlNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/JobVacancyDetailModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xKb2JWYWNhbmN5RGV0YWlsTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveApplicationDetailsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZUFwcGxpY2F0aW9uRGV0YWlsc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveApplicationEditModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZUFwcGxpY2F0aW9uRWRpdE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveApplicationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZUFwcGxpY2F0aW9uTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveApplicationSignatories/LeaveApplicationForm1Modal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZUFwcGxpY2F0aW9uU2lnbmF0b3JpZXNcTGVhdmVBcHBsaWNhdGlvbkZvcm0xTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveCredit/LeaveCreditModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZUNyZWRpdFxMZWF2ZUNyZWRpdE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveManagement/LeaveCreditsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZU1hbmFnZW1lbnRcTGVhdmVDcmVkaXRzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveManagement/MonetizationDetailsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZU1hbmFnZW1lbnRcTW9uZXRpemF0aW9uRGV0YWlsc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveManagement/MonetizedLeaveCreditsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZU1hbmFnZW1lbnRcTW9uZXRpemVkTGVhdmVDcmVkaXRzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeavePermissionDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZVBlcm1pc3Npb25EZXRhaWxzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeavePermissionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZVBlcm1pc3Npb25Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeavePermissionModalv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZVBlcm1pc3Npb25Nb2RhbHYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeavePermissionSignatory.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZVBlcm1pc3Npb25TaWduYXRvcnkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LeaveTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMZWF2ZVR5cGVNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LocatorSlipDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMb2NhdG9yU2xpcERldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LocatorSlipModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMb2NhdG9yU2xpcE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/LocatorSlipSignatory/LocatorSlipSig.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xMb2NhdG9yU2xpcFNpZ25hdG9yeVxMb2NhdG9yU2xpcFNpZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Cluster/ClusterMembersModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXENsdXN0ZXJcQ2x1c3Rlck1lbWJlcnNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Cluster/ClusterModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXENsdXN0ZXJcQ2x1c3Rlck1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Employee/EmployeeReElectionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXEVtcGxveWVlXEVtcGxveWVlUmVFbGVjdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Employee/EmployeeRenewalModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXEVtcGxveWVlXEVtcGxveWVlUmVuZXdhbE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Employee/EmployeeSalaryAdjustmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXEVtcGxveWVlXEVtcGxveWVlU2FsYXJ5QWRqdXN0bWVudE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Employee/EmployeeSeparationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXEVtcGxveWVlXEVtcGxveWVlU2VwYXJhdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Masterdata/Employee/EmploymentDetailsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xNYXN0ZXJkYXRhXEVtcGxveWVlXEVtcGxveW1lbnREZXRhaWxzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/NewMail.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xOZXdNYWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/NonPlantillaItemDetailModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xOb25QbGFudGlsbGFJdGVtRGV0YWlsTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/NonPlantillaModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xOb25QbGFudGlsbGFNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/OpenJobVacancyModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xPcGVuSm9iVmFjYW5jeU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/OrganizationLevelModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xPcmdhbml6YXRpb25MZXZlbE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PagibigContributionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYWdpYmlnQ29udHJpYnV0aW9uTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PagibigLoanReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYWdpYmlnTG9hblJlcG9ydE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PaperEvalSummaryReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXBlckV2YWxTdW1tYXJ5UmVwb3J0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PaperEvaluationTemplateItemModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXBlckV2YWx1YXRpb25UZW1wbGF0ZUl0ZW1Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PayrollValidationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsVmFsaWRhdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/DeductionTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXERlZHVjdGlvblR5cGVNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/DumpPayroll.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXER1bXBQYXlyb2xsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeAllowanceComponents/GenerateAllowanceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlQWxsb3dhbmNlQ29tcG9uZW50c1xHZW5lcmF0ZUFsbG93YW5jZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeAllowanceComponents/ManageAllowanceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlQWxsb3dhbmNlQ29tcG9uZW50c1xNYW5hZ2VBbGxvd2FuY2VNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeDeductionsComponents/GenerateDeductionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlRGVkdWN0aW9uc0NvbXBvbmVudHNcR2VuZXJhdGVEZWR1Y3Rpb25Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeDeductionsComponents/ManageDeductionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlRGVkdWN0aW9uc0NvbXBvbmVudHNcTWFuYWdlRGVkdWN0aW9uTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeLoanModals/GenerateLoanModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlTG9hbk1vZGFsc1xHZW5lcmF0ZUxvYW5Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeLoanModals/ManageLoanModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlTG9hbk1vZGFsc1xNYW5hZ2VMb2FuTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeePremiumComponents/GeneratePremiumModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlUHJlbWl1bUNvbXBvbmVudHNcR2VuZXJhdGVQcmVtaXVtTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeePremiumComponents/ManagePremiumModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlUHJlbWl1bUNvbXBvbmVudHNcTWFuYWdlUHJlbWl1bU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeePremiumModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlUHJlbWl1bU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeWithholdingTaxComponents/GenerateWithholdingTaxModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlV2l0aGhvbGRpbmdUYXhDb21wb25lbnRzXEdlbmVyYXRlV2l0aGhvbGRpbmdUYXhNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/EmployeeWithholdingTaxComponents/ManageWithholdingTaxModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEVtcGxveWVlV2l0aGhvbGRpbmdUYXhDb21wb25lbnRzXE1hbmFnZVdpdGhob2xkaW5nVGF4TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/HolidayModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXEhvbGlkYXlNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/LoanTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXExvYW5UeXBlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/MultiplierModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXE11bHRpcGxpZXJNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/OtherLoansModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXE90aGVyTG9hbnNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PayrollDateDetailModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBheXJvbGxEYXRlRGV0YWlsTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PayrollDateModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBheXJvbGxEYXRlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PayrollGenerationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBheXJvbGxHZW5lcmF0aW9uTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PayrollProfileComponents/PayrollProfileModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBheXJvbGxQcm9maWxlQ29tcG9uZW50c1xQYXlyb2xsUHJvZmlsZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PayrollSettingsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBheXJvbGxTZXR0aW5nc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PersonnelListingReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFBlcnNvbm5lbExpc3RpbmdSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PremiumContributions/GsisContibutionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFByZW1pdW1Db250cmlidXRpb25zXEdzaXNDb250aWJ1dGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PremiumContributions/PhilhealthContributionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFByZW1pdW1Db250cmlidXRpb25zXFBoaWxoZWFsdGhDb250cmlidXRpb25Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PrintGeneralPayrollModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFByaW50R2VuZXJhbFBheXJvbGxNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PrintLoansAndPremiumSummaryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFByaW50TG9hbnNBbmRQcmVtaXVtU3VtbWFyeU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/PrintSpecialPayrollModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFByaW50U3BlY2lhbFBheXJvbGxNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Payroll/SpecialPayrollGenerationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQYXlyb2xsXFNwZWNpYWxQYXlyb2xsR2VuZXJhdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Placement/StepIncrementApprovalModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFjZW1lbnRcU3RlcEluY3JlbWVudEFwcHJvdmFsTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PlantillaItemDetailModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFudGlsbGFJdGVtRGV0YWlsTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PlantillaModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFudGlsbGFNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PlantillaModalV2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFudGlsbGFNb2RhbFYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PlantillaSearchModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFudGlsbGFTZWFyY2hNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/AddEditCompetency.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcQWRkRWRpdENvbXBldGVuY3kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/AddPositionEligibility.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcQWRkUG9zaXRpb25FbGlnaWJpbGl0eS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/EditEligibility.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcRWRpdEVsaWdpYmlsaXR5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/EditPositionEducBackground.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcRWRpdFBvc2l0aW9uRWR1Y0JhY2tncm91bmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/EditPositionExperience.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcRWRpdFBvc2l0aW9uRXhwZXJpZW5jZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/EditPositionTraining.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcRWRpdFBvc2l0aW9uVHJhaW5pbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/PositionAddModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcUG9zaXRpb25BZGRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionComponents/PositionEditModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbkNvbXBvbmVudHNcUG9zaXRpb25FZGl0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PositionModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQb3NpdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/GsisMasterdataModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1xHc2lzTWFzdGVyZGF0YU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/HdmfMasterdataModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1xIZG1mTWFzdGVyZGF0YU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/PhilHealthMasterdataModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1xQaGlsSGVhbHRoTWFzdGVyZGF0YU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/SssMasterdataModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1xTc3NNYXN0ZXJkYXRhTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/WithHoldingMasterdataModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1xXaXRoSG9sZGluZ01hc3RlcmRhdGFNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/wtaxContent/Status.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1x3dGF4Q29udGVudFxTdGF0dXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Premiums/wtaxContent/Tax.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcmVtaXVtc1x3dGF4Q29udGVudFxUYXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ProfileModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQcm9maWxlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/RecruitmentPlanConspicuous/Conspicuous1.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xSZWNydWl0bWVudFBsYW5Db25zcGljdW91c1xDb25zcGljdW91czEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/RecruitmentPlanConspicuous/Conspicuous2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xSZWNydWl0bWVudFBsYW5Db25zcGljdW91c1xDb25zcGljdW91czIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/RecruitmentPlanConspicuous/Conspicuous3.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xSZWNydWl0bWVudFBsYW5Db25zcGljdW91c1xDb25zcGljdW91czMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/RecruitmentPlanModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xSZWNydWl0bWVudFBsYW5Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/RecruitmentPlanReportSettingsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xSZWNydWl0bWVudFBsYW5SZXBvcnRTZXR0aW5nc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/StaffingModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xTdGFmZmluZ01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RecruitmentModals/StaffingSignatoryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZWNydWl0bWVudE1vZGFsc1xTdGFmZmluZ1NpZ25hdG9yeU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Reports/HrManagement/PlantillaVacancyReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZXBvcnRzXEhyTWFuYWdlbWVudFxQbGFudGlsbGFWYWNhbmN5UmVwb3J0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Reports/HrManagement/VacantPositionsReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZXBvcnRzXEhyTWFuYWdlbWVudFxWYWNhbnRQb3NpdGlvbnNSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Reports/Payroll/PayrollSummaryReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZXBvcnRzXFBheXJvbGxcUGF5cm9sbFN1bW1hcnlSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RequestAppointmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZXF1ZXN0QXBwb2ludG1lbnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/RetireableEmployeeReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xSZXRpcmVhYmxlRW1wbG95ZWVSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SalaryDetailsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTYWxhcnlEZXRhaWxzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SalaryEffectivityProgressModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTYWxhcnlFZmZlY3Rpdml0eVByb2dyZXNzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/ScrapBuildPlantillaModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTY3JhcEJ1aWxkUGxhbnRpbGxhTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/ComparativeReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cQ29tcGFyYXRpdmVSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/Exam/CheckExamModel.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cRXhhbVxDaGVja0V4YW1Nb2RlbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/Exam/ExamSubjectEditModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cRXhhbVxFeGFtU3ViamVjdEVkaXRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/Exam/ExamSubjectModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cRXhhbVxFeGFtU3ViamVjdE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/Exam/ExamSubjectQuestion.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cRXhhbVxFeGFtU3ViamVjdFF1ZXN0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/Interview/SubmitCompetencyModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cSW50ZXJ2aWV3XFN1Ym1pdENvbXBldGVuY3lNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Selection/TurnAroundTimeReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZWxlY3Rpb25cVHVybkFyb3VuZFRpbWVSZXBvcnRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SeparationReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZXBhcmF0aW9uUmVwb3J0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SeparationStatusRequest.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZXBhcmF0aW9uU3RhdHVzUmVxdWVzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SgEffectivityDateModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTZ0VmZmVjdGl2aXR5RGF0ZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/SSSContribution.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xTU1NDb250cmlidXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/CalendarConfirm.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xDYWxlbmRhckNvbmZpcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/DeviceSelection.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xEZXZpY2VTZWxlY3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/EditTimeLog.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xFZGl0VGltZUxvZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Schedule/GenerateScheduleModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTY2hlZHVsZVxHZW5lcmF0ZVNjaGVkdWxlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Schedule/ManageScheduleModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTY2hlZHVsZVxNYW5hZ2VTY2hlZHVsZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Schedule/PrintScheduleModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTY2hlZHVsZVxQcmludFNjaGVkdWxlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Schedule/ScheduleDetailModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTY2hlZHVsZVxTY2hlZHVsZURldGFpbE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Schedule/WeekScheduleModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTY2hlZHVsZVxXZWVrU2NoZWR1bGVNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Station/CompDevice.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTdGF0aW9uXENvbXBEZXZpY2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Station/CompStation.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTdGF0aW9uXENvbXBTdGF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Station/EmployeeRegister.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTdGF0aW9uXEVtcGxveWVlUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TimeKeeping/Station/StationDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUaW1lS2VlcGluZ1xTdGF0aW9uXFN0YXRpb25EZXRhaWxzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TrainingSeminarEditModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmFpbmluZ1NlbWluYXJFZGl0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TrainingSeminarModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmFpbmluZ1NlbWluYXJNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TrainingSeminarModalv2.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmFpbmluZ1NlbWluYXJNb2RhbHYyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TravelOrder/FormSelector.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmF2ZWxPcmRlclxGb3JtU2VsZWN0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TravelOrder/Post.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmF2ZWxPcmRlclxQb3N0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TravelOrder/PostEmployee.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmF2ZWxPcmRlclxQb3N0RW1wbG95ZWUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/TravelOrder/Select.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xUcmF2ZWxPcmRlclxTZWxlY3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceCharacteristics.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlQ2hhcmFjdGVyaXN0aWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceHeads.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlSGVhZHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceIntro.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlSW50cm8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceIssues.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlSXNzdWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkForceModals/VacantStatusReportModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya0ZvcmNlTW9kYWxzXFZhY2FudFN0YXR1c1JlcG9ydE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkForceModals/WorkforceCharacteristicsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya0ZvcmNlTW9kYWxzXFdvcmtmb3JjZUNoYXJhY3RlcmlzdGljc01vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforcePositions.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlUG9zaXRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceStrategies.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlU3RyYXRlZ2llcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/Workforce/WorkforceSupplyGaps.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xXb3JrZm9yY2VcV29ya2ZvcmNlU3VwcGx5R2Fwcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/ReCAPTCHA.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJlQ0FQVENIQS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/SharedLevelOrganization.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFNoYXJlZExldmVsT3JnYW5pemF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Spinner.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFNwaW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/IndexV2.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXhWMi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-huhj9tr7hk
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Pages/IndexV2backup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXhWMmJhY2t1cC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-dyijzyqaq3
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/CustomNotFound.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEN1c3RvbU5vdEZvdW5kLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-9hvdc22d36
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/MainLayout.old.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQub2xkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-vvn7pwrjx0
+
+[C:/Users/Shuji/OneDrive/Documents/hrmsv4New/HRMSv4/Client/Shared/Modals/PlantillaRecordModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1vZGFsc1xQbGFudGlsbGFSZWNvcmRNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-8ci80crg9j

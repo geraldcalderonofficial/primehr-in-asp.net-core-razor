@@ -1,0 +1,262 @@
+﻿<style>
+    .fab-container {
+        position: fixed;
+        bottom: 50px;
+        right: 50px;
+        z-index: 999;
+        cursor: pointer;
+    }
+
+    .fab-icon-holder {
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+        background: #016fb9;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+        .fab-icon-holder:hover {
+            opacity: 0.8;
+        }
+
+        .fab-icon-holder i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 25px;
+            color: #ffffff;
+        }
+
+    .fab {
+        width: 60px;
+        height: 60px;
+        background: #d23f31;
+    }
+
+    .fab-options {
+        list-style-type: none;
+        margin: 0;
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: scale(0);
+        transform-origin: 85% bottom;
+    }
+
+        .fab:hover + .fab-options,
+        .fab-options:hover {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .fab-options li {
+            display: flex;
+            justify-content: flex-end;
+            padding: 5px;
+        }
+
+    .fab-label {
+        padding: 2px 5px;
+        align-self: center;
+        user-select: none;
+        white-space: nowrap;
+        border-radius: 3px;
+        font-size: 16px;
+        background: #666666;
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        margin-right: 10px;
+    }
+</style>
+
+<div class="fab-container">
+    <div class="fab fab-icon-holder">
+        <i class="pe-7s-config"></i>
+    </div>
+    <ul class="fab-options">
+        @if (ApprovalMode == true)
+        {
+              <li>
+                <span class="fab-label">Approve</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-check" @onclick="@(() => OnClick.InvokeAsync("Approve"))"></i>
+                </div>
+             </li>
+             <li>
+                 <span class="fab-label">Decline</span>
+                 <div class="fab-icon-holder">
+                    <i class="fas fa-thumbs-down" @onclick="@(() => OnClick.InvokeAsync("Decline"))"></i>
+                 </div>
+             </li>            
+        }
+        else if (ScheduleMode) 
+        {
+            <li>
+                <span class="fab-label">View Detail</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-calendar" @onclick="@(() => OnClick.InvokeAsync("Details"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Generate Schedule</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-sync-alt" @onclick="@(() => OnClick.InvokeAsync("Generate"))"></i>
+                </div>
+            </li>
+           
+            <li>
+                <span class="fab-label">Manage Schedule</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Manage"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Schedule</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-times" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (PremiumMode)
+        {
+            <li>
+                <span class="fab-label">Add Premium</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-plus" @onclick="@(() => OnClick.InvokeAsync("Add"))"></i>
+                </div>
+            </li>
+
+            <li>
+                <span class="fab-label">Update Premium</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Premium</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (WithholdingTaxMode)
+        {
+            <li>
+                <span class="fab-label">Add Withholding Tax</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-plus" @onclick="@(() => OnClick.InvokeAsync("Add"))"></i>
+                </div>
+            </li>
+
+            <li>
+                <span class="fab-label">Update Withholding Tax</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Withholding Tax</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (DeductionMode)
+        {
+            <li>
+                <span class="fab-label">Add Deduction</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-plus" @onclick="@(() => OnClick.InvokeAsync("Add"))"></i>
+                </div>
+            </li>
+
+            <li>
+                <span class="fab-label">Update Deduction</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Deduction</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (AllowanceMode)
+        {
+            <li>
+                <span class="fab-label">Add Allowance</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-plus" @onclick="@(() => OnClick.InvokeAsync("Add"))"></i>
+                </div>
+            </li>
+
+            <li>
+                <span class="fab-label">Update Allowance</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Allowance</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (PayrollProfileMode)
+        {
+
+            <li>
+                <span class="fab-label">Update</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+        else if (LoanMode)
+        {
+            <li>
+                <span class="fab-label">Add Loan</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-plus" @onclick="@(() => OnClick.InvokeAsync("Add"))"></i>
+                </div>
+            </li>
+
+            <li>
+                <span class="fab-label">Update Loan</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-pen" @onclick="@(() => OnClick.InvokeAsync("Update"))"></i>
+                </div>
+            </li>
+            <li>
+                <span class="fab-label">Clear Loan</span>
+                <div class="fab-icon-holder">
+                    <i class="fas fa-trash" @onclick="@(() => OnClick.InvokeAsync("Clear"))"></i>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
+@code {
+    [Parameter] public bool ApprovalMode { get; set; } = false;
+    [Parameter] public string Movement { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    [Parameter] public bool ScheduleMode { get; set; } = false;
+    [Parameter] public bool PremiumMode { get; set; } = false;
+    [Parameter] public bool WithholdingTaxMode { get; set; } = false;
+    [Parameter] public bool DeductionMode { get; set; } = false;
+    [Parameter] public bool AllowanceMode { get; set; } = false;
+    [Parameter] public bool PayrollProfileMode { get; set; } = false;
+    [Parameter] public bool LoanMode { get; set; } = false;
+}

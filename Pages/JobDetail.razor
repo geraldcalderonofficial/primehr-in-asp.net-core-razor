@@ -1,0 +1,222 @@
+﻿@page "/job-detail/{JobVacancyId:int}"
+@layout EmptyLayout
+@inject IJobVacancies service
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+<style>
+    #arvinHeader {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        background-color: #3f6ad8;
+        transition: all 0.4s ease;
+        z-index: 10 !important;
+        color: white;
+    }
+
+    .link {
+        color: #FFFFFF !important;
+    }
+
+    .bg-alternate {
+        background-color: #3f6ad8 !important;
+    }
+
+    .detail-wrapper-body {
+        padding: 1.5em 1em 1.5em 1.5em;
+    }
+
+    .user_job_detail {
+        border-left: 1px solid #eaeff5;
+    }
+
+    .mrg-bot-10 {
+        margin-bottom: 10px;
+    }
+
+    .width-100 {
+        width: 100px;
+        height: 100px;
+    }
+
+    .padd-r-10 {
+        padding-right: 15px;
+    }
+
+    .detail-wrapper {
+        width: 100%;
+        display: table;
+        border-radius: 6px;
+        margin-bottom: 40px;
+        border: 1px solid #eaeff5;
+    }
+
+    .detail-list {
+        margin: 0 0 20px 0;
+        padding: 0;
+        display: inline-block;
+        width: 100%;
+    }
+
+        .detail-list li {
+            list-style: none;
+            float: left;
+            width: 100%;
+            margin: 0;
+            margin-bottom: 0px;
+            position: relative;
+            padding-left: 23px;
+            line-height: 22px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+    li {
+        display: list-item;
+        text-align: -webkit-match-parent;
+    }
+</style>
+
+
+<div class="app-container">
+    <div class="app-header" id="arvinHeader">
+        <div class="app-header__logo"><div class="logo-src" style="max-width: 500px;"></div></div>
+        <div class="app-header__mobile-menu"><div></div></div>
+        <div class="app-header__menu"><span><button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav"><span class="btn-icon-wrapper"><i class="fa fa-ellipsis-v fa-w-6"></i></span></button></span></div>
+        <div class="app-header__content">
+            <div class="app-header-left"></div>
+            <div class="app-header-right">
+                <ul class="header-megamenu nav font-change">
+                    <li class="nav-item">
+                        <a href="tel:0919-730-7006" class="nav-link link">
+                            <i class="nav-link-icon fa fa-phone link"></i>
+                            Call us now
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/login" class="nav-link link">
+                            <i class="nav-link-icon fa fa-lock link"></i>
+                            Login
+                        </a>
+                    </li>
+                    <li class="btn-group nav-item">
+                        <a href="/register" class="nav-link link" aria-expanded="false">
+                            <i class="nav-link-icon fa fa-user link"></i>
+                            Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+   
+    <div class="app-main__outer" style="margin: 80px;">
+        <section class="padd-top-80 padd-bot-80" mt-5>
+            <div class="container">
+                 <h1>Job Detail</h1>
+                <div class="row">
+                    <div class="col-md-8 col-sm-12">
+                        <div class="card-shadow-primary card-border mb-3 profile-responsive card">
+                            <div class="detail-wrapper-body">
+                                <div class="row">
+                                    <div class="col-md-4 text-center user_profile_img">
+                                        <img src="/images/briefcase.png" class="width-100" alt="">
+                                        <h4 class="meg-0">@detail.Position</h4>
+                                        <span>@detail.Organization</span>
+                                        <div class="text-center">
+                                            <button type="button" @onclick="Apply" class="btn btn-primary">Apply Now</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 user_job_detail">
+                                        <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-wallet padd-r-10"></i> ₱ @detail.SalaryRate </div>
+                                        <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-phone padd-r-10"></i>@detail.Number</div>
+                                        <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-mail-open padd-r-10"></i>@detail.Email </div>
+                                        <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-date padd-r-10"></i><span class="full-type">@detail.EmploymentStatus</span> </div>
+                                        <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-folder padd-r-10"></i><span class="cl-danger">@detail.Slots Open Position</span> </div>
+                                       @* <div class="col-sm-12 mrg-bot-10"> <i class="pe-7s-menu padd-r-10"></i>1 Year Exp. </div>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-shadow-primary card-border mb-3 ">
+                            <div class="card-header">Job Description</div>
+                            <div class="card-body">
+                                <p>@detail.Description</p>
+                                @*<p>"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.</p>
+                                <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>*@
+                            </div>
+                        </div>
+                        <div class="card-shadow-primary card-border mb-3 ">
+                            <div class="card-header">Job Skills</div>
+                            <div class="card-body">
+                                <ul class="detail-list">
+                                    <li>Contrary to popular belief, Lorem Ipsum is not simply random text </li>
+                                    <li>Latin professor at Hampden-Sydney College in Virginia </li>
+                                    <li>looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage ideas </li>
+                                    <li>The standard chunk of Lorem Ipsum used since the 1500s is reproduced </li>
+                                    <li>accompanied by English versions from the 1914 translation by H. Rackham </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-shadow-primary card-border mb-3 ">
+                            <div class="card-header">Requirements</div>
+                            <div class="card-body">
+                                <p>"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue.</p>
+                                <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-md-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="widget-boxed-body">
+                                    <div class="side-list no-border">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><i class="pe-7s-wallet padd-r-10"></i>Package: 20K To 50K/Month</li>
+                                            <li class="list-group-item"><i class="pe-7s-global padd-r-10"></i>https://www.example.com</li>
+                                            <li class="list-group-item"><i class="pe-7s-phone padd-r-10"></i>91 234 567 8765</li>
+                                            <li class="list-group-item"><i class="pe-7s-mail-open padd-r-10"></i>mail@example.com</li>
+                                            <li class="list-group-item"><i class="pe-7s-study padd-r-10"></i>Bachelor Degree</li>
+                                            <li class="list-group-item"><i class="pe-7s-menu padd-r-10"></i>3 Year Exp.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int JobVacancyId { get; set; }
+    HRMSv4.Shared.OnBoarding.JobDetail detail = new HRMSv4.Shared.OnBoarding.JobDetail();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        detail = await service.JobDetail(JobVacancyId);
+        StateHasChanged();
+
+        // localStorage.SetItem("JobDetail", 8);
+    }
+
+    async void Apply()
+    {
+        //localStorage.SetItem("jobId", JobVacancyId);
+
+        /* Encrypt jobId */
+        var jobId = _crypto.ConvertStringToHex(JobVacancyId.ToString(), System.Text.Encoding.Unicode);
+        //await Crypto.EncryptAsync(jvId.ToString());
+        localStorage.SetItem("jobId", jobId.ToString());
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userRole = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+             _navigation.NavigateTo("/login");
+        }
+    }
+}

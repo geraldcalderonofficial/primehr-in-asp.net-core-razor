@@ -1,0 +1,75 @@
+﻿@page "/confirm-email"
+@*@inject IAuthService _authService*@
+@inject IAuthenticationService AuthenticationService;
+@using HRMSv4.Client.Interface.Auth
+@using Microsoft.AspNetCore.WebUtilities
+@using HRMSv4.Shared.Auth
+@using Newtonsoft.Json
+@inject NavigationManager NavManager
+
+<a href="/" style="cursor: pointer;"><div class="app-logo-inverse mx-auto mb-1" style="height:52px!important; width:200px !important"></div></a>
+<div class="modal-dialog w-100 mx-auto">
+    <div class="modal-content" style="padding: 35px;">
+        <div class="modal-body">
+            <div class="h5 modal-title text-center">
+                <h1 class="text-success font-30 font-bold">Congratulations!</h1>
+                <p>Your email has already been confirmed. You can now login to the application.</p>
+                <div class="swal2-icon swal2-success swal2-animate-success-icon" style="margin-bottom: 30px;">
+                    <div class="swal2-success-circular-line-left" style="background-color: rgb(255, 255, 255);"></div>
+                    <span class="swal2-success-line-tip"></span>
+                    <span class="swal2-success-line-long"></span>
+                    <div class="swal2-success-ring"></div>
+                    <div class="swal2-success-fix" style="background-color: rgb(255, 255, 255);"></div>
+                    <div class="swal2-success-circular-line-right" style="background-color: rgb(255, 255, 255);"></div>
+                </div>
+                <span>@resMsg</span>
+            </div>
+            <div class="divider"></div>
+            <h6 class="mb-0 text-center">
+                <a href="/Login" class="btn btn-primary mrg-top-20" style="color:white">Go To Login</a>
+            </h6>
+        </div>
+    </div>
+</div>
+<div class="text-center">
+    Copyright ©2022 Nspire, <a href="https://www.primehr.ph">PrimeHR v4</a> ®
+    @{
+        Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            <b>Build : @string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)</b>
+    }
+</div>
+
+@code {
+    public string resMsg = string.Empty;
+
+    private string? _userid;
+    private string? _code;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var queryStrings = QueryHelpers.ParseQuery(uri.Query);
+
+        if (queryStrings.TryGetValue("userId", out var userVal))
+        {
+            _userid = userVal;
+        }
+
+        if (queryStrings.TryGetValue("code", out var codeVal))
+        {
+            _code = codeVal;
+        }
+
+        var confirm = new HRMSv4.Shared.Auth.ConfirmEmail
+            {
+                UserId = _userid,
+                Code = _code
+            };
+        /* Remove 5/2/2022 3:54 pm By ronald */
+        var res =  await AuthenticationService.ConfirmEmail(confirm);
+        if (res.IsSuccessStatusCode) {
+            resMsg = await res.Content.ReadAsStringAsync();
+            //var message = JsonConvert.DeserializeObject(resMsg);
+        }
+    }
+}

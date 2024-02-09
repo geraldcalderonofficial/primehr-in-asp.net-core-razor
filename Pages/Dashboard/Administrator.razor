@@ -1,0 +1,429 @@
+﻿@page "/dashboard/administrator"
+@inherits ComponentBase
+@using HRMSv4.Client.Helpers
+@layout MainLayout
+@attribute [Authorize(Roles = "Administrator, Developer, Job Provider")]
+
+<style>
+    .wrapper {
+        display: flex;
+    }
+
+    .col {
+        flex: 1;
+        padding: 1em;
+    }
+</style>
+@if (!@_isLoading)
+{
+    <div class="text-center">
+        <div class="block-page-btn-example-1"></div>
+    </div>
+}
+else
+{
+    <h4>Administrator Dashboard</h4>
+    <div class="row">
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-night-fade">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Applicants</div>
+                        <div class="widget-subheading"></div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white">
+                            <span>23</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-arielle-smile">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Selection</div>
+                        <div class="widget-subheading"></div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white">
+                            <span>32</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-happy-green">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Placement</div>
+                        <div class="widget-subheading"></div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white">
+                            <span>64</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="main-card mb-3 ">
+            <div class="row">
+                <div class="p-2">
+                    <div class="col-12">
+                        <h5 class="card-title">Learning and Development</h5>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-4">
+                                <div class="card-border mb-sm-3 mb-md-0 border-light card" style="height:30vh">
+                                    <div class="widget-content text-center" style="margin:5vh">
+                                        <div class="widget-numbers" style="font-size: 3.7rem !important">3</div>
+                                        <h1 class="menu-header-subtitle">Seminars</h1>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-lg-8">
+                                <div class="main-card mb-3 card">
+                                    <div class="grid-menu grid-menu-2col">
+                                        <div class="g-0 row">
+                                            <div class="col-sm-12">
+                                                <div class="widget-chart widget-chart-hover">
+                                                    <h5>Employee Competency</h5>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="widget-chart widget-chart-hover">
+                                                    <div class="icon-wrapper rounded-circle">
+                                                        <div class="icon-wrapper-bg bg-danger"></div>
+                                                        <i class="lnr-laptop-phone text-danger"></i>
+                                                    </div>
+                                                    <div class="widget-numbers">5.82k</div>
+                                                    <div class="widget-subheading">Subject</div>
+                                                    <div class="widget-description text-primary">
+                                                        <span class="pe-1">54.1%</span>
+                                                        <i class="fa fa-angle-up"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="widget-chart widget-chart-hover br-br">
+                                                    <div class="icon-wrapper rounded-circle">
+                                                        <div class="icon-wrapper-bg bg-success"></div>
+                                                        <i class="lnr-screen"></i>
+                                                    </div>
+                                                    <div class="widget-numbers">17.2k</div>
+                                                    <div class="widget-subheading">Profiles</div>
+                                                    <div class="widget-description text-warning">
+                                                        <span class="pe-1">175.5%</span>
+                                                        <i class="fa fa-arrow-left"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="p-2">
+                        <div class="col-md-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-header">
+                                    Eligible Employees
+                                    <div class="btn-actions-pane-right">
+                                        <div role="group" class="btn-group-sm btn-group">
+                                            <button class="active btn btn-focus">Last Week</button>
+                                            <button class="btn btn-focus">All Month</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">#</th>
+                                                <th>Name</th>
+                                                <th class="text-center">City</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center text-muted">#345</td>
+                                                <td>
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <div class="widget-content-left">
+                                                                    <img width="40" class="rounded-circle"
+                                                                     src="images/avatars/4.jpg" alt="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="widget-content-left flex2">
+                                                                <div class="widget-heading">John Doe</div>
+                                                                <div class="widget-subheading opacity-7">Web Developer</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">Madrid</td>
+                                                <td class="text-center">
+                                                    <div class="badge bg-warning">Pending</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" id="PopoverCustomT-1" class="btn btn-primary btn-sm">Details</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center text-muted">#347</td>
+                                                <td>
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <div class="widget-content-left">
+                                                                    <img width="40" class="rounded-circle"
+                                                                     src="images/avatars/3.jpg" alt="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="widget-content-left flex2">
+                                                                <div class="widget-heading">Ruben Tillman</div>
+                                                                <div class="widget-subheading opacity-7">Etiam sit amet orci eget</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">Berlin</td>
+                                                <td class="text-center">
+                                                    <div class="badge bg-success">Completed</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" id="PopoverCustomT-2" class="btn btn-primary btn-sm">Details</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center text-muted">#321</td>
+                                                <td>
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <div class="widget-content-left">
+                                                                    <img width="40" class="rounded-circle"
+                                                                     src="images/avatars/2.jpg" alt="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="widget-content-left flex2">
+                                                                <div class="widget-heading">Elliot Huber</div>
+                                                                <div class="widget-subheading opacity-7">
+                                                                    Lorem ipsum dolor sic
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">London</td>
+                                                <td class="text-center">
+                                                    <div class="badge bg-danger">In Progress</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" id="PopoverCustomT-3" class="btn btn-primary btn-sm">Details</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center text-muted">#55</td>
+                                                <td>
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <div class="widget-content-left">
+                                                                    <img width="40" class="rounded-circle"
+                                                                     src="images/avatars/1.jpg" alt="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="widget-content-left flex2">
+                                                                <div class="widget-heading">Vinnie Wagstaff</div>
+                                                                <div class="widget-subheading opacity-7">UI Designer</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">Amsterdam</td>
+                                                <td class="text-center">
+                                                    <div class="badge bg-info">On Hold</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" id="PopoverCustomT-4" class="btn btn-primary btn-sm">Details</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-block text-center card-footer">
+                                    <button class="me-2 btn-icon btn-icon-only btn btn-outline-danger">
+                                        <i class="pe-7s-trash btn-icon-wrapper"></i>
+                                    </button>
+                                    <button class="btn-wide btn btn-success">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="row">
+            <div class="p-2">
+                <div class="col-12">
+                    <h5 class="card-title">Performance Management</h5>
+                    <div class="row  mb-3 ">
+                        <div class="col-sm-12 col-lg-8">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Target Sales</h5>
+                                    <Chart Config="_config1" @ref="_chart1" Height="400px" Style="margin-bottom: 150px;"></Chart>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4">
+                            <div class="card-shadow-primary card-border mb-3 card">
+                                <div class="p-3">
+                                    <h6 class="text-muted text-uppercase font-size-md opacity-5 fw-normal">Top Performing Employee</h6>
+                                    <ul class="rm-list-borders list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Ella-Rose Henry</div>
+                                                        <div class="widget-subheading">Web Developer</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Ruben Tillman</div>
+                                                        <div class="widget-subheading">UI Designer</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Vinnie Wagstaff</div>
+                                                        <div class="widget-subheading">Java Programmer</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Katerina Hutchings</div>
+                                                        <div class="widget-subheading">Group ArchitectUI</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Harper Rose</div>
+                                                        <div class="widget-subheading">Markets Planner</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Harper Rose</div>
+                                                        <div class="widget-subheading">Markets Planner</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">Harper Rose</div>
+                                                        <div class="widget-subheading">Markets Planner</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+}

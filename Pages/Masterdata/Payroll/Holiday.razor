@@ -1,0 +1,156 @@
+﻿@page "/masterdata-holiday"
+@using DevExpress.Blazor
+@using HRMSv4.Shared.Payroll
+@using HRMSv4.Client.Interface.Payroll
+@inject IHoliday _HolidayService
+@using HRMSv4.Shared.SignalRData
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject ISignalR _SignalRService
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Holiday" Text="Holiday" Path="/masterdata/holiday" />
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-2">
+                <label class="form-label">Year Filter</label>
+                <DxComboBox TextChanged="YearOnChange" @bind-Value="@yearFrom" Data="@Year.OrderByDescending(x => x).ToArray()" style="width: 100%;" />
+            </div>
+            <div class="col">
+                <button @onclick="@CreateRow" class="col-2 mx-2 me-2 btn btn-outline-2x btn-outline-primary" style="float: right; margin-top: 1.3rem;">
+                    <span class="ladda-label">Add Holiday</span>
+                </button>
+                <button @onclick="@CopyLastYear" class="col-2 mx-2 me-2 btn btn-outline-2x btn-primary" style="float: right; margin-top: 1.3rem;">
+                    <span class="fa fa-copy"></span>
+                    <span class="ladda-label">Copy Last Year</span>
+                </button>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="_holidays"
+                KeyFieldName="HolidayId"
+                PagerVisible="true"
+                PageSize="5">
+            <Columns>
+                <DxGridDataColumn FieldName="HolidayName" />
+                <DxGridDataColumn FieldName="Date" />
+                <DxGridDataColumn FieldName="HolidayType" />
+                <DxGridDataColumn Width="6.5rem">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.Payroll.Holiday);
+                        }
+                        <button data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-original-title="Edit record" class="border-0 btn-transition btn btn-outline-success" @onclick="() => GetDetail(temp.HolidayId)"><span class="pe-7s-note"></span></button>
+                        <button data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-original-title="Delete" class="border-0 btn-transition btn btn-outline-danger" @onclick="() => OnDelete(temp.HolidayId)"><i class="fa fa-trash-alt"></i></button>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+@code {
+    [CascadingParameter] public IModalService? Modal { get; set; }
+    IGrid? MyGrid { get; set; }
+    public string yearFrom { get; set; } = DateTime.Now.Year.ToString();
+
+    List<string> Year = new List<string>();
+    List<HRMSv4.Shared.Payroll.Holiday> _holidays = new List<HRMSv4.Shared.Payroll.Holiday>();
+    async void CopyLastYear()
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to undo this action!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "Red"
+            });
+        if (result.IsConfirmed)
+        {
+            var lastYear = DateTime.Now.AddYears(-1).Year;
+            var currentYear = DateTime.Now.Year;
+            var lastHoliday = await _HolidayService.GetAllByYear(lastYear);
+            var validHoliday = lastHoliday.Where(a => a.IsDateMoveable == true).ToList();
+            var res = await _HolidayService.CopyLastYear(validHoliday);
+            if (res.StatusCode == 200)
+            {
+                _holidays.Clear();
+                int selectedYear = Convert.ToInt16(yearFrom);
+                var allHoliday = await _HolidayService.GetAllByYear(selectedYear);
+                _holidays.AddRange(allHoliday);
+                StateHasChanged();
+                await _Swal.FireAsync("Success", "", "success");
+            }
+        }
+    }
+    async void YearOnChange(string newValue)
+    {
+        _holidays.Clear();
+        int selectedYear = Convert.ToInt16(newValue);
+        var allHoliday = await _HolidayService.GetAllByYear(selectedYear);
+        _holidays.AddRange(allHoliday);
+        StateHasChanged();
+    }
+    async Task OnDelete(int id)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to undo this action!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "Red"
+            });
+        if (result.IsConfirmed)
+        {
+            var res = await _HolidayService.Delete(id);
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", "Successfully Deleted", "success");
+                var SignalR_Result = await _SignalRService.RefreshResult();
+                return;
+            }
+            await _Swal.FireAsync("Warning", res.Value, "warning");
+        }
+    }
+    async Task GetDetail(int id)
+    {
+        var item = _holidays.FirstOrDefault(a => a.HolidayId == id);
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.Payroll.HolidayModal._holidays), item);
+        Modal.Show<HRMSv4.Client.Shared.Modals.Payroll.HolidayModal>("Holiday Details", parameters);
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        //s
+        for (int i = DateTime.Now.Year - 5; i <= DateTime.Now.Year + 5; i++)
+        {
+            if (i == DateTime.Now.Year)
+            {
+                Year.Add(i.ToString());
+                Year.Add(string.Empty);
+            }
+            else
+            {
+                Year.Add(i.ToString());
+            }
+        }
+        HubConnection.On<SignalRCarrier>("RefreshResult", async survey =>
+        {
+            _holidays.Clear();
+            int selectedYear = Convert.ToInt16(yearFrom);
+            var allHoliday = await _HolidayService.GetAllByYear(selectedYear);
+            _holidays.AddRange(allHoliday);
+            StateHasChanged();
+        });
+        StateHasChanged();
+    }
+    void CreateRow()
+    {
+        Modal!.Show<HRMSv4.Client.Shared.Modals.Payroll.HolidayModal>("Holiday Details");
+    }
+}

@@ -1,0 +1,556 @@
+﻿@page "/module-leaveapplication"
+@using DevExpress.Blazor
+@using HRMSv4.Shared.HrMgmt
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Client.Service
+@using HRMSv4.Client.Interface
+@using HRMSv4.Shared.Report
+@using Microsoft.AspNetCore.SignalR.Client
+@inject IJSRuntime JSRuntime
+@inject SweetAlertService Swal
+@inject HubConnection HubConnection
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ILeaveApplication _leaveApplicationService
+@*@inject HttpClient HttpClient*@
+@using DevExpress.Data.Linq
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Leave Application
+            </h3>
+        </div>
+        <div class="page-title-actions">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/module-leavemanagement">Leave Management</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Leave Application</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="min-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="LeaveApplicationStatus">Status</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@FilterStatus">
+                        <option value="" disabled>Select Status</option>
+                        <option value="All Records">All Records</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="Pending" selected>Pending</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="LeaveApplicationStartDate">From Date</label>
+                    @*<DxDateEdit Date="@Start"
+                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    NullText="Select a date..."></DxDateEdit>*@
+                    <DxDateEdit Date="@Start" SizeMode="SizeMode.Medium" Enabled="@isEnabledStart" DateChanged="@((DateTime? newValue) => OnDateChangedStart(newValue))"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Select a date..."></DxDateEdit>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="LeaveApplicationEndDate">To Date</label>
+                    <DxDateEdit SizeMode="SizeMode.Medium" Date="@End" Enabled="@isEnabledEnd"
+                                DateChanged="@((DateTime? newValue) => OnDateChangedEnd(newValue))"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Select a date..."></DxDateEdit>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="row">
+            <div class="col" align="right">
+                <button class="mb-3 me-2 btn btn-outline-2x btn-outline-primary" onclick="@PrintBlankForm" Disabled=@(appToInsert != null) style="width:200px;"> Print Leave Form </button>
+                <button class="mb-3 me-2 btn btn-outline-2x btn-outline-primary" onclick="@InsertRow" Disabled=@(appToInsert != null) style="margin-bottom: 10px; width:200px"> New Leave Application </button>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="Data"
+                ValidationEnabled="false"
+                PagerVisible="true"
+                @bind-SelectedDataItem="SelectedDataItem"
+                PageSize="10" ShowFilterRow="true">
+            <Columns>
+                <DxGridDataColumn FieldName="EmployeeNumber"  Caption="Employee Number" Width="10rem" TextAlignment="GridTextAlignment.Center">
+                   
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="FullName" Caption="Employee Name" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="Position" Caption="Position" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="Organization" Caption="Department" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="LeaveTypeName" Caption="Leave Type" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="InclusiveDates" Caption="Inclusive Dates" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="Duration" Caption="Duration" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="Status" Caption="Status" TextAlignment="GridTextAlignment.Center">
+                </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="LeaveApplicationId" Caption="Action" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as LeaveApplicationView);
+                            var roleUser = role;
+                        }
+
+                        @if (temp.Status.ToLower() == "approved")
+                        {
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Print Application" data-bs-original-title="Print" class="border-0 btn-transition btn btn-outline-warning" @onclick="()=> PrintUser(temp.LeaveApplicationId.ToString())"><span class="pe-7s-print"></span></button>
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Details" data-bs-original-title="Application details" class="border-0 btn-transition btn btn-outline-primary" @onclick="()=> ShowDetails(temp)"><span class="pe-7s-search"></span></button>
+                        }
+
+                        @if (temp.Status.ToLower() == "pending")
+                        {
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Edit" data-bs-original-title="Edit record" class="border-0 btn-transition btn btn-outline-success" @onclick="()=> EditRow(temp)"><span class="pe-7s-note"></span></button>
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Details" data-bs-original-title="Application details" class="border-0 btn-transition btn btn-outline-primary" @onclick="()=> ShowDetails(temp)"><span class="pe-7s-search"></span></button>
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Delete" data-bs-original-title="Delete record" class="border-0 btn-transition btn btn-outline-danger" @onclick="()=>DeleteRow((int)context.Value)"><span class="pe-7s-trash"></span></button>
+                        }
+
+                        @if (temp.Status.ToLower().Contains("decline"))
+                        {
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Details" data-bs-original-title="Application details" class="border-0 btn-transition btn btn-outline-primary" @onclick="()=> ShowDetails(temp)"><span class="pe-7s-search"></span></button>
+                        }
+
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+
+@code {
+    IEnumerable<HRMSv4.Shared.HrMgmt.LeaveApplication> applications;
+    RadzenDataGrid<HRMSv4.Shared.HrMgmt.LeaveApplication> applicationGrid;
+    HRMSv4.Shared.HrMgmt.LeaveApplication appToInsert;
+    [CascadingParameter] public IModalService Modal { get; set; }
+    IGrid? MyGrid { get; set; }
+    object SelectedDataItem { get; set; }
+
+    string Status { get; set; }
+    DateTime? Start { get; set; }
+    DateTime? End { get; set; }
+
+    bool isEnabledStart = true;
+    bool isEnabledEnd = false;
+
+    string formNo { get; set; }
+
+    DateTime defaultDate = new DateTime(1900, 01, 01);
+    DateTime newEndDate = new DateTime(2077, 01, 01);
+    public string role = "";
+
+    List<LeaveApplicationView> _leaveApplicationView = new List<LeaveApplicationView>();
+    List<LeaveApplication> _leaveApplication = new List<LeaveApplication>();
+
+    bool isSortByDate { get; set; } = true;
+    bool isButtonHide = false;
+    bool isLoading;
+    int count;
+
+    DateTime Value = DateTime.Now;
+
+    bool Value1 { get; set; } = true;
+
+    object? Data { get; set; }
+    GridDevExtremeDataSource<LeaveApplicationView>? gridDevExtremeDataSource;
+
+    EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        if (role == "Administrator")
+        {
+            isButtonHide = false;
+        }
+        else
+        {
+            if (role == "Employee")
+            {
+                isButtonHide = true;
+            }
+        }
+
+        if (Start == null)
+        {
+
+        }
+        var myDate = DateTime.Now;
+        Status = "Pending";
+
+        //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+        //StateHasChanged();
+
+        var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "LeaveApplicationId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+
+    async void FilterStatus(ChangeEventArgs e)
+    {
+        string temp = e.Value.ToString();
+        Status = temp;
+        //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(temp, Start, End, 0);
+        var queryList = await _leaveApplicationService.GetLeaveApplications(temp, Start, End, 0);
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+        Data = gridDevExtremeDataSource;
+        MyGrid.Reload();
+        StateHasChanged();
+    }
+
+    DateTime Date = DateTime.Today;
+    bool IsDisabled = true;
+
+    async Task OnDateChangedStart(DateTime? newValue)
+    {
+
+        if (newValue.HasValue) isEnabledEnd = true;
+        else isEnabledEnd = false;
+
+        Start = newValue == null ? null : newValue.Value;
+        if (newValue != DateTime.Today)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, (Start == null ? defaultDate : Start), End, 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, (Start == null ? defaultDate : Start), End, 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            StateHasChanged();
+            IsDisabled = false;
+
+        }
+        else
+        {
+            IsDisabled = true;
+        }
+    }
+
+    async Task OnDateChangedEnd(DateTime? newValue)
+    {
+
+        if (newValue.HasValue) isEnabledStart = false;
+        else isEnabledStart = true;
+
+        End = newValue == null ? null : newValue.Value;
+        if (newValue != defaultDate)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, (End == null ? defaultDate : End), 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, (End == null ? defaultDate : End), 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            StateHasChanged();
+            IsDisabled = false;
+
+        }
+        else
+        {
+            IsDisabled = true;
+        }
+    }
+
+    async void OnRowDoubleClick()
+    {
+        var parameters = new ModalParameters();
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LeaveApplicationDetailsModal>("Leave Application Details", options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        var parameters = new ModalParameters();
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LeaveApplicationModal>("New Leave Application", options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task ShowDetails(HRMSv4.Shared.HrMgmt.LeaveApplication la)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+
+            };
+        var parameters = new ModalParameters();
+
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.LeaveApplicationDetailsModal._leaveApplication), la);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LeaveApplicationDetailsModal>("Leave Application Details", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditRow(HRMSv4.Shared.HrMgmt.LeaveApplication la)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.LeaveApplicationEditModal._leaveApplication), la);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LeaveApplicationEditModal>("Edit Leave Application", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            MyGrid.Reload();
+            StateHasChanged();
+        }
+    }
+
+    async Task DeleteRow(int id)
+    {
+        try
+        {
+            SweetAlertResult res = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Are you sure?",
+                    Text = "You will not be able to recover this record!",
+                    Icon = "warning",
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "No",
+                    CancelButtonColor = "#dc3741"
+                });
+            if (!string.IsNullOrEmpty(res.Value))
+            {
+                var result = await _leaveApplicationService.DeleteLeaveApplication(id);
+                if (result.StatusCode == 200)
+                {
+                    //_leaveApplicationView = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+                    var queryList = await _leaveApplicationService.GetLeaveApplications(Status, Start, End, 0);
+                    gridDevExtremeDataSource = new GridDevExtremeDataSource<LeaveApplicationView>(queryList.AsQueryable());
+                    Data = gridDevExtremeDataSource;
+                    MyGrid.Reload();
+                    StateHasChanged();
+
+                    await Swal.FireAsync(
+                        "Deleted",
+                        "Record has been deleted",
+                        "success"
+                    );
+                }
+                else
+                {
+                    await Swal.FireAsync(
+                        "Opps...",
+                        "Something went wrong",
+                        "warning"
+                    );
+                }
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    async Task PrintBlankForm()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                //Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+
+        var _modalStatus = Modal.Show<Shared.Modals.LeaveApplicationSignatories.LeaveApplicationForm1Modal>("Print Leave Application Form", options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            var Id = 0;
+
+            var parameters = modalResult.Data as ReportParameters;
+
+            var formats = parameters.formValue;
+
+            if (formats.Contains("Form1"))
+            {
+                formNo = "ApplicationForLeaveForm1";
+            }
+
+            if (formats.Contains("Form2"))
+            {
+                formNo = "ApplicationForLeaveForm2";
+            }
+
+            if (formats.Contains("Form3"))
+            {
+                formNo = "ApplicationForLeaveForm3";
+            }
+
+            if (formats.Contains("Form4"))
+            {
+                formNo = "ApplicationForLeaveForm4";
+            }
+
+            if (formats.Contains("Form5"))
+            {
+                formNo = "ApplicationForLeaveForm5";
+            }
+
+            var psgcCode = await localStorage.GetItemAsync<string>("AdminPsgcCode");
+
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            string psgcUser = string.Format("{0};{1}", psgcCode, userId);
+            string arrayOfParemeters = string.Format("{0}${1}", psgcUser, Id);
+            string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+            string url = $"/viewer/{@formNo}/{_encryptedParameter}";
+            await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+        }
+
+    }
+
+    async Task PrintUser(string Id)
+    {
+
+
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                //Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+        //var parameters = new ModalParameters();
+        //parameters.Add(nameof(Shared.Modals.LeaveApplicationSignatories.LeaveApplicationForm1Modal.formValue), Id);
+        //parameters.Add(nameof(Shared.Modals.Selection.ComparativeReportModal.applicantIds), overall.Select(c => c.ApplicantId).Distinct().ToList());
+
+        var _modalStatus = Modal.Show<Shared.Modals.LeaveApplicationSignatories.LeaveApplicationForm1Modal>("Print Leave Application Form", options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            var parameters = modalResult.Data as ReportParameters;
+
+            var formats = parameters.formValue;
+
+            if (formats.Contains("Form1"))
+            {
+                formNo = "ApplicationForLeaveForm1";
+            }
+
+            if (formats.Contains("Form2"))
+            {
+                formNo = "ApplicationForLeaveForm2";
+            }
+
+            if (formats.Contains("Form3"))
+            {
+                formNo = "ApplicationForLeaveForm3";
+            }
+
+            if (formats.Contains("Form4"))
+            {
+                formNo = "ApplicationForLeaveForm4";
+            }
+
+            if (formats.Contains("Form5"))
+            {
+                formNo = "ApplicationForLeaveForm5";
+            }
+
+            var psgcCode = await localStorage.GetItemAsync<string>("AdminPsgcCode");
+
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            string psgcUser = string.Format("{0};{1}", psgcCode, userId);
+            string arrayOfParemeters = string.Format("{0}${1}", psgcUser, Id);
+            string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+            string url = $"/viewer/{@formNo}/{_encryptedParameter}";
+            await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+        }
+    }
+
+    //async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    //{
+
+    //}
+    //async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    //{
+
+    //}
+    //async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    //{
+
+    //}
+}

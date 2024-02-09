@@ -1,0 +1,127 @@
+﻿@page "/ExamAnswers/{ApplicantExamId}"
+@inject IExam service
+@using DevExpress.Blazor
+@using HRMSv4.Shared.Exam
+
+<div class="row">
+    <div class="mb-3 profile-responsive card">
+        <div class="dropdown-menu-header">
+            <div class="dropdown-menu-header-inner bg-dark">
+                <div class="menu-header-image opacity-2" style="background-image: url('images/dropdown-header/abstract2.jpg');"></div>
+                <div class="menu-header-content btn-pane-right">
+                    <div class="avatar-icon-wrapper me-3 avatar-icon-xl btn-hover-shine">
+                        <div class="avatar-icon rounded">
+                            <img src="/MainLayout/images/avatars/default-avatar.png" alt="Avatar 5">
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="menu-header-title" style="color:white">Applicant Name: @Name</h5>
+                        <h6 class="menu-header-subtitle" style="color:white">Desired Position: @PositionTitle</h6>
+                    </div>
+                    <div class="menu-header-btn-pane">
+                        @* <button class="btn btn-success" @onclick="@(args=>showEmployee())">View Profile</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <DxGrid @ref="Grid" Data="@result.Answers" PageSize="100"
+            ShowGroupPanel="true"
+            PageSizeSelectorAllRowsItemVisible="false">
+        <Columns>
+            <DxGridDataColumn FieldName="Type" DisplayFormat="c" GroupIndex="0" GroupInterval="GridColumnGroupInterval.Custom" />
+            <DxGridDataColumn FieldName="Question">
+                <CellDisplayTemplate>
+                    @((MarkupString)context.Value.ToString())
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Answer">
+                <CellDisplayTemplate>
+                    @((MarkupString)context.Value.ToString())
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Score" Width="150px" TextAlignment="GridTextAlignment.Center" />
+            <DxGridDataColumn FieldName="" Caption="Action" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate>
+                    @{
+                        var record = (context.DataItem as ApplicantAnswers);
+                    }
+                    @if (record.Type != "Multiple Choice" && record.Type != "True/False")
+                    {
+                        if (record.Score == null)
+                        {
+                            <button class="btn btn-link grid-btn-link" @onclick="() => Score(record)"><i class="pe-7s-note2"></i></button>
+                        }
+
+                        if (record.Score == 0)
+                        {
+                            <button class="btn btn-link grid-btn-link" @onclick="() => Score(record)"><i class="pe-7s-note2"></i></button>
+                        }
+
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Score" />
+        </TotalSummary>
+    </DxGrid>
+</div>
+
+@code {
+    [Parameter] public string ApplicantExamId { get; set; }
+    public int appExamId { get; set; }
+    [CascadingParameter] public IModalService Modal { get; set; }
+    ApplicantResultAnswersListView result = new ApplicantResultAnswersListView();
+    public string Name { get; set; }
+    string userId = "";
+    private string PositionTitle { get; set; } = "";
+
+    IGrid? Grid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string DecodedUrl = string.Empty;
+        string paramId = _crypto.ConvertHexToString(ApplicantExamId, System.Text.Encoding.Unicode);
+
+        appExamId = int.Parse(paramId);
+
+        result = await service.GetApplicantAnswers(appExamId);
+
+        if (result != null)
+        {
+            Name = result.ApplicantResultListView.ApplicantName;
+            PositionTitle = result.ApplicantResultListView.PositionTitle;
+        }
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Grid.ExpandGroupRow(0);
+    }
+
+    async void Score(ApplicantAnswers ans)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = true,
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.Selection.Exam.CheckExamModel.appAns), ans);
+        var form = Modal.Show<HRMSv4.Client.Shared.Modals.Selection.Exam.CheckExamModel>("Check Essay", parameters, options);
+        var modalResult = await form.Result;
+        if (!modalResult.Cancelled)
+        {
+            result = await service.GetApplicantAnswers(appExamId);
+            StateHasChanged();
+        }
+    }
+}

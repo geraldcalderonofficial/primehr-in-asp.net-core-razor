@@ -1,0 +1,406 @@
+﻿@page "/module-payrolldate"
+@inject IJSRuntime JS
+@using DevExpress.Blazor
+@using System.Collections.ObjectModel
+@using HRMSv4.Client.Interface.Payroll
+@using HRMSv4.Client.Shared.Modals.Payroll
+@using HRMSv4.Shared.Payroll
+@inject IPayrollDate service
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Payroll Dates
+            </h3>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-header">
+        <div class="btn-actions-pane-right text-capitalize">
+            <button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-focus btn-sm" onclick="@Add">Create New Payroll</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+               @* <h5>Payrolls</h5>*@
+               <div class="row">
+                  <div class="col">
+                        <h5>Payrolls</h5>
+                  </div>
+                    <div class="col">
+                        <DxComboBox Data="@payrollDatetypes" @bind-Text="_payrollType" SizeMode="SizeMode.Medium" ValueChanged="@((string e) => OnTypeChanged(e))" />
+                    </div>
+               </div>
+
+                <div class="d-flex flex-wrap w-100 mt-3">
+                    <div class="w-auto mt-1 me-1 flex-grow-1" style="flex-basis: 300px">
+
+                        <DxGrid Data="@dates" ValidationEnabled="false"
+                                SelectionMode="GridSelectionMode.Single"
+                                @bind-SelectedDataItem="SelectedDataItem"
+                                AllowSelectRowByClick="true"
+                                PopupEditFormCssClass="pw-800"
+                                PagerVisible="true"
+                                SelectedDataItemsChanged="SelectedDate"
+                                PageSize="10"
+                                ShowFilterRow="true"
+                                PagerPosition="GridPagerPosition.Bottom"
+                                PageSizeSelectorVisible="true"
+                                PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                                PageSizeSelectorAllRow ItemVisible="true"
+                                PagerSwitchToInputBoxButtonCount="10"
+                                PagerVisibleNumericButtonCount="10">
+
+                            <Columns>
+                                <DxGridDataColumn FieldName="Name" />
+                                <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="200px">
+                                    <CellDisplayTemplate>
+                                        @{
+                                            var temp = (context.DataItem as PayrollDateListView);
+                                        }
+                                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="View Payroll" @onclick="@(()=>ViewPayroll(temp))">
+                                            <i class="pe-7s-search"></i>
+                                        </button>
+                                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(()=>Edit(temp))">
+                                            <i class="lnr-pencil"></i>
+                                        </button>
+                                        <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteRow(temp))">
+                                            <i class="lnr-trash"></i>
+                                        </button>
+                                    </CellDisplayTemplate>
+                                </DxGridDataColumn>
+                               
+                            </Columns>
+                        </DxGrid>
+                   
+                    </div>
+                    <div class="card mt-1 me-1 flex-grow-1 max-h-420" style="flex-basis: 50%">
+                        <div class="card-header bg-transparent text-body py-2 border-bottom-0 fw-bold">Selected Payroll:</div>
+                        <div class="card-body p-0 pb-2 overflow-auto">
+                            <ul class="list-group list-group-flush bg-transparent border-0">
+                                <li class="list-group-item bg-transparent text-body py-1 border-0">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="col-4">Payroll Date</div>
+                                            <div class="col-1" s>:</div>
+                                            <div class="col">@detail.DateReflection</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item bg-transparent text-body py-1 border-0">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="col-4">Payroll name: </div>
+                                            <div class="col-1" s>:</div>
+                                            <div class="col">@detail.Name</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item bg-transparent text-body py-1 border-0">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="col-4">Start Date</div>
+                                            <div class="col-1" s>:</div>
+                                            <div class="col">@detail.StartDate</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item bg-transparent text-body py-1 border-0">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="col-4">End Date</div>
+                                            <div class="col-1" s>:</div>
+                                            <div class="col">@detail.EndDate</div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col">
+                <h5>Payroll Date Details</h5>
+                <DxGrid Data="@employees" PageSize="10"
+                        ShowFilterRow="true"
+                        PagerPosition="GridPagerPosition.Bottom"
+                        PageSizeSelectorVisible="true"
+                        PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                        PageSizeSelectorAllRowsItemVisible="true"
+                        PagerSwitchToInputBoxButtonCount="10"
+                        PagerVisibleNumericButtonCount="10">
+
+                    <Columns>
+                        <DxGridDataColumn FieldName="FullName" />
+                        <DxGridDataColumn FieldName="PositionName" />
+                    </Columns>
+                </DxGrid>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div style="display: flex">
+    <div style="width: 500px">
+        <h4>First Grid</h4>
+        <DxGrid @ref="FirstGrid"
+                Data="FirstGridItems"
+                CssClass="first-grid"
+                AllowSort="false"
+                CustomizeElement="Grid_CustomizeElement">
+            <Columns>
+                <DxGridDataColumn FieldName="Name" />
+            </Columns>
+        </DxGrid>
+    </div>
+    <div style="width: 500px; padding-left: 10px">
+        <h4>Second Grid</h4>
+        <DxGrid @ref="SecondGrid"
+                Data="SecondGridItems"
+                CssClass="second-grid"
+                AllowSort="false"
+                CustomizeElement="Grid_CustomizeElement">
+            <Columns>
+                <DxGridDataColumn FieldName="Name" />
+            </Columns>
+        </DxGrid>
+    </div>
+</div>*@
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    List<PayrollDateListView> dates = new List<PayrollDateListView>();
+    List<PayrollDateDetails> employees = new List<PayrollDateDetails>();
+
+    PayrollDateListView detail = new PayrollDateListView();
+
+    object SelectedDataItem { get; set; }
+
+    //bool ReInitializeDragging { get; set; }
+
+    //IGrid? FirstGrid { get; set; }
+    //IGrid? SecondGrid { get; set; }
+    //ObservableCollection<GridDataItem> FirstGridItems { get; set; }
+    //ObservableCollection<GridDataItem> SecondGridItems { get; set; }
+
+    //DotNetObjectReference<PayrollDates> DotNetHelper { get; set; }
+    //IJSObjectReference JsModule { get; set; }
+
+    DateTime defaultDate = new DateTime(1900, 01, 01);
+    string _payrollType = "Plantilla";
+    List<string> payrollDatetypes = new List<string> { "Plantilla", "Non-Plantilla", "Special-Plantilla", "Special-Non-Plantilla" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        dates = await service.GetPayrollDates(defaultDate, _payrollType);
+        SelectedDataItem = dates.FirstOrDefault();
+        employees = await service.GetPayrollDetails( dates.FirstOrDefault().PayrollDateId);
+        detail = await service.GetPayrollDateDetail(dates.FirstOrDefault().PayrollDateId);
+
+        StateHasChanged();
+    }
+
+    async Task ViewPayroll(PayrollDateListView pd)
+    {
+        if (pd.PayrollType.ToLower().Contains("special"))
+        {
+            var tempId = _crypto.ConvertStringToHex(pd.PayrollDateId.ToString(), System.Text.Encoding.Unicode);
+            string url = $"/module-specialpayroll/{tempId}";
+            _navigation.NavigateTo(url);
+        }
+        else
+        {
+            var tempId = _crypto.ConvertStringToHex(pd.PayrollDateId.ToString(), System.Text.Encoding.Unicode);
+            string url = $"/module-payroll/{tempId}";
+            _navigation.NavigateTo(url);
+        }
+
+    }
+
+    async Task Edit(PayrollDateListView pd)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = true,
+
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(PayrollDateModal.PayrollDateId), pd.PayrollDateId);
+
+        var form = Modal.Show<PayrollDateModal>("Edit Payroll Detail", parameters, options);
+
+        var response = await form.Result;
+
+        if (response.Cancelled == false)
+        {
+            dates = await service.GetPayrollDates(defaultDate, _payrollType);
+            //competencies = await service.GetAll();
+            //await compGrid.Reload();
+            StateHasChanged();
+        }
+    }
+
+    async Task DeleteRow(PayrollDateListView pd)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var res = await service.Delete(pd.PayrollDateId);
+
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", res.Value, "success");
+                //await UpdateDataAsync();
+                dates = await service.GetPayrollDates(defaultDate, _payrollType);
+                if(dates.Count > 0)
+                {
+                    SelectedDataItem = dates.FirstOrDefault();
+                    employees = await service.GetPayrollDetails(dates.FirstOrDefault().PayrollDateId);
+                    detail = await service.GetPayrollDateDetail(dates.FirstOrDefault().PayrollDateId);
+                }
+                else
+                {
+                    employees = new List<PayrollDateDetails>();
+                    detail = new PayrollDateListView();
+                }
+                
+                StateHasChanged();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+
+    }
+
+    async Task SelectedDate(object selected)
+    {
+        var temp = SelectedDataItem as PayrollDateListView;
+        employees = new List<PayrollDateDetails>();
+        employees = await service.GetPayrollDetails(temp.PayrollDateId);
+        detail = await service.GetPayrollDateDetail(temp.PayrollDateId);
+
+    }
+
+    async Task Add()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = true,
+
+            };
+
+        var form = Modal.Show<PayrollDateModal>("Payroll Detail", options);
+
+        var response = await form.Result;
+
+        if (response.Cancelled == false)
+        {
+            dates = await service.GetPayrollDates(defaultDate, _payrollType);
+            //competencies = await service.GetAll();
+            //await compGrid.Reload();
+            StateHasChanged();
+        }
+    }
+
+    async void OnTypeChanged(string value)
+    {
+        dates = await service.GetPayrollDates(defaultDate, _payrollType);
+        if (dates.Count() > 0)
+        {
+            SelectedDataItem = dates.FirstOrDefault();
+            employees = await service.GetPayrollDetails(dates.FirstOrDefault().PayrollDateId);
+            if (employees.Count() > 0)
+            {
+                detail = await service.GetPayrollDateDetail(dates.FirstOrDefault().PayrollDateId);
+            }
+            else
+            {
+                employees = new List<PayrollDateDetails>();
+            }
+            StateHasChanged();
+        }
+        else
+        {
+            SelectedDataItem = new PayrollDateListView();
+            employees = new List<PayrollDateDetails>();
+            detail = new PayrollDateListView();
+            StateHasChanged();
+        }
+
+       
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        JsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modules/Payroll/PayrollDates.razor.js");
+
+    //        DotNetHelper = DotNetObjectReference.Create(this);
+    //        await JsModule.InvokeVoidAsync("setDotNetHelper", DotNetHelper);
+    //        await JsModule.InvokeVoidAsync("initialize", GetGridSelector(FirstGrid), GetGridSelector(SecondGrid));
+    //    }
+    //    else
+    //    {
+    //        if (ReInitializeDragging)
+    //        {
+    //            ReInitializeDragging = false;
+    //            await JsModule.InvokeVoidAsync("initialize", GetGridSelector(FirstGrid), GetGridSelector(SecondGrid));
+    //        }
+    //    }
+    //}
+
+    //void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    //{
+    //    if (e.ElementType == GridElementType.DataRow)
+    //        e.Attributes["data-visible-index"] = e.VisibleIndex;
+    //}
+
+    //[JSInvokable]
+    //public void MoveGridRow(int draggableRowVisibleIndex, bool fromFirstGrid)
+    //{
+    //    var sourceGrid = fromFirstGrid ? FirstGrid : SecondGrid;
+    //    var sourceItems = fromFirstGrid ? FirstGridItems : SecondGridItems;
+    //    var targetItems = fromFirstGrid ? SecondGridItems : FirstGridItems;
+
+    //    var sourceItem = (GridDataItem)sourceGrid.GetDataItem(draggableRowVisibleIndex);
+    //    sourceItems.Remove(sourceItem);
+    //    targetItems.Add(sourceItem);
+
+    //    ReInitializeDragging = true;
+    //    StateHasChanged();
+    //}
+
+    //static string GetGridSelector(IGrid grid)
+    //{
+    //    return string.Join(
+    //        string.Empty,
+    //        grid.CssClass
+    //            .Split(" ")
+    //            .Where(i => !string.IsNullOrWhiteSpace(i))
+    //            .Select(i => "." + i.Trim())
+    //    );
+    //}
+
+    //public record GridDataItem(string Name);
+}

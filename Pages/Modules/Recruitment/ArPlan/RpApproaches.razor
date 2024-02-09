@@ -1,0 +1,175 @@
+﻿@inject IRecruitmentPlan service
+@using DevExpress.Blazor
+
+<BusyIndicator Message="Please wait while loading data..." Data="apList">
+
+    <div class="tab-pane active" id="tab-animated-0" role="tabpanel">
+        <div class="card-header">
+            <div class="col-12 mt-2">
+                <h5 class="card-header-text float-start"></h5>
+                <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@AddApproach" style="margin-bottom: 10px;"> + New</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <DxGrid Data="apList" @ref="MyGrid"
+                    KeyFieldName="RecruitmentApproachId"
+                    ValidationEnabled="false"
+                    CustomizeEditModel="Grid_CustomizeEditModel"
+                    EditModelSaving="Grid_EditModelSaving"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    PopupEditFormCssClass="pw-800"
+                    EditMode="GridEditMode.EditRow">
+                <Columns>
+                    <DxGridDataColumn FieldName="Strategy">
+                        <CellEditTemplate>
+                            @{
+                                var record = (RecruitmentApproach)context.EditModel;
+                            }
+                            <input class="form-control" type="text" placeholder="Enter strategy" @bind-value=@record.Strategy/>
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Description">
+                        <CellEditTemplate>
+                            @{
+                                var record = (RecruitmentApproach)context.EditModel;
+                            }
+                            <textarea class="form-control" rows="3" placeholder="Enter description" @bind=@record.Description></textarea>
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="IndividualResponsible">
+                        <CellEditTemplate>
+                            @{
+                                var record = (RecruitmentApproach)context.EditModel;
+                            }
+                            <input class="form-control" type="text" min="0" placeholder="Enter person responsible" @bind-value=@record.IndividualResponsible />
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as RecruitmentApproach);
+                            }
+                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(temp))">
+                                <i class="lnr-pencil"></i>
+                            </button>
+                        </CellDisplayTemplate>
+                        <CellEditTemplate>
+                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                                <i class="lnr-checkmark-circle"></i>
+                            </button>
+                            <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                                <i class="lnr-cross"></i>
+                            </button>
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+    [Parameter]
+    public string id { get; set; } //recruitmentplanId
+
+    int recruitmentPlanId { get; set; }
+    IGrid? MyGrid { get; set; }
+
+    List<RecruitmentApproach> apList = new List<RecruitmentApproach>();
+
+    string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        string DecodedUrl = string.Empty;
+        string paramId = _crypto.ConvertHexToString(id, System.Text.Encoding.Unicode);
+
+        recruitmentPlanId = int.Parse(paramId);
+
+        if (!string.IsNullOrWhiteSpace(paramId))
+        {
+
+            apList = await service.GetRecruitmentApproach(recruitmentPlanId);
+            StateHasChanged();
+        }
+
+    }
+
+    async void AddApproach()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var newEmployee = (RecruitmentApproach)e.EditModel;
+            //newEmployee.FirstName = "John";
+            //newEmployee.LastName = "Doe";
+        }
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var boom = e.EditModel as RecruitmentApproach;
+        boom.RecruitmentPlanId = recruitmentPlanId;
+        if (e.IsNew)
+        {
+            boom.CreatedBy = userId;
+        }
+        else
+        {
+            boom.UpdatedBy = userId;
+        }
+
+        var res = await service.PostRecruitmentApproaches(boom);
+        if (res.StatusCode == 200)
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Success",
+                    Text = res.Value,
+                    Icon = "success",
+                    CancelButtonColor = "#414141",
+                    ShowCancelButton = false,
+                    ConfirmButtonText = "Ok",
+                });
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", res.Value, "error");
+        }
+
+    }
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var a = e.DataItem as RecruitmentApproach;
+
+        var res = await service.DeleteRecruitmentApproach(a.RecruitmentApproachId);
+        if (res.StatusCode == 200)
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Success",
+                    Text = res.Value,
+                    Icon = "success",
+                    CancelButtonColor = "#414141",
+                    ShowCancelButton = false,
+                    ConfirmButtonText = "Ok",
+                });
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", res.Value, "error");
+        }
+
+    }
+    async Task UpdateDataAsync()
+    {
+        apList = await service.GetRecruitmentApproach(recruitmentPlanId);
+    }
+}

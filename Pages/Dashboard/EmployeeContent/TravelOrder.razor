@@ -1,0 +1,276 @@
+﻿@using DevExpress.Blazor
+@inject ITravelOrder _TravelOrderService
+@inject ContextMenuService ContextMenuService
+@using HRMSv4.Shared.SignalRData
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject ISignalR _SignalRService
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Travel Order" Text="Travel Order" Path="/masterdata/travelorder" />
+<BusyIndicator Message="Please wait while loading data..." Data="_TravelOrderData">
+    <div class="main-card mb-3 card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-2">
+                    <label class="form-label">Search Filter</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@FilterChange">
+                        <option value=0>All</option>
+                        <option value=1 selected>Pending</option>
+                        <option value=2>Approve</option>
+                        <option value=3>Reject</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <label class="form-label">From</label>
+                    <DxDateEdit Date="@SearchFrom" DateChanged="@((DateTime? newValue) => DateFilterChange(newValue, true))" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label">To</label>
+                    <DxDateEdit Date="@SearchTo" DateChanged="@((DateTime? newValue) => DateFilterChange(newValue, false))" />
+                </div>
+                <div class="col">
+                    <i @onclick="@ClearDate" hidden="@HideDateClear" class="fa fa-undo" style="margin-top: 11%"></i>
+                </div>
+                <div class="col">
+                    <button class="col-6 mx-2 me-2 btn btn-outline-2x btn-outline-primary position-relative" style="top: 1.8rem; left: 48%;" @onclick="@CreateRow">
+                        <span class="ladda-label">Create Request</span>
+                    </button>
+                </div>
+            </div>
+            <DxGrid @ref="MyGrid" Data="_TravelOrderData"
+                    KeyFieldName="TravelOrderId"
+                    PagerVisible="true"
+                    PageSize="5">
+                <Columns>
+                    <DxGridDataColumn FieldName="Status" Width="5rem">
+                        <CellDisplayTemplate>
+                            @{
+                                var status = "bg-success";
+                                var temp = (context.DataItem as HRMSv4.Shared.HrMgmt.TravelOrder);
+                                if (temp.Status == "Approve")
+                                {
+                                    status = "bg-success";
+                                }
+                                if (temp.Status == "Reject")
+                                {
+                                    status = "bg-danger";
+                                }
+                                if (temp.Status == "Pending")
+                                {
+                                    status = "bg-warning";
+                                }
+                            }
+                            <div class="badge @status" style="min-width: 4rem">@temp.Status</div>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="DateFiled" />
+                    <DxGridDataColumn FieldName="FromDate" Width="max-content" />
+                    <DxGridDataColumn FieldName="ToDate" />
+                    <DxGridDataColumn FieldName="Purpose" />
+                    <DxGridDataColumn FieldName="Allowance" />
+                    <DxGridDataColumn FieldName="Destination" />
+                    <DxGridDataColumn FieldName="Remarks" />
+                    <DxGridDataColumn Width="4.5rem">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as HRMSv4.Shared.HrMgmt.TravelOrder);
+                            }
+                            <DxButton data-bs-toggle="tooltip" data-bs-placement="left" title="Details" Click="() => GetDetails(temp.TravelOrderId)" IconCssClass="fa fa-info" RenderStyle="ButtonRenderStyle.Info" />
+                            <DxButton data-bs-toggle="tooltip" data-bs-placement="left" title="Delete" Click="() => OnDelete(temp.TravelOrderId)" IconCssClass="fa fa-trash" RenderStyle="ButtonRenderStyle.Danger" />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+        </div>
+    </div>
+</BusyIndicator>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter] public int EmployeeId { get; set; }
+
+    IGrid? MyGrid { get; set; }
+    DateTime? SearchFrom { get; set; }
+    DateTime? SearchTo { get; set; }
+
+    List<HRMSv4.Shared.HrMgmt.TravelOrder> _TravelOrderData = new List<HRMSv4.Shared.HrMgmt.TravelOrder>();
+
+    string globalFilterState = "Pending";
+    bool HideDateClear = true;
+
+    async void ClearDate()
+    {
+        SearchFrom = null;
+        SearchTo = null;
+        HideDateClear = true;
+        var travelOrders = await _TravelOrderService.GetAll();
+        var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+        _TravelOrderData.Clear();
+        foreach (var i in empTravelOrder)
+        {
+            var selectedTravelOrder = travelOrders.FirstOrDefault(a => a.TravelOrderId == i.TravelOrderId);
+            if (globalFilterState != "All")
+            {
+                if (selectedTravelOrder != null && (selectedTravelOrder.Status == globalFilterState))
+                {
+                    _TravelOrderData.Add(selectedTravelOrder);
+                }
+            } else {
+                _TravelOrderData.Add(selectedTravelOrder);
+            }
+        }
+        StateHasChanged();
+    }
+    async void DateFilterChange(DateTime? newValue, bool isFrom)
+    {
+        if (isFrom) SearchFrom = newValue;
+        if (!isFrom) SearchTo = newValue;
+        if (SearchFrom != null && SearchTo != null)
+        {
+            HideDateClear = false;
+            var allTravelOrders = await _TravelOrderService.GetAll();
+            var filteredTravelOrders = allTravelOrders.Where(a => (a.FromDate.Value.Date >= SearchFrom.Value.Date && a.FromDate.Value.Date <= SearchTo.Value.Date) || (a.ToDate.Value.Date >= SearchFrom.Value.Date && a.ToDate.Value.Date <= SearchTo.Value.Date)).ToList();
+            var travelOrderEmps = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+            var travelOrders = (from a in filteredTravelOrders
+                                join b in travelOrderEmps on a.TravelOrderId equals b.TravelOrderId
+                                select a).ToList();
+            _TravelOrderData.Clear();
+            _TravelOrderData = globalFilterState != "All" ? travelOrders.Where(a => a.Status == globalFilterState).ToList() : travelOrders;
+            StateHasChanged();
+        }
+    }
+    async Task FilterChange(ChangeEventArgs e)
+    {
+        var travelOrderEmps = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+        var allTravelOrders = await _TravelOrderService.GetAll();
+        var travelOrders = (from a in allTravelOrders
+                        join b in travelOrderEmps on a.TravelOrderId equals b.TravelOrderId
+                        select a).ToList();
+        _TravelOrderData.Clear();
+        var val = e.Value.ToString();
+        var stat = "Pending";
+        if (val == "2") stat = "Approve";
+        if (val == "3") stat = "Reject";
+        if (val == "0")
+        {
+            globalFilterState = "All";
+            if (SearchFrom != null && SearchTo != null)
+            {
+                _TravelOrderData = travelOrders.Where(a => (a.FromDate.Value.Date >= SearchFrom.Value.Date && a.FromDate.Value.Date <= SearchTo.Value.Date) || (a.ToDate.Value.Date >= SearchFrom.Value.Date && a.ToDate.Value.Date <= SearchTo.Value.Date)).ToList();
+            }
+            else
+            {
+                _TravelOrderData = travelOrders;
+            }
+        }
+        else
+        {
+            globalFilterState = stat;
+            if (SearchFrom != null && SearchTo != null)
+            {
+                var filtered = travelOrders.Where(a => a.Status == stat).ToList();
+                _TravelOrderData = filtered.Where(a => (a.FromDate.Value.Date >= SearchFrom.Value.Date && a.FromDate.Value.Date <= SearchTo.Value.Date) || (a.ToDate.Value.Date >= SearchFrom.Value.Date && a.ToDate.Value.Date <= SearchTo.Value.Date)).ToList();
+            }
+            else
+            {
+                _TravelOrderData = travelOrders.Where(a => a.Status == stat).ToList();
+            }
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var travelOrders = await _TravelOrderService.GetAll();
+        var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+        foreach (var i in empTravelOrder)
+        {
+            var selectedTravelOrder = travelOrders.FirstOrDefault(a => a.TravelOrderId == i.TravelOrderId);
+            if (selectedTravelOrder != null && (selectedTravelOrder.Status == globalFilterState)) _TravelOrderData.Add(selectedTravelOrder);
+        }
+        HubConnection.On<SignalRCarrier>("RefreshResult", async survey =>
+        {
+            _TravelOrderData.Clear();
+            var travelOrders = await _TravelOrderService.GetAll();
+            var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+            foreach (var i in empTravelOrder)
+            {
+                var selectedTravelOrder = travelOrders.FirstOrDefault(a => a.TravelOrderId == i.TravelOrderId);
+                if (selectedTravelOrder != null && (selectedTravelOrder.Status == globalFilterState)) _TravelOrderData.Add(selectedTravelOrder);
+            }
+            StateHasChanged();
+        });
+    }
+    async Task GetDetails(int id)
+    {
+        var target = _TravelOrderData.FirstOrDefault(a => a.TravelOrderId == id);
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.TravelOrder.Post._TravelOrder), target);
+        Modal.Show<HRMSv4.Client.Shared.Modals.TravelOrder.Select>($"Travel Order #{target.OrderNumber}", parameters);
+    }
+    async Task OnDelete(int id)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to undo this action!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "Red"
+            });
+        if (result.IsConfirmed)
+        {
+            var res = await _TravelOrderService.Delete(id);
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", "Successfully Deleted", "success");
+                var SignalR_Result = await _SignalRService.RefreshResult();
+                //var travelOrders = await _TravelOrderService.GetAll();
+                //var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+                //var isDel = true;
+                //if (empTravelOrder.Count > 0)
+                //{
+                //    var del1 = isDel ? "Deleted" : "Save"
+                //    _TravelOrderData.Clear();
+                //    foreach (var i in empTravelOrder)
+                //    {
+                //        _TravelOrderData.Add(travelOrders.FirstOrDefault(a => a.TravelOrderId == i.TravelOrderId));
+                //    }
+                //}
+                //else
+                //{
+                //    _TravelOrderData.Clear();
+                //}
+
+                var travelOrders = await _TravelOrderService.GetAll();
+                var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+                StateHasChanged();
+            }
+            else
+            {
+                await _Swal.FireAsync("Warning", res.Value, "warning");
+            }
+        }
+    }
+    async Task CreateRow()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.TravelOrder.PostEmployee.EmployeeId), EmployeeId);
+        var modal = Modal.Show<HRMSv4.Client.Shared.Modals.TravelOrder.PostEmployee>("Travel Order Request", parameters);
+        //var res = await modal.Result;
+        //if (!res.Cancelled)
+        //{
+        //    var travelOrders = await _TravelOrderService.GetAll();
+        //    var empTravelOrder = await _TravelOrderService.GetAllEmpById(EmployeeId, true);
+        //    _TravelOrderData.Clear();
+        //    var isDel = true;
+        //    foreach (var i in empTravelOrder)
+        //    {
+        //        var del1 = isDel ? "Deleted" : "Save"
+        //        _TravelOrderData.Add(travelOrders.FirstOrDefault(a => a.TravelOrderId == i.TravelOrderId));
+        //    }
+        //    StateHasChanged();
+        //}
+    }
+}

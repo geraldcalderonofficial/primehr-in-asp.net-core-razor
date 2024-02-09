@@ -1,0 +1,547 @@
+﻿@page "/module-plantilla"
+@using DevExpress.Blazor
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared
+@using System.Linq.Dynamic.Core
+@inject SweetAlertService Swal
+@inject ILevelOrganization _IlevelOrganization
+@inject IPlantilla plantillaService
+@inject IGeneralPolicy generalPolicyService
+@inject ContextMenuService ContextMenuService
+@attribute [AllowAnonymous]
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Plantilla" Text="Plantilla" Path="/module/plantilla" />
+<div class="row justify-content-end">
+    <button class="btn btn-outline-2x btn-outline-primary mb-3 mr-4" style="margin-bottom: 10px; width:200px; align-self: end;" @onclick="@GenerateAllPlantilla"> Generate new set </button>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-3">
+                        <label class="form-label">SORT BY</label>
+                        <DxComboBox Data="@sortByData"
+                                    TextChanged="OnSortBySelect"
+                                    @bind-Value="sortBy"
+                                    SizeMode="SizeMode.Medium" />
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label">ARRANGE BY</label>
+                        <DxComboBox Data="@arrangeByData"
+                                    TextChanged="OnArrangeBySelect"
+                                    @bind-Value="arrangeBy"
+                                    SizeMode="SizeMode.Medium" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">SELECT OFFICE</label>
+                        <DxComboBox Data="@_highestLevel"
+                                    NullText="--Select Level--"
+                                    TextChanged="OnDeptSelect"
+                                    @bind-Value="department"
+                                    SizeMode="SizeMode.Medium" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-4" style="align-self: end;">
+                <div class="row justify-content-end">
+                    <button class="btn btn-outline-2x btn-outline-primary mb-0 mr-3" style="margin-bottom: 10px; width:200px; align-self: end;" @onclick="@InsertRow"> Add Plantilla </button>
+                </div>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                ShowFilterRow
+                KeyFieldName="PositionItemId"
+                PagerVisible="true"
+                PageSize="10">
+            <Columns>
+                <DxGridDataColumn FieldName="ItemNumber" />
+                <DxGridDataColumn FieldName="Position" />
+                <DxGridDataColumn FieldName="Department" />
+                <DxGridDataColumn FieldName="AuthorizedSalary" />
+                <DxGridDataColumn FieldName="ActualSalary" />
+                <DxGridDataColumn FieldName="Step" Width="1.5rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" />
+                <DxGridDataColumn FieldName="Fullname" />
+                <DxGridDataColumn FieldName="HasTemporaryEmployee" />
+                <DxGridDataColumn FieldName="DateAdded" />
+                <DxGridDataColumn FilterRowEditorVisible="false" Width="15rem" Caption="Action" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.PlantillaRecordView);
+                        }
+                        <button data-toggle="tooltip" data-placement="left" title="Details" class="border-0 btn-transition btn btn-outline-warning" @onclick="() => ShowPlantillaDetailsModal(temp)"><span class="lnr-eye"></span></button>
+                        @if (temp.MovementType != "ABOLISHED ITEMS")
+                        {
+                            <button data-toggle="tooltip" data-placement="left" title="Edit" class="border-0 btn-transition btn btn-outline-dark" @onclick="() => EditItem(temp.PositionItemId)"><span class="lnr-pencil"></span></button>
+                            if (temp.EmployeeId == 0)
+                            {
+                                <button data-toggle="tooltip" data-placement="left" title="Scrap" class="border-0 btn-transition btn btn-outline-alternate" @onclick="() => ScrapPlantilla(temp)"><span class="lnr-cog"></span></button>
+                                <button data-toggle="tooltip" data-placement="left" title="Abolish" class="border-0 btn-transition btn btn-outline-danger" @onclick="() => AbolishItem(temp.PositionItemId)"><span class="lnr-cross"></span></button>
+                            }
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="ItemNumber" />
+            </TotalSummary>
+        
+        </DxGrid>
+    </div>
+</div>
+@code {
+    [CascadingParameter] public IModalService? Modal { get; set; }
+
+    IGrid? MyGrid { get; set; }
+    object? Data { get; set; }
+
+    GridDevExtremeDataSource<PlantillaRecordView>? gridDevExtremeDataSource;
+
+    string userId = "";
+    int totalCount = 0;
+    IEnumerable<PlantillaRecordView> plantillaList;
+    public string sortBy { get; set; } = "ACTIVE ITEMS";
+    string[] sortByData = {
+    "ALL RECORDS",
+    "ACTIVE ITEMS",
+    "AVAILABLE PLANTILLA SLOT",
+    "OCCUPIED PLANTILLA SLOT",
+    "INCOMING PLANTILLA",
+    "ABOLISHED ITEMS"
+    };
+    public string arrangeBy { get; set; } = "Item Number";
+    string[] arrangeByData = {
+    "Alphanumeric Item Number",
+    "Item Number",
+    "Salary Grade - Ascending",
+    "Salary Grade - Descending"
+    };
+    public string department { get; set; } = "0";
+    private List<SelectListItems> _highestLevel { get; set; } = new List<SelectListItems>();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value!;
+            var response = await plantillaService.PlantillaYear(userId);
+            if (response.StatusCode != 200)
+            {
+                await Swal.FireAsync("Warning", "Please set plantilla year", "warning");
+                _navigation.NavigateTo("policies", true);
+            }
+            else
+            {
+                _highestLevel = await _IlevelOrganization.GetHighestLevel();
+            }
+           
+            var queryList = response.StatusCode == 200 ? await plantillaService.GetPlantillaList(sortBy, arrangeBy, department) : new List<PlantillaRecordView>();
+            plantillaList = queryList;
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<PlantillaRecordView>(queryList.AsQueryable());
+            gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+            {
+                loadOptions.PrimaryKey = new[] { "PositionItemId" };
+                loadOptions.PaginateViaPrimaryKey = true;
+            };
+            Data = gridDevExtremeDataSource;
+            //GetData();
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    void OnSortBySelect(string item)
+    {
+        sortBy = item;
+        GetData();
+    }
+
+    void OnDeptSelect(string item)
+    {
+        department = item;
+        GetData();
+    }
+
+    void OnArrangeBySelect(string item)
+    {
+        arrangeBy = item;
+        GetData();
+    }
+
+    async void GetData()
+    {
+        try
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value!;
+            var res = await plantillaService.PlantillaYear(userId);
+            var queryList = res.StatusCode == 200 ? await plantillaService.GetPlantillaList(sortBy, arrangeBy, department) : new List<PlantillaRecordView>();
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<PlantillaRecordView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+    async void EditItem(int id)
+    {
+        await ShowPlantillaModal(id);
+    }
+
+    async void AbolishItem(int id)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you want to abolish the selected item?",
+                Text = "Please check information before Submiting!",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            PositionItem positionItem = new PositionItem();
+            positionItem.PositionItemId = id;
+            positionItem.UpdatedBy = userId;
+            var response = await plantillaService.AbolishItem(positionItem);
+            if (response.StatusCode == 200)
+            {
+                await Swal.FireAsync("Success", response.Value, "success");
+                GetData();
+            }
+            else if (response.StatusCode == 404)
+            {
+                await Swal.FireAsync("Warning", response.Value, "warning");
+            }
+            else
+            {
+                await Swal.FireAsync("Error", response.Value, "error");
+            }
+        }
+    }
+
+    async Task GenerateAllPlantilla()
+    {
+        var data = await plantillaService.GetPlantillaList(sortBy, arrangeBy, department);
+        var policy = await generalPolicyService.Get();
+        if (data.Count() == 0)
+        {
+            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Do you want to proceed to generation plantilla set?",
+                    Text = "",
+                    Icon = SweetAlertIcon.Question,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "No",
+                    CancelButtonColor = "#999999"
+                });
+            if (result.IsConfirmed)
+            {
+                _navigation.NavigateTo("module-plantilla-entries", true);
+            }
+            return;
+        }
+        if (data.Where(c => c.PlantillaYear >= policy.PlantillaYear).Count() == totalCount)
+        {
+            await Swal.FireAsync("Warning", "All items are recreated this year. Creating another set is unnecessary.", "warning");
+        }
+        else if (sortBy != "ACTIVE ITEMS")
+        {
+            await Swal.FireAsync("Warning", "Please load Active Items before generating plantilla item set.", "warning");
+        }
+        else
+        {
+            _navigation.NavigateTo("module-plantilla-entries", true);
+        }
+    }
+
+    async Task ScrapPlantilla(PlantillaRecordView data)
+    {
+        try
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+            res = await plantillaService.CheckPlantilla();
+
+            if (res.StatusCode == 200)
+            {
+                var options = new ModalOptions()
+                    {
+                        DisableBackgroundCancel = true,
+                        Animation = ModalAnimation.FadeIn(0.2),
+                        ContentScrollable = true,
+                    };
+                var parameters = new ModalParameters();
+                parameters.Add(nameof(ScrapBuildPlantillaModal.selectedTempItem), data);
+
+                if (data.PositionItemId > 0)
+                {
+                    var formModal = Modal!.Show<ScrapBuildPlantillaModal>("Scrap and Build Plantilla Item ", parameters, options);
+                    var result = await formModal.Result;
+
+                    if (result.Cancelled == false)
+                    {
+                        var tempObj = result.Data != null ? result.Data as List<PlantillaRecordView> : new List<PlantillaRecordView>();
+
+                        if (tempObj!.Count() > 0)
+                        {
+                            var response = await plantillaService.PassList(tempObj!, data.HistoryEntryId);
+
+                            if (response.StatusCode == 200)
+                            {
+                                await Swal.FireAsync("Success", response.Value, "success");
+                                GetData();
+                                return;
+                            }
+                            await Swal.FireAsync("Warning", response.Value, "warning");
+                        }
+                    }
+                }
+            }
+            else if (res.StatusCode == 404)
+            {
+                await Swal.FireAsync("Warning", res.Value, "warning");
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+    async void InsertRow()
+    {
+        HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+        res = await plantillaService.CheckPlantilla();
+
+        if (res.StatusCode == 200)
+        {
+            await ShowPlantillaModal(0);
+        }
+        else if (res.StatusCode == 404)
+        {
+            await Swal.FireAsync("Warning", res.Value, "warning");
+        }
+        else
+        {
+            await Swal.FireAsync("Error", "You have successfully deleted a record.", "success");
+        }
+    }
+
+    async Task ShowPlantillaModal(int id = 0)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(PlantillaModal.positionItemId), id);
+        parameters.Add(nameof(PlantillaModal.plantillaList), plantillaList);
+
+        var formModal = id > 0 ? Modal!.Show<PlantillaModal>("Update Plantilla ", parameters, options) : Modal!.Show<PlantillaModal>("Add Plantilla ", parameters, options);
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false) GetData();
+    }
+
+    async void ShowPlantillaDetailsModal(PlantillaRecordView item)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+        var parameters = new ModalParameters();
+
+        parameters.Add(nameof(PlantillaItemDetailModal.selectedPlantillaItem), item);
+        var formModal = Modal!.Show<PlantillaItemDetailModal>("Plantilla Item Details", parameters, options);
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false) GetData();
+    }
+    //=== Unused Code due to migration to DevExpress
+    //    <RadzenCard class="m-3">
+    //    <div class="col-lg-16" align="right">
+    //        <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" style="margin-bottom: 10px; width:200px" @onclick="@InsertRow"> Add Plantilla </button>
+    //    </div>
+    //    <RadzenDataGrid @ref="grid" AllowColumnResize="false" LoadData="@LoadData" Count="@count" IsLoading="@isLoading" Data="@plantillaListdata"
+    //                    TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Responsive="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.SimpleWithMenu"
+    //                    AllowSorting="true" AllowFiltering="true" ColumnWidth="auto" AllowPaging="true" PageSize="10" PagerAlwaysVisible="true" ShowPagingSummary="true" PagerHorizontalAlign="HorizontalAlign.Center">
+    //        <Columns>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="ItemNumber" Title="Item No" Frozen="true" TextAlign="TextAlign.Center" />
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Position" Title="Position Title/Salary Grade">
+    //            </RadzenDataGridColumn>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Department" Title="Department">
+    //            </RadzenDataGridColumn>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="AuthorizedSalary" TextAlign="TextAlign.Right" Title="Authorized Salary" />
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="ActualSalary" Title="Actual Salary" />
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Step" Title="Step">
+    //            </RadzenDataGridColumn>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Fullname" Title="IncumbentName">
+    //            </RadzenDataGridColumn>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="HasTemporaryEmployee" Title="Has Temporary Employee">
+    //            </RadzenDataGridColumn>
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="DateAdded" Title="Date Added" />
+    //            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Context="data" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+    //                <Template Context="data">
+    //                    <RadzenButton Text="Action" Click="@(args => ShowContextMenuWithItems(args, data.PositionItemId, data.EmployeeId, data))" ButtonStyle="ButtonStyle.Secondary" />
+    //                </Template>
+    //            </RadzenDataGridColumn>
+    //        </Columns>
+    //    </RadzenDataGrid>
+    //</RadzenCard>
+    //IEnumerable<HRMSv4.Shared.OnBoarding.PlantillaListView> plantillas;
+    //IEnumerable<HRMSv4.Shared.OnBoarding.PlantillaRecordView> plantillaListdata;
+    //RadzenDataGrid<HRMSv4.Shared.OnBoarding.PlantillaRecordView>? grid;
+    //IList<HRMSv4.Shared.OnBoarding.HistoryEntry> plList;
+    //bool isLoading;
+    //bool frozen = true;
+    //int count;
+    //bool hasPlantillaYear = false;
+    //async void ShowContextMenuWithItems(MouseEventArgs args, int id, int empId, PlantillaRecordView data)
+    //{
+    //    //service > get if has employee
+    //    if (empId > 0)
+    //    {
+    //        ContextMenuService.Open(args,
+    //       new List<ContextMenuItem> {
+    //            new ContextMenuItem(){ Text = "Edit Plantilla", Value = id,  },
+    //            new ContextMenuItem(){ Text = "View Details", Value = data },
+    //                     }, OnMenuItemClick);
+    //    }
+    //    else
+    //    {
+    //        if (data.MovementType == "ABOLISHED ITEMS")
+    //        {
+    //            ContextMenuService.Open(args,
+    //               new List<ContextMenuItem> {
+    //                   new ContextMenuItem(){ Text = "View Details", Value = data }
+    //                            }, OnMenuItemClick);
+    //        }
+    //        else
+    //        {
+    //            ContextMenuService.Open(args,
+    //      new List<ContextMenuItem> {
+    //            new ContextMenuItem(){ Text = "Edit Plantilla", Value = id,  },
+    //            new ContextMenuItem(){ Text = "View Details", Value = data },
+    //            new ContextMenuItem(){ Text = "Abolish Item", Value = id},
+    //            new ContextMenuItem(){ Text = "Scrap Plantilla", Value = data },
+    //                     }, OnMenuItemClick);
+    //        }
+    //    }
+    //}
+    //async void OnMenuItemClick(MenuItemEventArgs args)
+    //{
+    //    int id = 0;
+    //    switch (args.Text)
+    //    {
+    //        case "View Details":
+    //            //check if has employee > disable
+    //            //Modal.Show<PlantillaItemDetailModal>("Plantilla Item Details");
+    //            //id = args.Value != null ? Convert.ToInt32(args.Value)  : 0 ;
+    //            //id = args.Value != null ? Convert.ToInt32(args.Value)  : 0 ;
+    //            var data = args.Value as PlantillaRecordView;
+    //            ContextMenuService.Close();
+    //            if (data != null)
+    //            {
+    //                await ShowPlantillaDetailsModal(data);
+    //            }
+    //            //if (id > 0)
+    //            //{ await ShowPlantillaDetailsModal(id);}
+    //            break;
+    //        case "Scrap Plantilla":
+    //            var scrapData = args.Value as PlantillaRecordView;
+    //            ContextMenuService.Close();
+    //            if (scrapData != null)
+    //            {
+    //                await ScrapPlantilla(scrapData);
+    //            }
+    //            break;
+    //        case "Abolish Item":
+    //            ContextMenuService.Close();
+    //            //check if has employee > if true dont proceed
+    //            //check if has employee > if false > confirmation
+    //            id = args.Value != null ? Convert.ToInt32(args.Value) : 0;
+    //            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+    //                {
+    //                    Title = "Do you want to abolish the selected item?",
+    //                    Text = "Please check information before Submiting!",
+    //                    Icon = SweetAlertIcon.Question,
+    //                    ShowCancelButton = true,
+    //                    ConfirmButtonText = "Yes",
+    //                    CancelButtonText = "No",
+    //                    CancelButtonColor = "#999999"
+    //                });
+    //            if (!string.IsNullOrEmpty(result.Value))
+    //            {
+    //                PositionItem positionItem = new PositionItem();
+    //                positionItem.PositionItemId = id;
+    //                positionItem.UpdatedBy = userId;
+    //                var response = await plantillaService.AbolishItem(positionItem);
+    //                if (response.StatusCode == 200)
+    //                {
+    //                    await Swal.FireAsync("Success", response.Value, "success");
+    //                    await Reset();
+    //                }
+    //                else if (response.StatusCode == 404)
+    //                {
+    //                    await Swal.FireAsync("Warning", response.Value, "warning");
+    //                }
+    //                else
+    //                {
+    //                    await Swal.FireAsync("Error", response.Value, "error");
+    //                }
+    //            }
+    //            break;
+    //        default:
+    //            //check if has employee > confirmation > yes or no
+    //            id = args.Value != null ? Convert.ToInt32(args.Value) : 0;
+    //            ContextMenuService.Close();
+    //            await ShowPlantillaModal(id);
+    //            break;
+    //    }
+    //}
+    //async Task OnSelectPlantilla(PlantillaRecordView record)
+    //{
+    //    this.StateHasChanged();
+    //}
+    //async Task LoadData(LoadDataArgs args)
+    //{
+    //    isLoading = true;
+    //    await Task.Yield();
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //    userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    var response = await plantillaService.PlantillaYear(userId);
+    //    var data = response.StatusCode == 200 ? await plantillaService.GetPlantillaList(sortBy, arrangeBy, department) : new List<PlantillaRecordView>();
+    //    totalCount = data.Count();
+    //    var query = data.AsQueryable();
+    //    if (!string.IsNullOrEmpty(args.Filter))
+    //    {
+    //        query = query.Where(args.Filter);
+    //    }
+    //    if (!string.IsNullOrEmpty(args.OrderBy))
+    //    {
+    //        query = query.OrderBy(args.OrderBy);
+    //    }
+    //    count = query.Count();
+    //    plantillaListdata = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+    //    StateHasChanged();
+    //    isLoading = false;
+    //}
+    //async Task Reset()
+    //{
+    //    grid.Reset(true);
+    //    await grid.FirstPage(true);
+    //}
+    //async Task DeleteRow(HRMSv4.Shared.OnBoarding.Course course)
+        //{
+    //}
+}

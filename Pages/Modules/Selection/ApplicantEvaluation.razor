@@ -1,0 +1,163 @@
+﻿@page "/module-applicantevaluation"
+@using HRMSv4.Shared.Selection
+@inject IApplicantEvaluation service
+@inject ICharacterReference character
+@using DevExpress.Blazor
+@using Microsoft.AspNetCore.WebUtilities;
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Applicant Evaluation
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <div class="d-inline-block dropdown">
+                <button type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                    <span class="btn-icon-wrapper pe-2 opacity-7">
+                        <i class="fa fa-business-time fa-w-20"></i>
+                    </span>
+                    Actions
+                </button>
+                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-crquestiontype">
+                                <i class="nav-link-icon pe-7s-box2"></i>
+                                <span>Question Types</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-crquestion">
+                                <i class="nav-link-icon pe-7s-ribbon"></i>
+                                <span> Questions</span>
+
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-night-fade">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Applicants</div>
+                    @*<div class="widget-subheading">Last year expenses</div>*@
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white">
+                        <span>@ct.ApplicantsCount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-arielle-smile">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Total Evaluations</div>
+                    @* <div class="widget-subheading">Total Clients Profit</div>*@
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white">
+                        <span>@ct.TotalEvaluationCount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-happy-green">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Total Sent Evaluations</div>
+                    @* <div class="widget-subheading">People Interested</div>*@
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white">
+                        <span>@ct.TotalSentEvaluationCount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <DxGrid Data="@evalList" ShowFilterRow="true"
+                ShowGroupPanel="true"
+                AutoExpandAllGroupRows="true">
+            <Columns>
+                <DxGridDataColumn FieldName="ApplicantName" GroupIndex="0" />
+                <DxGridDataColumn FieldName="CrName" Caption="Character Reference Name" />
+                <DxGridDataColumn FieldName="CrContact" Caption="C haracter Reference Contact No."/>
+                <DxGridDataColumn FieldName="CrEmail" Caption="Character Reference Email" />
+                <DxGridDataColumn FieldName="Status"/>
+                <DxGridDataColumn FieldName="" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as ApplicationEvaluationListView);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Open in browser" @onclick="@(() => DigitalCharacterReference(temp))">
+                            <i class="pe-7s-upload"></i>
+                        </button>
+                       
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+      
+
+    </div>
+</div>
+@code {
+    ApplicantEvaluationCount ct = new ApplicantEvaluationCount();
+    IEnumerable<HRMSv4.Shared.Selection.ApplicationEvaluationListView> evalList;
+    RadzenDataGrid<HRMSv4.Shared.Selection.ApplicationEvaluationListView> evalGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ct = await service.GetCrDashboardCount();
+        evalList = await service.GetEvaluations();
+    }
+
+    void OnRender(DataGridRenderEventArgs<HRMSv4.Shared.Selection.ApplicationEvaluationListView> args)
+    {
+        if (args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = "ApplicantName", SortOrder = SortOrder.Ascending });
+            StateHasChanged();
+        }
+    }
+
+    async Task DigitalCharacterReference(ApplicationEvaluationListView eval)
+    {
+        SweetAlertResult res = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Confirming you want to invite to evaluate selected applicant.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                CancelButtonColor = "red",
+                ConfirmButtonText = "Yes"
+            });
+        if (res.IsConfirmed)
+        {
+            Response msgres = await character.SendCharacterInfo(eval.CharacterReferenceQuestionnaireId);
+
+            if (msgres.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", "An email has been sent.", "success");
+            }
+        }
+    }
+}

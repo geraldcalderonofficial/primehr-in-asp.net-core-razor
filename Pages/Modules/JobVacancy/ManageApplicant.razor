@@ -1,0 +1,96 @@
+﻿@page "/module-manageapplicant"
+@inject IEmployee EmployeeService
+@inject NavigationManager Navigation
+@inject SweetAlertService Swal;
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs/>
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">Search Filter</label>
+                    <select class="form-select form-control-sm form-control">
+                        <option>New Applicants</option>
+                        <option>Old Employees</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    @if (selectedEmployees?.Any() == true)
+    {
+        <h1>Boom! @selectedEmployees[0].FullName</h1>
+    }
+    
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <RadzenDataGrid Responsive=true @ref="empGrid" AllowFiltering="true" AllowPaging="true" PageSize="20" AllowSorting="true"
+        Data="@employees" TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+            <Columns>         
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="FullName" Title="Name">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.FullName" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="EmployeeNumber" Title="Employee No.">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.EmployeeNumber" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="EmailAddress" Title="Email Address">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.EmailAddress" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="MobileNo" Title="Mobile No.">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.MobileNo" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="Gender" Title="Gender">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.Gender" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    List<HRMSv4.Shared.OnBoarding.EmployeeListView> employees;
+
+    RadzenDataGrid<HRMSv4.Shared.OnBoarding.EmployeeListView> empGrid;
+
+    IList<HRMSv4.Shared.OnBoarding.Employee> employeeList;
+
+    IList<HRMSv4.Shared.OnBoarding.EmployeeListView> selectedEmployees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(LoadEmployees);
+         selectedEmployees = employees.Take(1).ToList();
+    }
+
+    private async void LoadEmployees()
+    {
+        // IsLoading = true;
+
+        System.Threading.Thread.Sleep(2000);
+        employees = await EmployeeService.GetAll();
+       
+        //  IsLoading = false;
+
+        await InvokeAsync(StateHasChanged);
+    }
+}

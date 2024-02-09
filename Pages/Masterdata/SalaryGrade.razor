@@ -1,0 +1,418 @@
+﻿@page "/masterdata-salarygrade"
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared
+@using Microsoft.EntityFrameworkCore
+@using System.Linq.Dynamic.Core
+@inject SweetAlertService Swal
+@inject ISalaryGrade service
+@using DevExpress.Blazor
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Salary Grade
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Salary Grade</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-start" onclick="@Add" style="margin-bottom: 10px;"> + New</button>
+                    <DxComboBox CssClass="float-end w-150" Data="@filters" Value="isPlantilla" SizeMode="SizeMode.Medium"
+                                ValueChanged="@((string fil) => Filter(fil))" NullText="Filter..." />
+                </div>
+            </div>
+            <div class="card-body">
+                <DxGrid Data="@effectivityDates"
+                        SelectionMode="GridSelectionMode.Single"
+                        AllowSelectRowByClick="true"
+                        KeyFieldName="SalaryGradeId"
+                        @bind-SelectedDataItem="SelectedDataItem"
+                        SelectedDataItemsChanged="SelectedDateChanged">
+                    <Columns>
+                        <DxGridDataColumn FieldName="EffectivityDate">
+                            <CellDisplayTemplate>
+                                @{
+                                    var record = context.DataItem as SalaryGradeEffectivityDateView;
+                                }
+                                @record.EffectivityDate.ToString("MMMM dd, yyyy")
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Annex" />
+                        <DxGridDataColumn FieldName="LbcNumber" />
+                        <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                            <CellDisplayTemplate>
+                                @{
+                                    var temp = (context.DataItem as SalaryGradeEffectivityDateView);
+                                }
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditEffectivityDate(temp))">
+                                    <i class="lnr-pencil"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteEffectivityDate(temp))">
+                                    <i class="lnr-trash"></i>
+                                </button>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@AddSalaryGrade" style="margin-bottom: 10px;"> + New</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <DxGrid Data="@DataSalaryGrades"
+                    PageSize="20">
+                    <Columns>
+                        <DxGridDataColumn FieldName="SalaryGradeNumber" />
+                        <DxGridDataColumn FieldName="Step1MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step2MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step3MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step4MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step5MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step6MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step7MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn FieldName="Step8MonthlyRate" DisplayFormat="n3" />
+                        <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                            <CellDisplayTemplate>
+                                @{
+                                    var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.SalaryGrade);
+                                }
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditSalaryGrade(temp))">
+                                    <i class="lnr-pencil"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteSalaryGrade(temp))">
+                                    <i class="lnr-trash"></i>
+                                </button>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </div>
+        </div>
+    </div>
+</div>
+@code
+{
+    [CascadingParameter] public IModalService Modal { get; set; }
+    //Janela 06/3/2022
+    //Janela Maganda 11/07/2022
+    List<string> filters = new List<string> { "Plantilla", "Non-Plantilla" };
+    public SalaryGradeEffectivityDateView sgEffectivityDate { get; set; } = new SalaryGradeEffectivityDateView();
+    string isPlantilla { get; set; } = "Plantilla";
+    IEnumerable<HRMSv4.Shared.OnBoarding.SalaryGradeEffectivityDateView> effectivityDates;
+    object SelectedDataItem { get; set; }
+    string userId = "";
+
+    //ssg
+    IGrid? MyGrid { get; set; }
+    object DataSalaryGrades { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.SalaryGrade> gridDevExtremeDataSource2;
+    public string filterEffectivityDateString { get; set; } = "";
+    public string filterAnnex { get; set; } = "";
+    public bool filterIsPlantilla { get; set; }
+    public HRMSv4.Shared.OnBoarding.SalaryGrade salaryGrade = new HRMSv4.Shared.OnBoarding.SalaryGrade();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        bool plantillaBa = isPlantilla == "Plantilla" ? true : false;
+
+        effectivityDates = await service.GetEffectivityDates(plantillaBa);
+        //isDefault = false;
+        StateHasChanged();
+    }
+
+    async Task UpdateDataAsync2()
+    {
+        //phs = await service.GetContributions(selectedDate.EffectivityDate);
+        var data = await service.GetSalaryGradeList(filterEffectivityDateString, filterAnnex, filterIsPlantilla);
+        var rawr = data.AsQueryable();
+        gridDevExtremeDataSource2 = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.SalaryGrade>(rawr);
+        DataSalaryGrades = gridDevExtremeDataSource2;
+        MyGrid.Reload();
+
+        StateHasChanged();
+    }
+
+    async Task SelectedDateChanged(object selected)
+    {
+        var temp = SelectedDataItem as SalaryGradeEffectivityDateView;
+
+        filterEffectivityDateString = temp.EffectivityDate.ToString("yyyy-MM-dd");
+        filterAnnex = temp.Annex ?? "";
+        filterIsPlantilla = temp.PlantillaType == "Plantilla";
+
+
+        var data = await service.GetSalaryGradeList(filterEffectivityDateString, filterAnnex, filterIsPlantilla);
+        var rawr = data.AsQueryable();
+        gridDevExtremeDataSource2 = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.SalaryGrade>(rawr);
+        gridDevExtremeDataSource2.CustomizeLoadOptions = (loadOptions) =>
+        {
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "SalaryGradeId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        DataSalaryGrades = gridDevExtremeDataSource2;
+
+        this.StateHasChanged();
+    }
+
+    async void Add()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+        DateTime janThisYear = new DateTime(DateTime.Today.Year, 1, 1);
+        sgEffectivityDate = new SalaryGradeEffectivityDateView()
+            {
+                SalaryGradeId = 0,
+                EffectivityDate = janThisYear,
+                Annex = "A1",
+                PlantillaType = isPlantilla == "Plantilla" ? "Plantilla" : "Non-Plantilla",
+                LbcNumber = ""
+            };
+
+        bool plantillaBa = isPlantilla == "Plantilla" ? true : false;
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(SgEffectivityDateModal.sgEffectivityDate), sgEffectivityDate);
+        parameters.Add(nameof(SgEffectivityDateModal.isPlantilla), plantillaBa);
+        var formModal = Modal.Show<SgEffectivityDateModal>("Effectivity Date", parameters, options);
+        var result = await formModal.Result;
+        if (!result.Cancelled)
+        {
+            await UpdateDataAsync();
+           
+
+            this.StateHasChanged();
+        }
+    }
+
+    async void AddSalaryGrade()
+    {
+        var selectedEffectivityDates = SelectedDataItem as SalaryGradeEffectivityDateView;
+
+        if (selectedEffectivityDates != null)
+        {
+            //var selectedDate = selectedEffectivityDates[0];
+
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true,
+                    Animation = ModalAnimation.FadeIn(0.2),
+                    ContentScrollable = true,
+
+                };
+            salaryGrade = new HRMSv4.Shared.OnBoarding.SalaryGrade()
+                {
+                    EffectivityDate = selectedEffectivityDates.EffectivityDate,
+                    IsPlantilla = selectedEffectivityDates.PlantillaType == "Plantilla",
+                    Annex = selectedEffectivityDates.Annex,
+                    LbcNumber = selectedEffectivityDates.LbcNumber,
+                    SalaryGradeNumber = 1,
+                    Step1MonthlyRate = 0M,
+                    Step2MonthlyRate = 0M,
+                    Step3MonthlyRate = 0M,
+                    Step4MonthlyRate = 0M,
+                    Step5MonthlyRate = 0M,
+                    Step6MonthlyRate = 0M,
+                    Step7MonthlyRate = 0M,
+                    Step8MonthlyRate = 0
+                };
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(SalaryDetailsModal.salaryGrade), salaryGrade);
+            parameters.Add(nameof(SalaryDetailsModal.sgEffectivityDate), selectedEffectivityDates);
+            var formModal = Modal.Show<SalaryDetailsModal>("Salary Grade Details", parameters, options);
+            var result = await formModal.Result;
+            if (!result.Cancelled)
+            {
+                if (SelectedDataItem != null)
+                {
+                    SelectedDateChanged(SelectedDataItem);
+                }
+               // await UpdateDataAsync2();
+            }
+        }
+        else
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Invalid request",
+                    Text = "Please select effectivity date",
+                    Icon = SweetAlertIcon.Info
+                });
+        }
+    }
+
+    async Task Filter(string e)
+    {
+        string a = e;
+        isPlantilla = a;
+        UpdateDataAsync();
+
+    }
+
+    async Task EditEffectivityDate(SalaryGradeEffectivityDateView ed)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+        bool plantillaBa = isPlantilla == "Plantilla" ? true : false;
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(SgEffectivityDateModal.sgEffectivityDate), ed);
+        parameters.Add(nameof(SgEffectivityDateModal.isPlantilla), plantillaBa);
+        var formModal = Modal.Show<SgEffectivityDateModal>("Effectivity Date", parameters, options);
+        var result = await formModal.Result;
+        if (!result.Cancelled)
+        {
+            await UpdateDataAsync();
+            this.StateHasChanged();
+        }
+        else
+        {
+            //effectivityDates = await service.GetEffectivityDates(isPlantilla);
+            //selectedEffectivityDates = effectivityDates.Take(1).ToList();
+            //await edGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task DeleteEffectivityDate(SalaryGradeEffectivityDateView ed)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmation",
+                Text = "Do you really want to delete this record?",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            bool plantillaBa = isPlantilla == "Plantilla" ? true : false;
+
+            Response response = await service.DeleteEffectivityDate(ed.EffectivityDate.ToString("yyyy-MM-dd"), ed.Annex, plantillaBa);
+            if (response.StatusCode == 200)
+            {
+
+                await _Swal.FireAsync("Success", response.Value, "success");
+                //effectivityDates = await service.GetEffectivityDates(isPlantilla);
+                //selectedEffectivityDates = effectivityDates.Take(1).ToList();
+                //await edGrid.Reload();
+                await UpdateDataAsync();
+                this.StateHasChanged();
+            }
+            else
+            {
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Invalid request",
+                        Text = response.Value,
+                        Icon = SweetAlertIcon.Info,
+                    });
+            }
+        }
+    }
+    async Task EditSalaryGrade(HRMSv4.Shared.OnBoarding.SalaryGrade sg)
+    {
+
+        var temp = SelectedDataItem as SalaryGradeEffectivityDateView;
+
+        if (temp != null)
+        {
+
+
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true,
+                    Animation = ModalAnimation.FadeIn(0.2),
+                    ContentScrollable = true,
+                };
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(SalaryDetailsModal.salaryGrade), sg);
+            parameters.Add(nameof(SalaryDetailsModal.sgEffectivityDate), temp);
+            var formModal = Modal.Show<SalaryDetailsModal>("Salary Grade", parameters, options);
+            var result = await formModal.Result;
+            if (!result.Cancelled)
+            {
+                await UpdateDataAsync2();
+            }
+        }
+        else
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Invalid request",
+                    Text = "Please select effectivity date",
+                    Icon = SweetAlertIcon.Info
+                });
+        }
+    }
+
+    async Task DeleteSalaryGrade(HRMSv4.Shared.OnBoarding.SalaryGrade sg)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmation",
+                Text = "Do you really want to delete this record?",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            Response response = await service.DeleteSalaryGrade(sg.SalaryGradeId);
+            if (response.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", response.Value, "success");
+                await UpdateDataAsync2();
+            }
+            else
+            {
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Invalid request",
+                        Text = response.Value,
+                        Icon = SweetAlertIcon.Info,
+                    });
+            }
+        }
+    }
+}

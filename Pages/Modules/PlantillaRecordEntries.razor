@@ -1,0 +1,133 @@
+﻿@page "/module-plantilla-entries"
+@using DevExpress.Blazor
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Plantilla Entries" Text="Plantilla Entries" Path="../module-plantilla-history" />
+
+<div class="container col-sm-12 col-md-12 col-xl-12 customModal">
+    <div class="main-card mb-3 card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="position-relative mb-3">
+                        <label class="form-label d-block">Plantilia</label>
+                        <label class="form-label m-0">@yearTo.ToString()</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="position-relative mb-3">
+                        <label class="form-label" for="exampleEmail55">Office</label>
+                        <DxComboBox Data="_highestLevel"
+                                    NullText="--Select Level--"
+                                    TextChanged="OnDeptSelect"
+                                    @bind-Value="department" />
+                    </div>
+                </div>
+                <div class="col-6 align-self-center" align="right">
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" @onclick="@GenerateSetRow" style="width:200px"> Generate Set </button>
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" @onclick="@InsertRow" style="width:200px"> Add Plantilla History </button>
+                </div>
+            </div>
+            <DxGrid @ref="MyGrid" Data="@Data"
+                    ShowFilterRow
+                    KeyFieldName="TravelOrderId"
+                    PagerVisible="true"
+                    PageSize="5">
+                <Columns>
+                    <DxGridDataColumn FieldName="ItemNumber" />
+                    <DxGridDataColumn FieldName="Position" />
+                    <DxGridDataColumn FieldName="Department" />
+                    <DxGridDataColumn FieldName="AuthorizedSalary" />
+                    <DxGridDataColumn FieldName="ActualSalary" />
+                    <DxGridDataColumn FieldName="Step" Width="1.5rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="Fullname" />
+                    <DxGridDataColumn FieldName="HasTemporaryEmployee" />
+                    <DxGridDataColumn FieldName="DateAdded" />
+                    <DxGridDataColumn FilterRowEditorVisible="false" Width="10rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.PlantillaRecordView);
+                            }
+                            <button data-toggle="tooltip" data-placement="left" title="Edit" class="border-0 btn-transition btn btn-outline-dark" @onclick="() => ShowPlantillaModal(temp.PositionItemId, temp)"><span class="lnr-pencil"></span></button>
+                            @if (temp.PositionItemId > 0) {
+                                <button data-toggle="tooltip" data-placement="left" title="Scrap" class="border-0 btn-transition btn btn-outline-alternate" @onclick="() => ShowScrapBuildModal(temp)"><span class="lnr-cog"></span></button>
+                            }
+                            <button data-toggle="tooltip" data-placement="left" title="Abolish" class="border-0 btn-transition btn btn-outline-danger" @onclick="() => AbolishItem(temp)"><span class="lnr-cross"></span></button>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+            @*            <RadzenDataGrid @ref="grid" AllowColumnResize="true" Data="@plantillaListdata"
+            TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Responsive="true" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="10" PagerAlwaysVisible="true"
+            ShowPagingSummary="true" PagerHorizontalAlign="HorizontalAlign.Center"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.SimpleWithMenu">
+            <Columns>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="ItemNumber" Filterable="false" Width="200px" Title="Item No" Frozen="true" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Position" Title="Position Title/Salary Grade" Width="200px">
+            <Template Context="data">
+            <p style="white-space:normal">@data.Position</p>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Department" Title="Department" Width="200px">
+            <Template Context="data">
+            <p style="white-space:normal">@data.Department</p>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="AuthorizedSalary" TextAlign="TextAlign.Right" Title="Authorized Salary" />
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="ActualSalary" Title="Actual Salary" />
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Step" Title="Step" Width="100px">
+            <Template Context="data">
+            <p style="white-space:normal">@data.Step</p>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="Fullname" Title="IncumbentName">
+            <Template Context="data">
+            <p style="white-space:normal">@data.Fullname</p>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="HasTemporaryEmployee" Title="Has Temporary Employee">
+            <Template Context="data">
+            <p style="white-space:normal">@data.HasTemporaryEmployee</p>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Property="DateAdded" Title="Date Added" />
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Context="category" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+            <Template Context="data">
+            <button class="border-0 btn-transition btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Edit Plantilla" @onclick="@(args => ShowPlantillaModal(data.PositionItemId, data))">
+            <i class="lnr-pencil"></i>
+            </button>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Context="category" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+            <Template Context="data">
+            <button class="border-0 btn-transition btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Delete" @onclick="@(args => AbolishItem(data))">
+            <i class="lnr-trash"></i>
+            </button>
+            </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.PlantillaRecordView" Context="category" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+            <Template Context="data">
+            <button class="border-0 btn-transition btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Scrap" @onclick="@(args => ShowScrapBuildModal(data))">
+            <i class="pe-7s-tools"></i>
+            </button>
+            </Template>
+            </RadzenDataGridColumn>
+            </Columns>
+            </RadzenDataGrid>*@
+        </div>
+    </div>
+    <div class="blockUI blockOverlay" hidden="@isLoading">
+        <div class="blockUI blockElement" style="position: absolute; opacity: 1">
+            <div class="loader mx-auto">
+                <div class="loader-wrapper d-flex justify-content-center align-items-center">
+                    <div class="loader">
+                        <div class="ball-clip-rotate-pulse">
+                            <div style="width:50px;height:50px;top: 13px;left: 50px;"></div>
+                            <div style="width:50px;height:50px;top: 13px;left: 50px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center;font-size: 18px;color: white;margin-left: 10px;margin-top: 1px;">@counter</p>
+            </div>
+        </div>
+    </div>
+</div>

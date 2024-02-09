@@ -1,0 +1,205 @@
+﻿@using HRMSv4.Shared.Mailing
+@using HRMSv4.Client.Pages.Mail
+@inject IMail service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<BusyIndicator Message="Please wait while loading data..." Data="m">
+    <div hidden="@isHideMailList">
+        <div class="app-inner-layout__top-pane">
+            <div class="pane-left">
+                <div class="mobile-app-menu-btn">
+                    <button type="button" class="hamburger hamburger--elastic">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                </div>
+                <h4 class="mb-0">Sent Message Detail</h4>
+
+            </div>
+            <div class="pane-right">
+            </div>
+        </div>
+        <div class="divider"></div>
+        <button class="btn btn-light" @onclick="@DoProcessing"><i class="fas fa-arrow-left"></i>Go back</button>
+        <div class="m-5">
+            <div class="card-header">
+                <div class="d-flex flex-wrap w-100 align-items-center">
+                    <div class="flex-shrink-0">
+                        <img style="width: 40px; height: auto;" src="/images/avatars/default-avatar-grey.png"
+                             class="d-block ui-w-40 rounded-circle" alt="">
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <a href="javascript:void(0)">Subj: @m.Subject</a>
+                        <div class="text-muted small">@m.To</div>
+                    </div>
+                    <div class="text-muted small ms-3">
+                        <div>
+                            <strong>@m.CreatedAt.ToString("MMM dd, yyyy")</strong>
+                        </div>
+                        <div>
+                            @* <strong>1,234</strong> posts*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>
+                    @m.Message
+                </p>
+            </div>
+           @* <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+                <div class="px-4 pt-3">
+                </div>
+                <div class="px-4 pt-3">
+                    <button hidden="@isReply" type="button" class="btn btn-primary" onclick="@Reply">
+                        <i class="ion ion-md-create"></i>
+                        Reply
+                    </button>
+                </div>
+            </div>*@
+            <div class="row" hidden="@isRead">
+                <div class="flex-grow-1">
+                    <a href="javascript:void(0)" class="card-title">Reply to: @m.From</a>
+                </div>
+                <textarea rows="4" class="form-control mt-2" @bind="reply">
+
+            </textarea>
+                <div class="clearfix text-end mt-4">
+                    <button type="button" id="next-btn" class="btn-transition btn btn-outline-danger" onclick="@Cancel">Cancel</button>
+                    <button type="button" id="prev-btn" class="btn-transition btn btn-outline-primary" onclick="@Send">Send</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+    [Parameter]
+    public int MailId { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } //inbox, outbox, trash
+
+    [Parameter] public EventCallback GoBackOutbox { get; set; }
+
+    private MailBox mailBox { get; set; }
+
+    bool isHideMailList { get; set; } = false;
+
+    Mail m = new Mail();
+    Mail mail = new Mail();
+
+    bool isRead = true;
+    bool isReply = false;
+    string reply = "";
+    string paramId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        m = null;
+
+        string empId = await localStorage.GetItemAsStringAsync(">>redd");
+
+        //string ronron = empId.Replace("\"", "");
+
+
+        //string DecodedUrl = string.Empty;
+
+        //string replacement = "ItIsSlashReplacement";
+        //DecodedUrl = ronron.ToString().Replace(replacement, "/");
+
+        paramId =  _crypto.ConvertHexToString(empId, System.Text.Encoding.Unicode);
+        //await Crypto.DecryptAsync(DecodedUrl);
+
+        await service.ReadMail(MailId);
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(1000); // simulate loading
+        m = await service.Get(MailId);
+
+        this.StateHasChanged();
+    }
+
+    protected void Reply()
+    {
+        isRead = false;
+        isReply = true;
+
+        StateHasChanged();
+    }
+
+    protected void Cancel()
+    {
+        isRead = true;
+        isReply = false;
+        StateHasChanged();
+    }
+
+    protected async Task Send()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to send a reply",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            mail.From = paramId;
+            mail.CreatedBy = userId;
+            mail.To = m.From;
+            mail.Attachment = string.Empty;
+            mail.Status = "Sent";
+            mail.SubDomain = string.Empty;
+            mail.Message = reply;
+            mail.Subject = "RE: " + m.Subject;
+
+            HttpResponseMessage res = await service.Add(mail);
+            if (res.IsSuccessStatusCode)
+            {
+                SweetAlertResult _swres = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Success",
+                        Text = "Message successfully sent.",
+                        Icon = "success"
+                    });
+
+                if (!string.IsNullOrEmpty(_swres.Value))
+                {
+                    isRead = true;
+                    isReply = false;
+                    reply = "";
+                    //StateHasChanged();
+
+                    //int tempId = int.Parse(paramId);
+
+                    //await UpdateMailCount.InvokeAsync(paramId);
+                    //mailBox.UpdateMailCount();
+                    //await Task.Run(() => mailBox.UpdateMailCount());
+                    //await Task.Run(() => _mailbox.UpdateMailCount());
+                    //async () => await _mailbox.GetMailCount(paramId);
+                    //await Task.CompletedTask;
+
+                }
+            }
+        }
+    }
+
+    private async Task DoProcessing()
+    {
+        isHideMailList = true;
+        await GoBackOutbox.InvokeAsync();
+    }
+}

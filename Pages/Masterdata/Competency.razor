@@ -1,0 +1,338 @@
+﻿@page "/masterdata-competency"
+@using System.Linq.Dynamic.Core
+@using HRMSv4.Client.Shared.Modals.CompetencyComponents
+@inject ICompetency service
+@using DevExpress.Blazor
+
+@*<style>
+   .rz-column-title{
+        white-space:normal;
+    }
+
+</style>
+*@
+
+<style>
+    .dxbs-grid-group-row {
+        font-weight: bold;
+    }
+</style>
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+               Competency
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Competency</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+
+
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@Add" Disabled=@(competencyToInsert != null) style="margin-bottom: 10px; width:200px"> Add Competency </button>
+        </div>
+       @*table here*@
+        <DxGrid @ref="MyGrid" Data="@competencies"
+                    ShowGroupPanel="false"
+                    PageSizeSelectorAllRowsItemVisible="false"
+                  
+                    EditMode="GridEditMode.EditRow">
+                <Columns>
+                    <DxGridDataColumn FieldName="CompetencyType" TextAlignment="DevExpress.Blazor.GridTextAlignment.Left" DisplayFormat="c" GroupIndex="0" GroupInterval="GridColumnGroupInterval.Custom" >
+                           
+                    </DxGridDataColumn>
+                <DxGridDataColumn FieldName="CompetencyName" TextAlignment="DevExpress.Blazor.GridTextAlignment.Left" Width="40%">
+                        <CellDisplayTemplate>
+                            @{
+                                 var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.Competency);
+                            }
+                            <label style="padding-left:10px">@temp.CompetencyName</label>
+
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+
+                <DxGridDataColumn FieldName="Description" TextAlignment="DevExpress.Blazor.GridTextAlignment.Left" Width="52%">
+
+                </DxGridDataColumn>
+
+
+
+                <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="8%">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.Competency);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditRow(temp))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(args => DeleteRow(temp))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                   
+                </DxGridDataColumn>
+
+                </Columns>
+
+
+
+
+            </DxGrid>
+    </div>
+</div>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    IEnumerable<HRMSv4.Shared.OnBoarding.Competency> competencies;
+    IList<Competency> selectedCompetency;
+    RadzenDataGrid<HRMSv4.Shared.OnBoarding.Competency>? compGrid;
+    List<string> listType = new List<string>();
+    HRMSv4.Shared.OnBoarding.Competency competencyToInsert;
+    string nameToEdit;
+    string typeToEdit;
+    string descriptionToEdit;
+    bool isLoading;
+    int count;
+    IGrid? MyGrid { get; set; }
+    //
+    protected override async Task OnInitializedAsync()
+    {
+        competencies = await service.GetAll();
+
+        GetType();
+
+    }
+    private void GetType()
+    {
+        listType.Add("Core Competencies");
+        listType.Add("Leadership Competencies");
+        listType.Add("Functional Competencies");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        MyGrid?.ExpandAllGroupRows();
+    }
+
+    async Task Add()
+    {
+        //var options = new ModalOptions()
+        //    {
+        //        DisableBackgroundCancel = true,
+        //        //Animation = ModalAnimation.FadeIn(0.2),
+        //        ContentScrollable = true,
+
+        //    };
+
+        var form = Modal.Show<CompetencyModal>("Competency Details");
+
+        var response = await form.Result;
+
+        if (response.Cancelled == false)
+        {
+             competencies = await service.GetAll();
+            //await compGrid.Reload();
+            StateHasChanged();
+        }
+    }
+
+    async void OnUpdateRow(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+        if(com == competencyToInsert)
+        {
+            competencyToInsert = null;
+        }
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        com.UpdatedBy = userId;
+        await service.Update(com);
+        competencies = await service.GetAll();
+    }
+
+    async Task OnCreateRow(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        com.CreatedBy = userId;
+
+        await service.Add(com);
+        competencies = await service.GetAll();
+    }
+
+    async Task InsertRow()
+    {
+        competencyToInsert = new HRMSv4.Shared.OnBoarding.Competency();
+        await compGrid.InsertRow(competencyToInsert);
+
+    }
+
+    async Task SaveRow(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+        if (com == competencyToInsert)
+        {
+            competencyToInsert = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(com.CompetencyName) || string.IsNullOrWhiteSpace(com.CompetencyType) || string.IsNullOrWhiteSpace(com.Description))
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Oops!",
+                    Text = "Please complete all details.",
+                    Icon = "warning",
+                    AllowOutsideClick = false
+
+                });
+            competencyToInsert = com;
+        }
+        else
+        {
+            var comp = await service.GetAll();
+            var duplicate = comp.Where(a => a.CompetencyId != com.CompetencyId && a.CompetencyName.ToLower() == com.CompetencyName.ToLower()).ToList();
+            if (duplicate.Count() == 0)
+            {
+                await compGrid.UpdateRow(com);
+                StateHasChanged();
+
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Record already exist!", "warning");
+            }
+        }
+
+    }
+
+    async Task EditRow(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(CompetencyModal.competencyId), com.CompetencyId);
+
+        var formModal = Modal.Show<CompetencyModal>("Update Competency Details", parameters, options);
+
+        var res = await formModal.Result;
+        if (res.Cancelled == false)
+        {
+            competencies = await service.GetAll();
+            //await compGrid.Reload();
+            StateHasChanged();
+        }
+    }
+
+    async void CancelEdit(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+
+        if (com == competencyToInsert)
+        {
+            competencyToInsert = null;
+        }
+        if (com.CompetencyName != nameToEdit)
+        {
+            com.CompetencyName = nameToEdit;
+            compGrid.CancelEditRow(com);
+        }
+        else
+        {
+            compGrid.CancelEditRow(com);
+        }
+    }
+
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.Competency com)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Are you sure?",
+            Text = "You are about to delete this record.",
+            Icon = "warning",
+            ShowCancelButton = true,
+            ConfirmButtonText = "Yes, delete it!",
+            CancelButtonText = "Cancel",
+            CancelButtonColor = "#414141"
+        });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            if (com == competencyToInsert)
+            {
+                competencyToInsert = null;
+            }
+
+            if (competencies.Contains(com))
+            {
+                res = await service.Delete(com.CompetencyId);
+
+                if (res.StatusCode == 200)
+                {
+                    await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+                    competencies = await service.GetAll();
+                    //await compGrid.Reload();
+                    StateHasChanged();
+                }
+                else
+                {
+                    await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+                }
+            }
+            else
+            {
+                compGrid.CancelEditRow(com);
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        await Task.Yield();
+
+        var data = await service.GetAll();
+        var query = data.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        competencies = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+
+    async Task Reset()
+    {
+        compGrid.Reset(true);
+        await compGrid.FirstPage(true);
+    }
+
+}

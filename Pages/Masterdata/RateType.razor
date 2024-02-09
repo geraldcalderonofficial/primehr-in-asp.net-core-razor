@@ -1,0 +1,442 @@
+﻿@page "/masterdata-ratetypes"
+@using HRMSv4.Client.Helpers
+@using HRMSv4.Shared
+@inject IRateType service
+@using System.Linq.Dynamic.Core
+@using DevExpress.Blazor
+<style>
+    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: inherit;
+        height: inherit;
+    }
+</style>
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Rate Types
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Rate Types</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@InsertRow" Disabled=@(rateToInsert != null) style="margin-bottom: 10px; width:200px"> Add Rate Type </button>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@RateTypes" ValidationEnabled="false"
+                SelectionMode="GridSelectionMode.Single"
+                AllowSelectRowByClick="true"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                DataItemDeleting="Grid_DataItemDeleting"
+                PopupEditFormCssClass="pw-800"
+                EditMode="GridEditMode.EditRow"
+                PagerVisible="true"
+                PageSize="50" ShowFilterRow="true">
+            <Columns>
+                <DxGridDataColumn FieldName="RateTypeName">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.RateType)context.EditModel;
+                        }
+                        <DxTextBox CssClass="cw-320" NullText="Enter rate type name" @bind-Text="record.RateTypeName" SizeMode="SizeMode.Medium" />
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="IsPlantilla">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.RateType)context.EditModel;
+                        }
+                        <DxCheckBox CssClass="chkClass" CheckType="CheckType.Switch"
+                                    LabelPosition="LabelPosition.Left"
+                                    @bind-Checked="@record.IsPlantilla"
+                                    Alignment="CheckBoxContentAlignment.SpaceBetween">
+                        </DxCheckBox>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="Arithmetic">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.RateType)context.EditModel;
+                        }
+                        <DxComboBox CssClass="cw-480" AllowUserInput="true" Data="@arithmetics" @bind-Text="record.Arithmetic" NullText="Select arithmetic" @bind-Value="record.Arithmetic" SizeMode="SizeMode.Medium" />
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.RateType);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(temp))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteRow(temp))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                    <CellEditTemplate>
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                            <i class="lnr-checkmark-circle"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                            <i class="lnr-cross"></i>
+                        </button>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+
+    </div>
+</div>
+
+@code {
+    IEnumerable<HRMSv4.Shared.OnBoarding.RateType> rates;
+    //RadzenDataGrid<HRMSv4.Shared.OnBoarding.RateType>? rateGrid;
+    //IList<HRMSv4.Shared.OnBoarding.RateType> rateList;
+    HRMSv4.Shared.OnBoarding.RateType rateToInsert;
+    string rateToEdit;
+    string plantillaToEdit;
+    //List<string> arithmetics = new List<string>();
+    //bool isLoading;
+    //int count;
+    //bool isPopUp = false;
+
+    List<string> arithmetics = new List<string> { "+", "-", "*", "/" };
+    IGrid? MyGrid { get; set; }
+    string userId = "";
+
+    object RateTypes { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.RateType> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //rates = await service.GetAll();
+        //rateList = rates.ToList();
+
+        //arithmetics.Add("+");
+        //arithmetics.Add("-");
+        //arithmetics.Add("*");
+        //arithmetics.Add("/");
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        rates = await service.GetAll();
+        var tempList = rates.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.RateType>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "RateTypeId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        RateTypes = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+
+    //async Task LoadData(LoadDataArgs args)
+    //{
+    //    isLoading = true;
+
+    //    await Task.Yield();
+    //    rateToInsert = null;
+    //    var data = await service.GetAll();
+    //    isPopUp = data.Count() > 1 ? true : false ;
+    //    var query = data.AsQueryable();
+
+    //    if (!string.IsNullOrEmpty(args.Filter))
+    //    {
+    //        query = query.Where(args.Filter);
+    //    }
+
+    //    if (!string.IsNullOrEmpty(args.OrderBy))
+    //    {
+    //        query = query.OrderBy(args.OrderBy);
+    //    }
+
+    //    count = query.Count();
+
+    //    rates = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+    //    StateHasChanged();
+    //    isLoading = false;
+    //}
+
+    //async Task Reset()
+    //{
+    //    rateGrid.Reset(true);
+    //    await rateGrid.FirstPage(true);
+    //}
+
+    async Task InsertRow()
+    {
+        //rateToInsert = new HRMSv4.Shared.OnBoarding.RateType();
+        //if (count == 0){ count++; }
+        //await rateGrid.InsertRow(rateToInsert);
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var temp = (HRMSv4.Shared.OnBoarding.RateType)e.EditModel;
+        }
+        else
+        {
+            var temp = (HRMSv4.Shared.OnBoarding.RateType)e.EditModel;
+        }
+    }
+
+    //async Task OnCreateRow(HRMSv4.Shared.OnBoarding.RateType rate)
+    //{
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //    string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    rate.CreatedBy = userId;
+
+    //    var result = await service.Add(rate);
+
+    //    if (result.StatusCode == 200)
+    //    {
+    //         await _Swal.FireAsync("Success", result.Value , "success");
+    //         await Reset();
+    //    }
+    //    else
+    //    {
+    //         await Reset();
+    //        await _Swal.FireAsync("Oops...", result.Value, "error");
+    //    }
+    //}
+
+    //async void OnUpdateRow(HRMSv4.Shared.OnBoarding.RateType rate)
+    //{
+    //    if (rate == rateToInsert)
+    //    {
+    //        rateToInsert = null;
+    //    }
+
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //    string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    rate.UpdatedBy = userId;
+
+    //    var result = await service.Update(rate);
+
+    //    if (result.StatusCode == 200)
+    //    {
+    //         await _Swal.FireAsync("Success", result.Value, "success");
+    //         await Reset();
+    //    }
+    //    else
+    //    {
+    //        await Reset();
+    //        await _Swal.FireAsync("Oops...", result.Value, "error");
+
+    //    }
+    //}
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var data = e.EditModel as HRMSv4.Shared.OnBoarding.RateType;
+        data.RateTypeName = GetValidString(data.RateTypeName);
+        data.Arithmetic = GetValidString(data.Arithmetic);
+        Response result = new Response();
+
+        if (!string.IsNullOrWhiteSpace(data.RateTypeName) && !string.IsNullOrWhiteSpace(data.Arithmetic))
+        {
+            data.RateTypeName = GetValidString(data.RateTypeName);
+
+            if (e.IsNew)
+            {
+                data.CreatedBy = userId;
+                result = await service.Add(data);
+            }
+            else
+            {
+                var res = await service.GetCheckDuplicate(data);
+                if (res.StatusCode == 200)
+                {
+                    data.UpdatedBy = userId;
+                    result = await service.Update(data);
+                }
+                else if (res.StatusCode == 400)
+                {
+                    await _Swal.FireAsync("Oops...", result.Value, "warning");
+                }
+                else
+                {
+                    await _Swal.FireAsync("Error", result.Value, "error");
+                }
+
+            }
+
+
+            if (result.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", result.Value, "success");
+                await UpdateDataAsync();
+            }
+            else
+            {
+                await UpdateDataAsync();
+                await _Swal.FireAsync("Oops...", result.Value, "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", "Please enter rate type details.", "warning");
+        }
+    }
+
+    //async Task EditRow(HRMSv4.Shared.OnBoarding.RateType rate)
+    //{
+    //    rateToInsert = rate;
+    //    await rateGrid.EditRow(rate);
+    //    rateToEdit = rate.RateTypeName;
+    //}
+
+    //async Task SaveRow(HRMSv4.Shared.OnBoarding.RateType rate)
+    //{
+    //    rate.RateTypeName = GetValidString(rate.RateTypeName);
+    //    rate.Arithmetic = GetValidString(rate.Arithmetic);
+    //    if (!string.IsNullOrWhiteSpace(rate.RateTypeName) && !string.IsNullOrWhiteSpace(rate.Arithmetic))
+    //    {
+    //        var result = await service.GetCheckDuplicate(rate);
+    //        if (result.StatusCode == 200)
+    //        {
+    //             await rateGrid.UpdateRow(rate);
+    //        }
+    //        else if(result.StatusCode == 400)
+    //        {
+    //            await _Swal.FireAsync("Oops...", result.Value, "warning");
+    //        }
+    //        else
+    //        {
+    //             await _Swal.FireAsync("Error", result.Value, "error");
+    //        }
+    //    }
+    //    else
+    //    {
+    //        await rateGrid.UpdateRow(rate);
+    //    }
+
+
+    //}
+
+    //async void CancelEdit(HRMSv4.Shared.OnBoarding.RateType rate)
+    //{
+    //    if (rate == rateToInsert)
+    //    {
+    //        rateToInsert = null;
+    //    }
+    //    if (rate.RateTypeName != rateToEdit)
+    //    {
+    //        rate.RateTypeName = rateToEdit;
+
+    //        rateGrid.CancelEditRow(rate);
+    //    }
+    //    else
+    //    {
+    //        rateGrid.CancelEditRow(rate);
+    //    }
+    //}
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var temp = (HRMSv4.Shared.OnBoarding.RateType)e.DataItem;
+        var result = await service.Delete(temp.RateTypeId);
+        if (result.StatusCode == 200)
+        {
+            await _Swal.FireAsync("Success", result.Value, "success");
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Error", result.Value, "error");
+        }
+    }
+
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.RateType rate)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            if (rate == rateToInsert)
+            {
+                rateToInsert = null;
+            }
+
+            if (rates.Contains(rate))
+            {
+                res = await service.Delete(rate.RateTypeId);
+
+                if (res.StatusCode == 200)
+                {
+                    //rates = await service.GetAll();
+                    await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+                    await UpdateDataAsync();
+                }
+                else
+                {
+                    await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+                }
+            }
+            else
+            {
+                await UpdateDataAsync();
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    string GetValidString(string str)
+    {
+        string validString = "";
+        if (str != null)
+        {
+            string[] newStr = str.Split(' ');
+            List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+            foreach (string str1 in validList)
+            {
+                if (validString != "")
+                {
+                    validString += " " + str1;
+                }
+                else
+                {
+                    validString = str1;
+                }
+            }
+        }
+
+        return validString;
+    }
+
+}

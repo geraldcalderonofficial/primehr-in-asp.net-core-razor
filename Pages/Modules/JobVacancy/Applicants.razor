@@ -1,0 +1,349 @@
+﻿@page "/module-applicants"
+@inject IApplicants _appService
+@using DevExpress.Blazor
+@inject SweetAlertService Swal
+@using System.Linq.Dynamic.Core
+@using HRMSv4.Shared.Misc
+@using HRMSv4.Shared.OnBoarding
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Applicants List" Text="Applicants List" Path="/module/applicantslist" />
+
+<div class="row">
+    <div class="col-sm-8 col-xl-8 col-md-8">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-sm-12 col-xl-12 col-md-12">
+                    <div class="row">
+                        <div class="col-4">
+                            <span style="vertical-align:middle; line-height: 2.5rem;">Applicants List</span>
+                        </div>
+                        <div class="col-8 row">
+                            <div class="col-md-6">
+                                <DxComboBox Data="@types"
+                                            NullText="Select type"
+                                            @bind-Text="@selectedType"
+                                            SizeMode="SizeMode.Medium"
+                                            ValueChanged="@((string type) => OnTypeSelect(type))"
+                                            CssClass="cw-480" />
+                            </div>
+                            <div class="col-md-6">
+                                <DxComboBox Data="@statuses"
+                                            NullText="Select status"
+                                            @bind-Text="@selectedStatus"
+                                            SizeMode="SizeMode.Medium"
+                                            ValueChanged="@((string stat) => OnStatusSelect(stat))"
+                                            CssClass="cw-480" />
+                            </div>
+                        </div>
+                    </div>
+
+                    @* <select class="form-select form-control-sm form-control col-md-3" @onchange="@OnTypeSelect" style="float:right !important; margin-top: 5px;">
+                    <option value=0 selected>Select Type</option>
+                    <option value=1>New Applicants</option>
+                    <option value=2>Old Applicants</option>
+                    <option value=3>Internal Applicants</option>
+                    </select>*@
+
+                    @* <select class="form-select form-control-sm form-control col-md-3 mr-2" @onchange="@OnStatusSelect" style="float:right !important; margin-top: 5px;">
+                    <option value="All">All</option>
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Disapproved">Disapproved</option>
+                    </select>*@
+                </div>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                AllowSelectRowByClick
+                ShowFilterRow="true"
+                SelectedDataItemChanged="SelectedApplicant"
+                KeyFieldName="EmployeeId"
+                PagerVisible="true"
+                PageSize="5">
+            <Columns>
+                <DxGridDataColumn FieldName="" Caption="PHOTO" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" Width="100px">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.ApplicantListView);
+                        }
+                        @if (temp.ImageName == "default-avatar-grey.png")
+                        {
+                            <img src="/images/avatars/default-avatar-grey.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        }
+                        else
+                        {
+                            <img src=@(@apiURL + "Uploads/Employees/Avatar/" + temp.EmployeeId + "/" + temp.ImageName) style="width: 40px; height: 40px; border-radius: 8px;" />
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="FullName" />
+                <DxGridDataColumn FieldName="RegisteredAt" />
+                <DxGridDataColumn FieldName="lastAppliedAt" Caption="Last Applied At" />
+            </Columns>
+        </DxGrid>
+    </div>
+    <div class="col-sm-4 col-xl-4 col-md-4">
+        <div class="card-header">Details</div>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">
+                <div class="widget-content p-0">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left me-3">
+                            @if (string.IsNullOrWhiteSpace(@ApplicantAvatar))
+                            {
+                                <img class="rounded-circle" src="/images/avatars/default-avatar-grey.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                            else
+                            {
+                                <img class="rounded-circle" src=@(@apiURL + "Uploads/Employees/Avatar/" + @EmployeeId + "/" + ApplicantAvatar) style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                        </div>
+                        <div class="widget-content-left">
+                            <div class="widget-heading">@FullName</div>
+                            <div class="widget-subheading"></div>
+                        </div>
+                    </div>
+                    <div class="widget-content p-0">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-subheading">Address: @Address</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-content p-0">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-subheading">Email Address: @EmailAddress</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-content p-0">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-subheading">Mobile No.: @MobileNumber</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-content p-0">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-subheading">Landline No.: @LandlineNo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-content p-0">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-subheading">Previous Employee No.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <h5 class="card-title">Applied Jobs</h5>
+                <div class="table-responsive">
+                    <table class="mb-0 table table-hover" style="font-size:13px;">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Position</th>
+                                <th>Designation</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (@_jobs != null)
+                            {
+                                foreach (var item in @_jobs)
+                                {
+                                    <tr>
+                                        <th scope="row">
+                                            @if (@item.IsPlantilla == true)
+                                            {
+                                                Status = "Plantilla";
+                                            }
+                                            else
+                                            {
+                                                Status = "NonPlantilla";
+                                            }
+                                            @Status
+                                        </th>
+                                        <td>@item.PositionTitle</td>
+                                        <td>@item.Designation</td>
+                                        <td>@item.DateApplied</td>
+                                        <td>
+                                            @item.Status
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td [attr.colspan]="columns.length">
+                                        No records found
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    List<string> types = new List<string> { "New Applicants", "Old Applicants", "Internal Applicants" };
+    List<string> statuses = new List<string> { "All", "Pending", "Approved", "Disapproved" };
+
+    string selectedType { get; set; }
+    string selectedStatus { get; set; } = "All";
+
+    IEnumerable<ApplicantListView> _applicants;
+    IGrid? MyGrid { get; set; }
+
+    List<AppliedJobsView> _jobs = new List<AppliedJobsView>();
+    RadzenDataGrid<ApplicantListView> _applicantsGrid;
+
+    public string? apiURL { get; set; }
+    bool isLoading;
+    int count;
+    string applicationStatus = "Pending";
+
+    object Data { get; set; }
+
+    /* Detail Info */
+    public int EmployeeId { get; set; }
+    public string? ApplicantAvatar { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? EmailAddress { get; set; }
+    public string? MobileNumber { get; set; }
+    public string? LandlineNo { get; set; }
+    public string? Status { get; set; }
+
+    public int status { get; set; }
+    public string deptFilter { get; set; } = "null";
+    public int orderByFilter { get; set; }
+
+    GridDevExtremeDataSource<ApplicantListView> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        apiURL = AppInfo.ApiUrl;
+
+        var queryList = await _appService.GetApplications(status, applicationStatus);
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<ApplicantListView>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "EmployeeId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        Data = gridDevExtremeDataSource;
+    }
+
+    async Task SelectedApplicant(object item)
+    {
+        var selectedRow = item as ApplicantListView;
+        var data = await _appService.GetApplicantDetails(selectedRow.EmployeeId);
+
+        EmployeeId = data.EmployeeId;
+        ApplicantAvatar = data.ImageName;
+        FullName = data.FullName;
+        Address = data.Address;
+        EmailAddress = data.EmailAddress;
+        MobileNumber = data.MobileNumber;
+        LandlineNo = data.LandlineNumber;
+
+        _jobs = await _appService.GetJobApplied(selectedRow.EmployeeId);
+
+        this.StateHasChanged();
+    }
+
+    //async Task LoadData(LoadDataArgs args)
+    //{
+    //    isLoading = true;
+
+    //    await Task.Yield();
+
+    //    var data = await _appService.GetApplications(status, applicationStatus);
+    //    var query = data.AsQueryable();
+
+    //    if (!string.IsNullOrEmpty(args.Filter))
+    //    {
+    //        query = query.Where(args.Filter);
+    //    }
+
+    //    if (!string.IsNullOrEmpty(args.OrderBy))
+    //    {
+    //        query = query.OrderBy(args.OrderBy);
+    //    }
+
+    //    count = query.Count();
+
+    //    _applicants = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+    //    isLoading = false;
+    //}
+
+    async Task Reset()
+    {
+        try
+        {
+            var queryList = await _appService.GetApplications(status, applicationStatus);
+            if (queryList.Count() == 0)
+            {
+                Data = null;
+                StateHasChanged();
+            }
+            else
+            {
+                gridDevExtremeDataSource = new GridDevExtremeDataSource<ApplicantListView>(queryList.AsQueryable());
+                gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+                {
+                    // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+                    // This can make SQL execution plans more efficient.
+                    loadOptions.PrimaryKey = new[] { "EmployeeId" };
+                    loadOptions.PaginateViaPrimaryKey = true;
+                };
+                Data = gridDevExtremeDataSource;
+                StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+
+            throw;
+        }
+
+    }
+
+    public async void OnTypeSelect(string e)
+    {
+        //status = e.Value != null ? int.Parse(e.Value.ToString()) : 0;
+        if (e == "New Applicants") status = 1;
+        else if (e == "Old Applicants") status = 2;
+        else if (e == "Internal Applicants") status = 1;
+
+        await Reset();
+    }
+
+    public async void OnStatusSelect(string e)
+    {
+        isLoading = true;
+        applicationStatus = e;
+        await Reset();
+    }
+
+    //public void Dispose() => Interceptor.DisposeEvent();
+}

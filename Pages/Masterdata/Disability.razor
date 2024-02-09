@@ -1,0 +1,161 @@
+﻿@page "/masterdata-disability"
+@using DevExpress.Blazor
+@inject IJSRuntime JSRuntime
+@using HRMSv4.Client.Helpers
+@using HRMSv4.Client.Service
+@inject IDisability service
+@using System.Linq.Dynamic.Core
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Disability" Text="Disability" Path="/masterdata/disability" />
+
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@HandleNewRecord" disabled="@(disabilityToInsert != null)" style="margin-bottom: 10px; width:200px"> Add Disability </button>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                ShowFilterRow
+                KeyFieldName="DisabilityId"
+                PagerVisible="true"
+                ValidationEnabled="false"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                EditMode="GridEditMode.EditRow"
+                PageSize="5">
+            <Columns>
+                <DxGridDataColumn Width="20rem" FieldName="DisabilityName">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.Masterdata.Disability)context.EditModel;
+                        }
+                        <DxTextBox @bind-Text="@record.DisabilityName" NullText="Enter disability name"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="Description">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.Masterdata.Disability)context.EditModel;
+                        }
+                        <DxTextBox @bind-Text="@record.Description" NullText="Enter description"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FilterRowEditorVisible="false" Width="8rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var dataItem = (context.DataItem as HRMSv4.Shared.Masterdata.Disability);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-dark" data-toggle="tooltip" data-placement="left" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(dataItem))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Delete" @onclick="@(() => DeleteRow(dataItem))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                    <CellEditTemplate>
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                            <i class="lnr-checkmark-circle"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Cancel" data-bs-original-title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                            <i class="lnr-cross"></i>
+                        </button>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+@code {
+    IGrid? MyGrid { get; set; }
+    HRMSv4.Shared.Masterdata.Disability disabilityToInsert;
+    GridDevExtremeDataSource<HRMSv4.Shared.Masterdata.Disability> gridDevExtremeDataSource;
+    object Data { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        GetData();
+    }
+    public async void GetData()
+    {
+        var queryList = await service.GetAll();
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.Masterdata.Disability>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "DisabilityId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        HRMSv4.Shared.Masterdata.Disability targetItem = e.EditModel as HRMSv4.Shared.Masterdata.Disability;
+        //targetItem.DisabilityName = GetValidString(targetItem.DisabilityName);
+        //targetItem.Description = GetValidString(targetItem.Description);
+
+        if (!string.IsNullOrWhiteSpace(targetItem.DisabilityName) && !string.IsNullOrWhiteSpace(targetItem.Description))
+        {
+            var result = await service.GetCheckDuplicate(targetItem);
+            if (result.StatusCode == 400)
+            {
+                await _Swal.FireAsync("Oops...", result.Value, "warning");
+            }
+            GetData();
+        }
+    }
+    //string GetValidString(string str)
+    //{
+    //    string validString = "";
+    //    if (str != null)
+    //    {
+    //        string[] newStr = str.Split(' ');
+    //        List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+    //        foreach (string str1 in validList)
+    //        {
+    //            if (validString != "") return validString += " " + str1;
+    //            validString = str1;
+    //        }
+    //    }
+    //    return validString;
+    //}
+    async Task DeleteRow(HRMSv4.Shared.Masterdata.Disability item)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            if (item == disabilityToInsert)
+            {
+                disabilityToInsert = null;
+            }
+            res = await service.Delete(item.DisabilityId);
+
+            if (res.StatusCode == 200)
+            {
+                GetData();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+    }
+    async Task HandleNewRecord()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+}

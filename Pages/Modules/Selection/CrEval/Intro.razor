@@ -1,0 +1,100 @@
+﻿@page "/digital-evaluation"
+
+<!-- Intro Quizzes -->
+<div style=" position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);">
+    <div class="container-lg">
+        <a href="/" style="cursor: pointer;"><div class="app-logo-inverse mx-auto mb-3" style="height:52px!important; width:200px !important"></div></a>
+    </div>
+    <div class="container-lg" style="margin-top: 10px;">
+        <div class="main-card mb-3 card" style="margin-bottom: unset !important;">
+            <div class="main-card mb-3 card-border card" style="padding: 15px; margin-bottom: unset !important; box-shadow: unset !important; border-width: 0 !important">
+
+                <div class="display-flex flex-column pt3">
+                    <div>
+                        <div class="myHeading">
+                            <div class="font-icon-wrapper font-icon-lg">
+                                <i class="pe-7s-note2 icon-gradient bg-amy-crisp"> </i>
+                            </div>
+                            <h1 class="t-20 t-bold">
+                                Performance Evaluation
+                            </h1>
+                            <div class="t-8">
+                                <span>
+                                    Ronald Aguirre
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="artdeco-divider mb0 mt4">
+
+                    <p style="width:600px">
+                        We would appreciate if you can take a couple of minutes to evaluate Mr. Ronald Aguirre 
+                        regarding his work. Your answer will be anonymous, and we will use the responses to
+                    </p>
+                </div>
+
+                <div class="footer">
+                    <div class="text-center">
+                        <button class=" mb-2 me-2 btn-icon btn-pill btn btn-outline-success" @onclick="StartHandlerClick">
+                            <i class="lnr-chevron-right-circle btn-icon-wrapper"></i>Start Evaluation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*//Questionaire*@
+        @if (ShowEvaluation)
+        {
+        @GetRenderFragment(comptypes[selected])
+        }
+    </div>
+</div>
+
+@code {
+    private bool ShowEvaluation { get; set; } = false;
+    private bool ShowIntro { get; set; } = false;
+    private int selected { get; set; } = 0;
+
+    RenderFragment GetRenderFragment(Type type)
+    {
+        RenderFragment renderFragment = renderTreeBuilder =>
+        {
+            renderTreeBuilder.OpenComponent(0, type);
+            renderTreeBuilder.AddAttribute(1, "ApplicantExamId", 16);
+            renderTreeBuilder.CloseComponent();
+        };
+        return renderFragment;
+    }
+
+    ComponentBase[] components = {
+        new DigitalEvaluation()
+    };
+
+    Type[] comptypes => components.Select(c => c.GetType()).ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+    async void StartHandlerClick()
+    {
+        ShowEvaluation = true;
+        ShowIntro = true;
+
+        if (comptypes != null)
+        {
+            foreach (var item in comptypes)
+            {
+                if (item.Name == "DigitalEvaluation")
+                {
+                    selected = Array.IndexOf(comptypes, item);
+                }
+            }
+        }
+
+        StateHasChanged();
+    }
+}

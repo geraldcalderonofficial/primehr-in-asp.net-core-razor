@@ -1,0 +1,420 @@
+﻿@using HRMSv4.Shared.Mailing
+@inject IMail service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject SweetAlertService Swal;
+<style>
+    .wrapper {
+        text-align: center;
+    }
+
+        .wrapper ul {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            /* For IE, the outcast */
+            zoom: 1;
+            *display: inline;
+        }
+
+        .wrapper li {
+            float: left;
+            /*padding: 2px 5px;*/
+        }
+
+    .table-lg th, .table-lg td {
+        padding: 0.5rem 0.3rem;
+    }
+
+    #inbox {
+        background-color: #3f6ad8;
+        color: white;
+    }
+
+        #inbox i {
+            color: white;
+        }
+</style>
+<BusyIndicator Message="Please wait while loading data..." Data="mail">
+    <div hidden=@isHideMailList>
+        <div class="app-inner-layout__top-pane">
+            <div class="pane-left">
+                <div class="mobile-app-menu-btn">
+                    <button type="button" class="hamburger hamburger--elastic">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                </div>
+                <h4 class="mb-0">Inbox</h4>
+
+            </div>
+            <div class="pane-right">
+                <div class="text-muted mb-3 mr-5">@entries</div>
+                <ul class="pagination">
+                    @if (mail.PageCount > 1)
+                    {
+                        <li class="@(mail.CurrentPageIndex  == 1 ? "page-item disabled" : "page-item")">
+                            <a @onclick="@(() => PreviousClick(mail.CurrentPageIndex))" class="page-link" aria-label="Previous">
+                                Previous
+                            </a>
+                        </li>
+                        @* for (int oi = 1; oi <= mail.PageCount; oi++)
+                    {
+                    var temp = oi;
+                    <li class="@(oi == mail.CurrentPageIndex ? "page-item active" : "page-item")">
+                    <a @onclick="@(() => PagerClick(temp))" class="page-link" aria-label="Previous">
+                    @oi
+                    </a>
+                    </li>
+                    }*@
+
+                        <li class="@(mail.CurrentPageIndex  == mail.PageCount ? "page-item disabled" : "page-item")">
+                            <a class="page-link" @onclick="@(() => NextClick(mail.CurrentPageIndex))" tabindex="-1">Next</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="bg-white">
+            <div class="table-responsive">
+                <button data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-original-title="Delete" class="border-0 btn-transition btn btn-outline-danger" @onclick="@ShowSelected"><i class="fa fa-trash-alt"></i></button>
+                <table class="text-nowrap table-lg mb-0 table table-hover">
+                    <tbody>
+                        <tr>
+                            <th class="text-center"><input type="checkbox" id="select-all" checked="@Checked" @onchange="@(args => { SelectAll(args.Value);})"></th>
+                            <th></th>
+                            <th class="text-muted small card-title">From</th>
+                            <th class="text-muted small card-title">Subject</th>
+                            <th class="text-muted small card-title text-center">Date</th>
+                        </tr>
+                        @if (mail.Inbox.Count() > 0)
+                        {
+                            foreach (var item in mail.Inbox)
+                            {
+                                <tr @ondblclick="() => AddComponent(item.MailId)">
+                                    <td style="width:50px" class="text-center">
+                                        <input type="checkbox" checked=@item.IsChecked @onchange="@(eventArgs => { CheckboxClicked(item.MailId.ToString(), eventArgs.Value);})">
+                                    </td>
+                                    @if (@item.IsFavorite)
+                                    {
+                                        <td class="text-start ps-1 text-center" style="width:50px">
+                                            <a onclick="@(() => Favorite(item.MailId))"><i class="far fa-star" style="color:#FFD700"></i></a>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-start ps-1 text-center" style="width:50px">
+                                            <a onclick="@(() => Favorite(item.MailId))"><i class="far fa-star"></i></a>
+                                        </td>
+                                    }
+
+                                    <td>
+                                        <div class="widget-content p-0">
+                                            <div class="widget-content-wrapper">
+                                                <div class="widget-content-left me-3">
+                                                    <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                </div>
+                                                <div class="widget-content-left">
+                                                    @if (item.IsRead)
+                                                    {
+                                                        <div class="widget-subheading">@item.From</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="widget-heading">@item.From</div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-start">@item.Subject</td>
+                                    <td class="text-center mr-3">
+                                        <i class="fa fa-calendar-alt opacity-4 me-2"></i>
+                                        @item.Date
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr class="text-center">
+                                <div class="widget-title opacity-5 text-muted text-uppercase ml-3">No messages.</div>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="app-inner-layout__bottom-pane">
+            <nav class="" aria-label="Page navigation example">
+                <div class="wrapper">
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    @if (list.Any())
+    {
+        <ul style="padding: unset; margin: unset;">
+            @foreach (var item in list)
+            {
+                @item
+            }
+        </ul>
+    }
+</BusyIndicator>
+
+@code {
+    MailListView mail = new MailListView();
+    [Parameter] public EventCallback<string> UpdateMailCount { get; set; }
+
+    private string Update { get; set; }
+
+    bool isHideMailList { get; set; } = false;
+
+    private int parameterId = 0;
+
+    string paramId = "";
+
+    bool testBind { get; set; } = true;
+
+    bool Checked { get; set; } = false;
+
+    public List<RenderFragment> list { get; set; }
+    RenderFragment RenderFragmentParent;
+
+    string entries = "";
+
+    Detail arvin = new Detail();
+
+    //public IEnumerable<MailModelView> Data { get; set; }
+    //public Func<MailModelView, string> TextField { get; set; }
+    //public Func<MailModelView, object> ValueField { get; set; }
+    public List<string> SelectedValues = new List<string>();
+
+    bool ticked = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        list = new List<RenderFragment>();
+        mail = null;
+        this.StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            string empId = await localStorage.GetItemAsStringAsync(">>redd");
+            if (empId != null)
+            {
+                string ronron = empId.Replace("\"", "").ToString();
+                //string DecodedUrl = string.Empty;
+                //string replacement = "ItIsSlashReplacement";
+                //DecodedUrl = ronron.ToString().Replace(replacement, "/");
+                if (string.IsNullOrWhiteSpace(empId))
+                {
+                    paramId = "0";
+                }
+                else
+                {
+                    paramId = _crypto.ConvertHexToString(ronron, System.Text.Encoding.Unicode);
+                }
+                //await Crypto.DecryptAsync(DecodedUrl);
+                await Task.Delay(1000); // simulate loading
+                mail = await service.GetAll(paramId, 1, string.Empty);
+                entries = mail.IndexSelected;
+            }
+            else
+            {
+                mail = null;
+            }
+            this.StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+
+    private async Task PagerClick(int pg)
+    {
+        mail = new MailListView();
+        mail = await service.GetAll(paramId, pg, "");
+        StateHasChanged();
+    }
+    private async Task PreviousClick(int pg)
+    {
+        mail = new MailListView();
+        mail = await service.GetAll(paramId, pg - 1, "");
+        entries = mail.IndexSelected;
+        StateHasChanged();
+    }
+    private async Task NextClick(int pg)
+    {
+        mail = new MailListView();
+        mail = await service.GetAll(paramId, pg + 1, "");
+        entries = mail.IndexSelected;
+        StateHasChanged();
+    }
+
+    public async Task AddComponent(int selectedValue)
+    {
+        parameterId = selectedValue;
+        list = new List<RenderFragment>();
+        await Task.Delay(1000);
+        isHideMailList = true;
+        list.Add(CreateDynamicComponent());
+        this.StateHasChanged();
+
+
+    }
+
+    RenderFragment CreateDynamicComponent() => builder =>
+       {
+           var callback = EventCallback.Factory.Create(this, ClickHandler);
+
+           builder.OpenComponent(0, typeof(Detail));
+           builder.AddAttribute(1, "MailId", parameterId);
+           builder.AddAttribute(2, "GoBackInbox", callback);
+           builder.CloseComponent();
+       };
+
+    public async Task DeleteMsg(string id)
+    {
+        int count = SelectedValues.Count();
+
+        if (count == 0)
+        {
+            await Swal.FireAsync("Oh no!", "Please select a mail to delete", "warning");
+        }
+        else
+        {
+            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Are you sure?",
+                    Text = "You are about to trash (" + count + ") message.",
+                    Icon = "warning",
+                    ShowCancelButton = true,
+                    AllowOutsideClick = false,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "Cancel",
+                    CancelButtonColor = "#dc3741"
+
+                });
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                var httRes = await service.Trash(id);
+
+                if (httRes.IsSuccessStatusCode)
+                {
+                    mail = new MailListView();
+                    mail = await service.GetAll(paramId, 1, "");
+                    isHideMailList = false;
+                    _navigation.NavigateTo("MailBox", true);
+                    StateHasChanged();
+                    string resMsg = await httRes.Content.ReadAsStringAsync();
+                    await Swal.FireAsync("Success", "A record was successfully deleted.", "success");
+                }
+                else
+                {
+                    await Swal.FireAsync("Oops...", "Something went wrong!", "error");
+                }
+            }
+            else
+            {
+                await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+            }
+        }
+    }
+
+    public void CheckboxClicked(string aSelectedId, object aChecked)
+    {
+        try
+        {
+            if ((bool)aChecked)
+            {
+                if (SelectedValues != null)
+                {
+                    var a = SelectedValues.Where(a => a.Contains(aSelectedId)).ToList();
+
+                    if (a.Count() == 0) SelectedValues.Add(aSelectedId);
+                }
+                else
+                {
+                    SelectedValues.Add(aSelectedId);
+                }
+
+            }
+            else
+            {
+                if (SelectedValues.Contains(aSelectedId))
+                {
+                    SelectedValues.Remove(aSelectedId);
+                }
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+
+
+    }
+
+    public void ShowSelected()
+    {
+        string a = string.Join(",", SelectedValues);
+        DeleteMsg(a);
+    }
+
+    public void SelectAll(object aChecked)
+    {
+        if ((bool)aChecked)
+        {
+            ticked = true;
+
+            mail.Inbox.ToList().ForEach(a => a.IsChecked = true);
+            SelectedValues = mail.Inbox.Select(a => a.MailId.ToString()).ToList();
+            StateHasChanged();
+        }
+        else
+        {
+            mail.Inbox.ToList().ForEach(a => a.IsChecked = false);
+            SelectedValues = new List<string>();
+            StateHasChanged();
+        }
+
+    }
+
+    public async void Favorite(int mailId)
+    {
+        var g = mail.Inbox.FirstOrDefault(a => a.MailId == mailId);
+
+        if (g.IsFavorite)
+        {
+            mail.Inbox.Where(a => a.MailId == mailId).ToList().ForEach(a => a.IsFavorite = false);
+            await service.Favorite(mailId, false);
+        }
+        else
+        {
+            mail.Inbox.Where(a => a.MailId == mailId).ToList().ForEach(a => a.IsFavorite = true);
+            await service.Favorite(mailId, true);
+        }
+
+
+        StateHasChanged();
+    }
+
+    async Task ClickHandler()
+    {
+        mail = await service.GetAll(paramId, 1, string.Empty);
+        isHideMailList = false;
+
+        //StateHasChanged();
+    }
+}

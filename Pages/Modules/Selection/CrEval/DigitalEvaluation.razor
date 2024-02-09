@@ -1,0 +1,152 @@
+﻿<style>
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-top: 5%;
+    }
+
+    #myHeading img {
+        float: left;
+        margin-right: 10px;
+        position: relative;
+        top: 2px;
+    }
+
+    body {
+        /*background-color: #1fc8db;*/
+        /*   background-image: linear-gradient(141deg, #9fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);*/
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .demo {
+        margin: 60px auto;
+    }
+
+    .radiogroup {
+        width: 500px;
+        margin: 70px auto;
+        position: relative;
+    }
+
+        .radiogroup ul {
+            list-style: none;
+        }
+
+            .radiogroup ul li {
+                border-bottom: 2px solid #000000;
+            }
+
+                .radiogroup ul li:last-child {
+                    border-bottom: 1px solid transparent;
+                }
+
+    .control input {
+        position: absolute;
+        left: 30px;
+        opacity: 0;
+    }
+
+    .control {
+        display: block;
+        position: relative;
+        padding-left: 60px;
+        padding-top: 8px;
+        padding-bottom: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+        .control span {
+            color: #000000;
+            transition: color 0.5s;
+        }
+
+    .control-indicator {
+        position: absolute;
+        top: 6px;
+        left: 10px;
+        height: 25px;
+        width: 25px;
+        background-color: transparent;
+        border: 4px solid #000000;
+        border-radius: 50%;
+        transition: border-color 0.5s;
+    }
+
+        .control-indicator:after {
+            content: '';
+            position: absolute;
+            display: block;
+            left: 3px;
+            top: 4px;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            transition: border-color 0.5s, background-color 0.5s;
+        }
+
+    .control input:focus ~ span,
+    .control input:hover ~ span {
+        color: #FBBC05;
+    }
+
+    .control input:focus ~ .control-indicator,
+    .control input:hover ~ .control-indicator {
+        border-color: #FBBC05;
+    }
+
+    .control input:checked ~ span {
+        color: #c0392b;
+    }
+
+    .control input:checked ~ .control-indicator {
+        border-color: #c0392b;
+    }
+
+        .control input:checked ~ .control-indicator:after {
+            background-color: #c0392b;
+        }
+
+    h1 {
+        margin-left: 20px;
+        color: white;
+    }
+
+    .answer {
+        display: block;
+        border-radius: 4px;
+        padding: 13px 20px 13px 60px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: background .15s linear,color .15s linear;
+        text-transform: none;
+        font-size: 14px;
+        border: 2px solid #d0d9df;
+    }
+
+</style>
+<div class="container">
+    <div class="main-card mb-3 card">
+        <div id="evaluations">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Subject: Character Reference for Ronald Aguirre
+                <div class="sub-label-left"> <span class="sub-label-right" style="color:#043b8d; margin-left: 15px;">0%</span> Total Progress</div>
+                <div class="col">
+                    <div class="widget-progress-wrapper">
+                        <div class="progress-bar-sm progress-bar-animated-alt progress" style="border-radius: unset !important;">
+                            <div class="progress-bar bg-focus" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+
+}

@@ -1,0 +1,696 @@
+﻿@page "/masterdata-employee"
+@attribute [Authorize(Roles = "Job Provider, Administrator")]
+@implements IDisposable
+@inject IEmployee EmployeeService
+@inject ILevel _levelOrg
+@inject ILevelOrganization _IlevelOrganization
+@inject IJSRuntime jsRuntime
+@inject IPersonalActionMemo _personnelActionService
+@inject IEmploymentStatus statusService
+@inject IServiceRecord serviceRecordService
+@using HRMSv4.Client.Service.Auth
+@using HRMSv4.Shared.OnBoarding.EmpSearch
+@using System.Linq.Dynamic.Core
+@using System.Text
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject HttpInterceptorService Interceptor
+
+<style>
+    [data-title] {
+        border-bottom: 1px dashed;
+        text-decoration: none
+    }
+
+        [data-title]:hover {
+            cursor: help;
+            position: relative
+        }
+
+        [data-title] span {
+            display: none
+        }
+
+        [data-title]:hover span {
+            border: #c0c0c0 1px dotted;
+            padding: 5px 20px 5px 5px;
+            display: block;
+            z-index: 200;
+            /*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+            left: 0px;
+            margin: 10px;
+            width: 250px;
+            position: absolute;
+            top: 10px;
+            text-decoration: none
+        }
+</style>
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Employee List" Text="Employee" Path="/masterdata/employee" />
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">Search Filter</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@OnSearchFilterSelect">
+                        <option value=0 selected>Employed</option>
+                        <option value=1>Incoming Employees</option>
+                        <option value=2>InActive</option>
+                        <option value=3>Separated Employees</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">@department</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@OnDeptSelect">
+                        @foreach (var item in _highestLevel)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">Arranged By</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@OnOrderBySelect">
+                        <option value=0 selected>Employee No.</option>
+                        <option value=1>Employee No.[Last 3 Digits]</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 col-lg-10">
+        <RadzenDataGrid @ref="empGrid" LoadData="@LoadData" Count="@count" IsLoading="@isLoading" RowSelect=@SelectedEmployee SelectionMode="DataGridSelectionMode.Single" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterMode="FilterMode.Simple" LogicalFilterOperator="LogicalFilterOperator.Or" AllowFiltering="true" AllowPaging="true" PageSize="20" AllowSorting="true"
+                        PagerAlwaysVisible="true" ShowPagingSummary="true"
+                        PagerHorizontalAlign="HorizontalAlign.Center" Data="@employees" TItem="HRMSv4.Shared.OnBoarding.EmployeeListView">
+            <Columns>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px">
+                    <Template Context="employee">
+                        @if (employee.Gender == "FEMALE")
+                        {
+                            @if (string.IsNullOrWhiteSpace(employee.ImageName) || employee.ImageName == "default-avatar-grey.png")
+                            {
+                                <RadzenImage Path="/images/avatars/avatar_women_gray.svg" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                            else
+                            {
+                                <RadzenImage Path=@("Uploads/Employees/Avatar/" + employee.EmployeeId + "/" + employee.ImageName) style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                        }
+                        else
+                        {
+                            @if (string.IsNullOrWhiteSpace(employee.ImageName) || employee.ImageName == "default-avatar-grey.png")
+                            {
+                                <RadzenImage Path="/images/avatars/default-avatar-grey.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                            else
+                            {
+                                <RadzenImage Path=@("Uploads/Employees/Avatar/" + employee.EmployeeId + "/" + employee.ImageName) style="width: 40px; height: 40px; border-radius: 8px;" />
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="FullName" Title="Name">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.FullName" Style="width:100%; display: block" Name="Category" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="EmployeeNumber" Title="Employee No.">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.EmployeeNumber" Style="width:100%; display: block" Name="EmployeeNumber" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="Department" Title="Department">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.Department" Style="width:100%; display: block" Name="Department" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="Designation" Title="Designation">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.Designation" Style="width:100%; display: block" Name="Designation" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Property="EmploymentStatus" Title="Employment Status">
+                    <EditTemplate Context="employee">
+                        <RadzenTextBox @bind-Value="employee.EmploymentStatus" Style="width:100%; display: block" Name="" />
+                    </EditTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.EmployeeListView" Context="category" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <Template Context="employee">
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit Employee" @onclick="@(args => showEmployee(employee))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        @if (employee.IsEmployee.HasValue)
+                        {
+                            if (employee.IsEmployee.Value == false)
+                            {
+                                <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Invite Employee" @onclick="@(args => sendInvitation(employee))">
+                                    <i class="lnr-envelope"></i>
+                                </button>
+                            }
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-light" data-toggle="tooltip" data-placement="top" title="Print Orientation Check List" @onclick="@(args => PrintCheckList(employee))">
+                            <i class="pe-7s-note2"></i>
+                        </button>
+                        @*           
+                        <RadzenButton title="Edit Employee" data-title="Edit Employee" ButtonStyle="ButtonStyle.Primary" Icon="edit" Size="ButtonSize.Small" Class="btnRadz m-1" Click="@(args => showEmployee(employee))" @onclick:stopPropagation="true">
+                        </RadzenButton>
+                        <RadzenButton title="Invite Employee" data-title="Invite Employee" ButtonStyle="ButtonStyle.Primary" Icon="mail" Size="ButtonSize.Small" Class="btnRadz m-1" Click="@(args => sendInvitation(employee))" @onclick:stopPropagation="true">
+                        </RadzenButton>*@
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+    <div class="col-sm-12 col-lg-2" style="height: min-content; position: sticky; top: 5rem;">
+        <div class="d-grid">
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisPromotion" @onclick="(() => OnClickCallback(0))"><i class="pe-7s-star btn-icon-wrapper"></i>Promotion</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisDemotion" @onclick="(() => OnClickCallback(1))"><i class="fa fa-angle-double-down btn-icon-wrapper"></i>Demotion</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisIncrement" @onclick="(() => OnClickCallback(8))"><i class="fa fa-angle-double-up btn-icon-wrapper"></i>Step Increment</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisTransfer" @onclick="(() => OnClickCallback(2))"><i class="fa fa-share-square btn-icon-wrapper"></i>Transfer</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisAdjustSalary" @onclick="(() => OnClickCallback(9))"><i class="pe-7s-cash btn-icon-wrapper"></i>Adjust Salary</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisSeparation" @onclick="(() => OnClickCallback(4))"><i class="pe-7s-close-circle btn-icon-wrapper"></i>Separation</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisRenewal" @onclick="(() => OnClickCallback(3))"><i class="pe-7s-tools btn-icon-wrapper"></i>Renewal</button> <!-- Non Plantilla-->
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisReemployment" @onclick="(() => OnClickCallback(5))"><i class="pe-7s-tools btn-icon-wrapper"></i>Reemployment</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisReElection" @onclick="(() => OnClickCallback(6))"><i class="pe-7s-tools btn-icon-wrapper"></i>Re-Election</button>
+            <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary" disabled="@DisAppointment" @onclick="(() => OnClickCallback(7))"><i class="pe-7s-tools btn-icon-wrapper"></i>Reappointment</button>
+        </div>
+    </div>
+</div>
+
+@*<div class="col-sm-12 col-xl-12 col-md-12 mb-3 card" style="padding-right: unset !important; padding-left: unset !important;">
+    <HRMSv4.Client.Shared.MainComponents.Fab></HRMSv4.Client.Shared.MainComponents.Fab>
+</div>*@
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    IEnumerable<EmployeeListView> employees;
+    RadzenDataGrid<EmployeeListView>? empGrid;
+    IList<HRMSv4.Shared.OnBoarding.Employee> employeeList;
+    private List<SelectListItems> _highestLevel { get; set; } = new List<SelectListItems>();
+
+    private bool DisAppointment { get; set; } = true;
+    private bool DisPromotion { get; set; } = true;
+    private bool DisDemotion { get; set; } = true;
+    private bool DisIncrement { get; set; } = true;
+    private bool DisTransfer { get; set; } = true;
+    private bool DisAdjustSalary { get; set; } = true;
+    private bool DisSeparation { get; set; } = true;
+    private bool DisRenewal { get; set; } = true;
+    private bool DisReemployment { get; set; } = true;
+    private bool DisReElection { get; set; } = true;
+
+    /* Search Filter Header */
+    public int SearchFilter { get; set; }
+    public string deptFilter { get; set; } = "null";
+    public int orderByFilter { get; set; }
+    public string? department { get; set; }
+    public string? apiURL { get; set; }
+    bool isLoading;
+    int count;
+    private int empId { get; set; }
+    string userId = "";
+
+    async Task SelectedEmployee(EmployeeListView selectedRow)
+    {
+        if (selectedRow != null)
+        {
+            empId = selectedRow.EmployeeId;
+            /*check for last service record*/
+            ServiceRecord res = new ServiceRecord();
+            res = await EmployeeService.LastServiceRecord(empId);
+
+            var IsStepIncrementQualified = await serviceRecordService.StepIncrementQualification(empId);
+            DisIncrement = IsStepIncrementQualified != false ? false : true; 
+
+            if (SearchFilter == 3)// Separated Only
+            {
+                if (res != null)
+                {
+                    //Validate separation type(dont allow deceased)
+                    //if yes allow reemployment
+                    //var stat = await _personnelActionService.GetSeparationType(res.PersonnelActionMemoId.Value);
+                    //if (stat.StatusCode == 200)
+                    //{
+                    DisPromotion = true;
+                    DisDemotion = true;
+                    //DisIncrement = true;
+                    DisAdjustSalary = true;
+                    DisTransfer = true;
+                    DisRenewal = true;
+                    DisSeparation = true;
+                    DisReemployment = false;
+                    DisReElection = selectedRow != null && selectedRow.EmploymentStatus.ToLower() == "elective" ? false : true  ;
+                    DisAppointment = selectedRow != null && selectedRow.EmploymentStatus.ToLower().Contains("terminous") ? false : true;
+                    //}
+                }
+            }
+            else if (SearchFilter == 2)
+            {
+                DisPromotion = true;
+                DisDemotion = true;
+                //DisIncrement = true;
+                DisAdjustSalary = false;
+                DisTransfer = true;
+                DisSeparation = false;
+                DisRenewal = false;
+                DisReElection = true;
+                DisAppointment = true;
+                DisReemployment = true;
+            }
+            else if (SearchFilter == 1)
+            {
+                DisPromotion = true;
+                DisDemotion = true;
+                //DisIncrement = true;
+                DisAdjustSalary = false;
+                DisTransfer = true;
+                DisSeparation = true;
+                DisRenewal = true;
+                DisReElection = true;
+                DisAppointment = true;
+                DisReemployment = true;
+            }
+            else
+            {
+                DisAdjustSalary = false;
+                if (res != null)
+                {
+                    /* Let's cound service record of employee */
+                    int srCount = await EmployeeService.EmpSrCount(empId);
+                    //Check Plantilla/Non plantilla
+                    EmployeeStatus es = new EmployeeStatus();
+                    es = await EmployeeService.Status(empId);
+
+                    if (srCount > 0)
+                    {
+                        if (srCount == 1)
+                        {
+                            if (es.isPlantillaItem)
+                            {
+                                /* Plantilla */
+                                /* Disable only demotion */
+
+                                DisPromotion = false;
+                                DisDemotion = true;
+                                //DisIncrement = false;
+                                DisTransfer = false;
+                                DisRenewal = true;
+                                DisSeparation = false;
+
+                                /*Disable reelection*/
+                                if (!es.EmploymentStatus.ToLower().Contains("elect"))
+                                {
+
+                                    DisReElection = true;
+                                }
+                                else
+                                {
+                                    DisReElection = false;
+                                }
+
+                                /*Disable reappointment*/
+                                if (!es.EmploymentStatus.ToLower().Contains("terminous"))
+                                {
+                                    DisAppointment = true;
+                                }
+                                else
+                                {
+                                    DisAppointment = false;
+                                }
+                            }
+
+                            else
+                            {
+                                /* Non plantilla employee */
+                                /* Disable only demotion */
+                                DisPromotion = true;
+                                DisDemotion = true;
+                                //DisIncrement = true;
+                                DisTransfer = true;
+                                DisSeparation = false;
+                                DisRenewal = false;
+                                DisReElection = true;
+                                DisAppointment = true;
+                                DisReemployment = true;
+                            }
+                        }
+                        else
+                        {
+                            /* More than 1 service record */
+                            if (es.isPlantillaItem)
+                            {
+                                /* Enable All */
+                                DisPromotion = false;
+                                DisDemotion = false;
+                                //DisIncrement = false;
+                                DisTransfer = false;
+                                DisRenewal = true;
+                                DisSeparation = false;
+
+                                /*Disable reelection*/
+                                if (!es.EmploymentStatus.ToLower().Contains("elect"))
+                                {
+                                    DisReElection = true;
+                                }
+                                else
+                                {
+                                    DisReElection = false;
+                                }
+
+                                /*Disable reappointment*/
+                                if (!es.EmploymentStatus.ToLower().Contains("terminous"))
+                                {
+                                    DisAppointment = true;
+                                }
+                                else
+                                {
+                                    DisAppointment = false;
+                                }
+
+                            }
+                            else
+                            {
+                                /* Enable All */
+                                DisPromotion = false;
+                                DisDemotion = false;
+                                //DisIncrement = false;
+                                DisTransfer = false;
+                                DisRenewal = false;
+                                DisSeparation = false;
+                                DisReElection = true;
+                                DisAppointment = true;
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        /* No service record disable all*/
+                        DisPromotion = true;
+                        DisDemotion = true;
+                        //DisIncrement = true;
+                        DisTransfer = true;
+                        DisRenewal = true;
+                        DisSeparation = false;
+                        DisReemployment = true;
+                        DisReElection = true;
+                        DisAppointment = true;
+                    }
+                }
+            }
+        }
+        //salaryGrades = new List<HRMSv4.Shared.OnBoarding.SalaryGrade>();
+        //if (selectedRow != null)
+        //{
+        //    salaryGrades = await service.GetSalaryGrades(selectedRow.EffectivityDate.ToString("yyyy-MM-dd"), selectedRow.Annex, selectedRow.PlantillaType == "Plantilla");
+        //}
+        //sgList = salaryGrades.ToList();
+        //await sgGrid.Reload();
+
+        this.StateHasChanged();
+    }
+
+    async Task showEmployee(EmployeeListView emp)
+    {
+        //var parameters = new ModalParameters();
+        //parameters.Add(nameof(HRMSv4.Client.Shared.Modals.EmployeeModal.employeeId), emp.EmployeeId);
+
+        //Modal.Show<HRMSv4.Client.Shared.Modals.EmployeeModal>("Edit Applicant", parameters);
+
+        if (empId > 0)
+        {
+            if (emp.EmployeeId == empId)
+            {
+                string beforeUrlEncoded = string.Empty;
+
+                var tempId = _crypto.ConvertStringToHex(emp.EmployeeId.ToString(), System.Text.Encoding.Unicode);
+
+                //Crypto.EncryptAsync(emp.EmployeeId.ToString());
+
+                //string replacement = "ItIsSlashReplacement";
+                //beforeUrlEncoded = tempId.Value.ToString().Replace("/", replacement);
+
+                string url = $"/dashboard/employee/{tempId}";
+                await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+            }
+        }
+    }
+
+    async Task PrintCheckList(EmployeeListView emp)
+    {
+        var psgcCode = await localStorage.GetItemAsync<string>("AdminPsgcCode");
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string userName = user.FindFirst(c => c.Type.Contains("givenname"))?.Value;
+        string arrayOfParemeters = emp.EmployeeId + "," + emp.Designation + "," + emp.OrganzationLevelId + "," + psgcCode + "," + userName;
+        string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+        string url = $"/viewer/{"EmployeeOrientationCheckListReport"}/{_encryptedParameter}";
+        await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        try
+        {
+            isLoading = true;
+
+            await Task.Yield();
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            var data = await EmployeeService.GetListEmployee(SearchFilter, deptFilter, orderByFilter);
+            var query = data.AsQueryable();
+
+            if (!string.IsNullOrEmpty(args.Filter))
+            {
+                query = query.Where(args.Filter);
+            }
+
+            if (!string.IsNullOrEmpty(args.OrderBy))
+            {
+                query = query.OrderBy(args.OrderBy);
+            }
+
+            count = query.Count();
+
+            employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+            StateHasChanged();
+            isLoading = false;
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+
+    async Task Reset()
+    {
+        empGrid.Reset(true);
+        await empGrid.FirstPage(true);
+    }
+
+    private async Task OnClickCallback(int selection)
+    {
+        /* empId - EmployeeeId */
+        if (empId > 0)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal.employeeId), empId);
+            parameters.Add(nameof(HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal._task), selection);
+
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true,
+                    Animation = ModalAnimation.FadeIn(0.2),
+                    ContentScrollable = false,
+                };
+
+            switch (selection)
+            {
+                case 1:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Demotion", parameters, options);
+                    break;
+                case 2:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Transfer", parameters, options);
+                    break;
+                case 3:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmployeeRenewalModal>("Renewal", parameters, options);
+                    break;
+                case 4:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmployeeSeparationModal>("Separation", parameters, options);
+                    break;
+                case 5:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Reemployment", parameters, options);
+                    break;
+                case 6:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmployeeReElectionModal>("Re-Election", parameters, options);
+                    break;
+                case 7:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Reappointment", parameters, options);
+                    break;
+                case 8:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Step Increment", parameters, options);
+                    break;
+                case 9:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmployeeSalaryAdjustmentModal>("Salary Adjustment", parameters, options);
+                    break;
+                default:
+                    StateHasChanged();
+                    Modal.Show<HRMSv4.Client.Shared.Modals.Masterdata.Employee.EmploymentDetailsModal>("Promotion", parameters, options);
+                    break;
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", "You have to select to proceed with Employee Approval.", "error");
+        }
+    }
+
+    public void Dispose() => Interceptor.DisposeEvent();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Interceptor.RegisterEvent();
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            _navigation.NavigateTo("/");
+        }
+        else
+        {
+            //await Task.Run(LoadEmployees);
+            var result = await _levelOrg.GetLabel();
+            /* Get Department Highest level */
+            _highestLevel = await _IlevelOrganization.GetHighestLevel();
+            department = result.ToString();
+
+            apiURL = AppInfo.ApiUrl;
+            this.StateHasChanged();
+        }
+    }
+
+    private async void LoadEmployees()
+    {
+        //System.Threading.Thread.Sleep(2000);
+        //await Task.Yield();
+        //employees = await EmployeeService.GetAll();
+        //await InvokeAsync(StateHasChanged);
+    }
+
+    public async void OnSearchFilterSelect(ChangeEventArgs e)
+    {
+        DisPromotion = true;
+        DisDemotion = true;
+        DisIncrement = true;
+        DisTransfer = true;
+        DisRenewal = true;
+        DisSeparation = true;
+        DisReemployment = true;
+        DisReElection = true;
+        DisAppointment = true;
+        SearchFilter = int.Parse(e.Value.ToString());
+        await Reset();
+        //await GetListEmployeeAsync();
+    }
+
+    public async void OnDeptSelect(ChangeEventArgs e)
+    {
+        deptFilter = e.Value.ToString();
+        await Reset();
+        await GetListEmployeeAsync();
+    }
+
+    public async void OnOrderBySelect(ChangeEventArgs e)
+    {
+        orderByFilter = int.Parse(e.Value.ToString());
+        await Reset();
+        //await GetListEmployeeAsync();
+    }
+
+    public async Task GetListEmployeeAsync()
+    {
+        employees = await EmployeeService.GetListEmployee(SearchFilter, deptFilter, orderByFilter);
+        this.StateHasChanged();
+    }
+
+    public async Task sendInvitation(HRMSv4.Shared.OnBoarding.EmployeeListView emp)
+    {
+        if (emp.EmployeeId == empId)
+        {
+            var validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Confirm",
+                    Text = "Are you sure would you like to invite this employee to login to this site?",
+                    Icon = "question",
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "Cancel",
+                    CancelButtonColor = "#dc3741"
+
+                });
+
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                var code = GetInvitationCode(10, validChars);
+                /* Send email invitation */
+
+                var user = (await _AutService.GetAuthenticationStateAsync()).User;
+                string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+                var data = new EmployeeInvitationView
+                    {
+                        EmployeeId = emp.EmployeeId,
+                        AccessCode = code,
+                        CreatedBy = userId
+                    };
+
+                var httRes = await EmployeeService.InviteEmployee(data);
+
+                if (httRes.IsSuccessStatusCode)
+                {
+                    await _Swal.FireAsync("Success", "A email was send to Employee with invitation code.", "success");
+                }
+                else
+                {
+                    await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+                }
+            }
+            else
+            {
+                //await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+            }
+        }
+    }
+
+    public static string GetInvitationCode(int length, string alphabet)
+    {
+        var secret = new StringBuilder();
+        while (length-- > 0)
+        {
+            secret.Append(alphabet[System.Security.Cryptography.RandomNumberGenerator.GetInt32(alphabet.Length)]);
+        }
+        return secret.ToString();
+    }
+}

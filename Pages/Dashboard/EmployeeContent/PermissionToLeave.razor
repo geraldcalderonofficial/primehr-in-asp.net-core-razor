@@ -1,0 +1,24 @@
+﻿@inject IStaffing serviceStaffing
+@inject IJSRuntime JSRuntime
+@inject IPosition service
+@inject IJobCategory serviceJobCategory
+@inject SweetAlertService _swal
+@using HRMSv4.Client.Service
+@using HRMSv4.Shared.HrMgmt
+@using HRMSv4.Shared.OnBoarding
+@using DevExpress.Blazor
+@inject ILeavePermission _leavePermissionService
+
+<PermissionToLeaveTable EmployeeId=@EmployeeId></PermissionToLeaveTable>
+
+@code {
+    [Parameter] public int EmployeeId { get; set; } = 0;
+
+    int count;
+    List<LeavePermissionView> leavePermissions = new List<LeavePermissionView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+}

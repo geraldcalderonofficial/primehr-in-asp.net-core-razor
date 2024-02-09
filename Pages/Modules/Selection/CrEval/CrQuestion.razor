@@ -1,0 +1,220 @@
+﻿@page "/module-crquestion"
+@using HRMSv4.Client.Service
+@inject IApplicantEvaluation service
+@inject SweetAlertService Swal;
+@using DevExpress.Blazor
+@using HRMSv4.Shared.Selection
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Questions
+            </h3>
+        </div>
+        <div class="page-title-actions">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/module-applicantevaluation">Application Evaluation</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Questions</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4 col-sm-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <h5 class="card-header-text float-start">Question Types</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <DxGrid @ref="MyGrid" Data="@types" ValidationEnabled="false"
+                        SelectionMode="GridSelectionMode.Single"
+                        @bind-SelectedDataItem="SelectedTypeItem"
+                        AllowSelectRowByClick="true"
+                        PopupEditFormCssClass="pw-800"
+                        EditMode="GridEditMode.EditRow"
+                        PagerVisible="true"
+                        SelectedDataItemsChanged="SelectedType"
+                        PageSize="10" ShowFilterRow="true">
+                    <Columns>
+                        <DxGridDataColumn FieldName="QuestionTypeName" />
+                    </Columns>
+                </DxGrid>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8 col-sm-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <h5 class="card-header-text float-start">Questions</h5>
+                    <button class="mb-2 me-2 btn btn-outline btn-outline-primary float-end" onclick="@InsertRow" style="margin-bottom: 10px;"> + New </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <DxGrid Data="@questions" ShowFilterRow="true"
+                        ShowGroupPanel="true"
+                        AutoExpandAllGroupRows="true">
+                    <Columns>
+                        <DxGridDataColumn FieldName="QuestionTypeName" Caption="Type Name" GroupIndex="0" />
+                        <DxGridDataColumn FieldName="Question" />
+                        <DxGridDataColumn FieldName="" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                            <CellDisplayTemplate>
+                                @{
+                                    var temp = (context.DataItem as CrQuestionListView);
+                                }
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditQuestionRow(temp.CharacterReferenceQuestionId))">
+                                    <i class="lnr-pencil"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteQuestionRow(temp))">
+                                    <i class="lnr-trash"></i>
+                                </button>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+               
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    IEnumerable<HRMSv4.Shared.Selection.QuestionType>? types;
+    IEnumerable<HRMSv4.Shared.Selection.CrQuestionListView>? questions;
+    IList<HRMSv4.Shared.Selection.QuestionType> selectedTypeList;
+    //RadzenDataGrid<HRMSv4.Shared.Selection.QuestionType> qtGrid;
+    RadzenDataGrid<HRMSv4.Shared.Selection.CrQuestionListView> qGrid;
+    int count;
+
+    object SelectedTypeItem { get; set; }
+    string userId = "";
+    IGrid? MyGrid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task SelectedType(object selected)
+    {
+        var temp = SelectedTypeItem as QuestionType;
+
+        questions = await service.GetAllQuestion(temp.QuestionTypeId);
+        StateHasChanged();
+
+        this.StateHasChanged();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        types = await service.GetTypes();
+        questions = await service.GetAllQuestion(0);
+        count = types.Count();
+        this.StateHasChanged();
+    }
+
+
+
+    async Task InsertRow()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.CrQuestionModal>("New Question", options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            //types = await service.GetTypes();
+            //questions = await service.GetAllQuestion(0);
+            await UpdateDataAsync();
+            var temp = SelectedTypeItem as QuestionType;
+            questions = await service.GetAllQuestion(temp.QuestionTypeId);
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditQuestionRow(int id)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Would you like to edit the selected record?",
+                Icon = "question",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(CrQuestionModal.CharacterReferenceQuestionId), id);
+            var _modalStatus = Modal.Show<CrQuestionModal>("Edit Question", parameters);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                //questions = await service.GetAllQuestion(0);
+                //await qGrid.Reload();
+                await UpdateDataAsync();
+                //var temp = SelectedTypeItem as QuestionType;
+                //questions = await service.GetAllQuestion(temp.QuestionTypeId);
+                SelectedType(SelectedTypeItem);
+                this.StateHasChanged();
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task DeleteQuestionRow(HRMSv4.Shared.Selection.CrQuestionListView q)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "Do you really want to delete this question? This process cannot be undone.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var httRes = await service.DeleteQuestion(q.CharacterReferenceQuestionId);
+
+            if (httRes.StatusCode == 200)
+            {
+                questions = await service.GetAllQuestion(0);
+                StateHasChanged();
+                //string resMsg = await httRes.Value;
+                await Swal.FireAsync("Success", "Your record was successfully deleted.", "success");
+            }
+            else
+            {
+                await Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+}

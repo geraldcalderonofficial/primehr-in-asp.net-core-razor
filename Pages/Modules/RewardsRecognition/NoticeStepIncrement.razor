@@ -1,0 +1,190 @@
+﻿@page "/module-noticestepincr"
+@using DevExpress.Blazor
+@using HRMSv4.Client.Interface.Rnr
+@using HRMSv4.Shared.HrMgmt
+@inject INoticeOfStepIncrement service
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Notice of Step Increment
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">List of Employees with Step Increment</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row  col-12">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="mb-3 col-xl-2 col-sm-12">
+                        <div class="row">
+                            <label class="" for="exampleEmail55">Within this: </label>
+                            <DxComboBox Data="@withinThis" @bind-Text="selectedWithinThis" SizeMode="SizeMode.Medium" ValueChanged="@((string e) => OnChanged(e))" />
+                        </div>
+
+                    </div>
+                    <div class="mb-3 col-xl-2 col-sm-12">
+                        <div class="row">
+                            <label class="" for="exampleEmail55">From: </label>
+                            <DxDateEdit @bind-Date="@start"
+                                        PickerDisplayMode="DatePickerDisplayMode.ScrollPicker"
+                                        ScrollPickerFormat="@dateMask" SizeMode="SizeMode.Medium"
+                                        DisplayFormat="@dateMask"
+                                        CssClass="cw-320" />
+                        </div>
+
+                    </div>
+                    <div class="mb-3 col-xl-2 col-sm-12">
+                        <div class="row">
+                            <label class="" for="exampleEmail55">To: </label>
+                            <DxDateEdit @bind-Date="@end"
+                                        PickerDisplayMode="DatePickerDisplayMode.ScrollPicker"
+                                        ScrollPickerFormat="@dateMask" SizeMode="SizeMode.Medium"
+                                        DisplayFormat="@dateMask"
+                                        CssClass="cw-320" />
+                        </div>
+
+                    </div>
+                    <div class="mb-3 col-xl-1 col-sm-12" style="margin-top: 1.3rem !important;">
+                        <div class="row">
+                            <label class="" for="exampleEmail55"></label>
+                            <button class="btn btn-outline-2x btn-outline-primary" @onclick="() => Filter()">Filter</button>
+                        </div>
+
+                    </div>
+                    <div class=" mb-3 col" align="right">
+                        <button class="btn btn-outline-2x btn-outline-primary" @onclick="() => Request()" style="margin-bottom: 10px; width:200px"> Request Step Increment </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row col-12">
+            <DxGrid Data="@empList" AutoExpandAllGroupRows="true"
+                    PopupEditFormCssClass="pw-800"
+                    SelectionMode="GridSelectionMode.Multiple"
+                    AllowSelectRowByClick="true"
+                    PageSize="50" PagerPosition="GridPagerPosition.TopAndBottom"
+                    PagerVisibleNumericButtonCount="50"
+                    @bind-SelectedDataItems="@SelectedDataItems">
+                <Columns>
+                    <DxGridDataColumn FieldName="EmployeeNumber" />
+                    <DxGridDataColumn FieldName="Fullname" />
+                    <DxGridDataColumn FieldName="PositionTitle" />
+                    <DxGridDataColumn FieldName="CurrentStep" />
+                    <DxGridDataColumn FieldName="OrganizationalLevel" />
+                    <DxGridDataColumn FieldName="DateOfStepIncrement" />
+                   
+                </Columns>
+            </DxGrid>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    List<NoticeOfStepIncrementListView> empList = new List<NoticeOfStepIncrementListView>();
+    public string? apiURL { get; set; }
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    DateTime start { get; set; } = DateTime.Now;
+    DateTime end { get; set; } = DateTime.Now;
+
+
+    List<string> withinThis = new List<string> { "Day", "Month", "Year", "Custom" };
+
+    string selectedWithinThis { get; set; }
+
+    string dateMask { get; set; }
+
+    string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        apiURL = AppInfo.ApiUrl;
+        selectedWithinThis = "Year";
+        dateMask = "yyyy";
+        empList = await service.EmployeeNoticeStepIncrement(start, end, selectedWithinThis);
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    }
+
+    async Task Filter()
+    {
+        empList = await service.EmployeeNoticeStepIncrement(start, end, selectedWithinThis);
+        StateHasChanged();
+    }
+
+    async void OnChanged(string value)
+    {
+        selectedWithinThis = value;
+
+        if (value == "Day")
+        {
+            dateMask = "dd";
+        }
+        else if (value == "Month")
+        {
+            dateMask = "MMM";
+        }
+        else if (value == "Year")
+        {
+            dateMask = "yyyy";
+        }
+        else
+        {
+            dateMask = "MMM dd, yyyy";
+        }
+
+        StateHasChanged();
+    }
+
+    async Task Request()
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to send step increment request for selected employee(s).",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            List<NoticeOfStepIncrementListView> emps = new List<NoticeOfStepIncrementListView>();
+            emps = SelectedDataItems.Cast<NoticeOfStepIncrementListView>().ToList();
+
+            NsiRequest model = new NsiRequest
+                {
+                    UserId = userId,
+                    SelectedEmployees = emps
+                };
+
+            var res = await service.RequestStepIncrement(model);
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", res.Value, "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", res.Value, "error");
+            }
+        }
+    }
+
+    
+}

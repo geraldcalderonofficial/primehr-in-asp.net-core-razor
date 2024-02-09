@@ -1,0 +1,219 @@
+﻿@page "/evaluation-templateitem"
+@inject IJSRuntime JSRuntime
+@using HRMSv4.Client.Service
+@inject IPaperEvaluation service
+@using System.Linq.Dynamic.Core
+@inject SweetAlertService Swal;
+@using DevExpress.Blazor
+
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Paper Evaluation
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/module-paperevaluation">Paper Evaluation</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Templates</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@InsertRow" disabled="@(itemToInsert != null)" style="margin-bottom: 10px; width:200px"> Add Template Item </button>
+        </div>
+        <DxGrid Data="@PaperEvalItems" PageSize="20"
+                ShowFilterRow="true"
+                PagerPosition="GridPagerPosition.Bottom"
+                PageSizeSelectorVisible="true"
+                PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                PageSizeSelectorAllRowsItemVisible="true"
+                PagerSwitchToInputBoxButtonCount="10"
+                PagerVisibleNumericButtonCount="10">
+
+            <Columns>
+                <DxGridDataColumn FieldName="Type" />
+                <DxGridDataColumn FieldName="GroupName" />
+                <DxGridDataColumn FieldName="ItemDescription" />
+                <DxGridDataColumn FieldName="EquivalentPointsDescription" />
+                <DxGridDataColumn FieldName="MaxPoints" />
+                <DxGridDataColumn FieldName="" Caption="Action" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.Selection.PaperEvaluationTemplateItem);
+                        }
+
+                        <button class="border-0 btn-transition btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Edit" @onclick="@(asd => EditRow(temp))">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Delete" @onclick="@(asd => DeleteRow(temp))">
+                            <i class="fa fa-trash"></i>
+                        </button>
+
+
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+        @* <RadzenDataGrid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="20" AllowPaging="true" AllowSorting="true"
+        Data="@items" TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender"
+        HideGroupedColumn="true" GroupRowRender="OnGroupRowRender">
+        <Columns>
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Property="Type" Title="Type" />
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Property="GroupName" Title="Group Name" />
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Property="ItemDescription" Title="Description" Width="200px" />
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Property="EquivalentPointsDescription" Title="Equivalent Points Description" />
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Property="MaxPoints" />
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.Selection.PaperEvaluationTemplateItem" Context="template" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="80px">
+        <Template Context="template">
+        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Class="m-1" Size="ButtonSize.Small" Click="@(args => EditRow(template))" @onclick:stopPropagation="true"></RadzenButton>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Class="m-1" Size="ButtonSize.Small" Click="@(args => DeleteRow(template))" @onclick:stopPropagation="true"></RadzenButton>
+        </Template>
+        </RadzenDataGridColumn>
+        </Columns>
+        </RadzenDataGrid>*@
+    </div>
+</div>
+@code {
+    IEnumerable<HRMSv4.Shared.Selection.PaperEvaluationTemplateItem> items;
+    RadzenDataGrid<HRMSv4.Shared.Selection.PaperEvaluationTemplateItem> itemGrid;
+    HRMSv4.Shared.Selection.PaperEvaluationTemplateItem itemToInsert;
+    [CascadingParameter] public IModalService Modal { get; set; }
+    string itemToEdit;
+    bool isLoading;
+    int count;
+
+    string userId = "";
+    object PaperEvalItems { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.Selection.PaperEvaluationTemplateItem> gridDevExtremeDataSource;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        //items = await service.GetTemplateItems();
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        items = await service.GetTemplateItems();
+
+        var tempList = items.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.Selection.PaperEvaluationTemplateItem>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "PaperEvaluationTemplateItemId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        PaperEvalItems = gridDevExtremeDataSource;
+
+        StateHasChanged();
+    }
+
+    //void OnRender(DataGridRenderEventArgs<HRMSv4.Shared.Selection.PaperEvaluationTemplateItem> args)
+    //{
+    //    if (args.FirstRender)
+    //    {
+    //        args.Grid.Groups.Add(new GroupDescriptor() { Property = "Type", SortOrder = SortOrder.Ascending });
+    //        StateHasChanged();
+    //    }
+    //}
+
+    //void OnGroupRowRender(GroupRowRenderEventArgs args)
+    //{
+    //    if (args.FirstRender && args.Group.Data.Key == "Vice President, Sales")
+    //    {
+    //        args.Expanded = false;
+    //    }
+    //}
+
+
+    async Task InsertRow()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+
+
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.PaperEvaluationTemplateItemModal>("New Template Item", options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            /* Ronald was here 4/20/2022 GetAll remarks */
+            items = await service.GetTemplateItems();
+            //await esGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditRow(HRMSv4.Shared.Selection.PaperEvaluationTemplateItem temp)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.PaperEvaluationTemplateItemModal.itemId), temp.PaperEvaluationTemplateItemId);
+
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.PaperEvaluationTemplateItemModal>("Edit Template Item", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            items = await service.GetTemplateItems();
+            //await itemGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task DeleteRow(HRMSv4.Shared.Selection.PaperEvaluationTemplateItem temp)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "Do you really want to delete this record? This process cannot be undone.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var httRes = await service.Delete(temp.PaperEvaluationTemplateItemId);
+
+            if (httRes.IsSuccessStatusCode)
+            {
+                items = await service.GetTemplateItems();
+                StateHasChanged();
+                string resMsg = await httRes.Content.ReadAsStringAsync();
+                await Swal.FireAsync("Success", "Your record was successfully deleted.", "success");
+            }
+            else
+            {
+                await Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+}

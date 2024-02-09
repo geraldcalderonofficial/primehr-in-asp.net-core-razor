@@ -1,0 +1,405 @@
+﻿@using HRMSv4.Shared.Exam
+@inject IExam service
+@inject SweetAlertService Swal;
+@using static HRMSv4.Shared.Exam.Subject
+@inject IJSRuntime JSRuntime
+@using System.Globalization
+@using HRMSv4.Client.Service.Auth
+@inject HttpInterceptorService Interceptor
+
+<BusyIndicator Message="Please wait while loading data..." Data="dre">
+    <div class="tab-pane active show" id="dashboard">
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                <div class="card mb-3 widget-chart card-hover-shadow-2x text-start">
+                    <div class="icon-wrapper border-light rounded">
+                        <div class="icon-wrapper-bg bg-light"></div>
+                        <i class="lnr-users icon-gradient bg-malibu-beach"></i>
+                    </div>
+                    <div class="widget-chart-content">
+                        <div class="widget-numbers">@dc.Applicants</div>
+                        <div class="widget-subheading">Applicants</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card mb-3 widget-chart card-hover-shadow-2x text-start">
+                    <div class="icon-wrapper border-light rounded">
+                        <div class="icon-wrapper-bg bg-light"></div>
+                        <i class="pe-7s-news-paper icon-gradient bg-malibu-beach"></i>
+                    </div>
+                    <div class="widget-chart-content">
+                        <div class="widget-numbers">@dc.GeneratedExams</div>
+                        <div class="widget-subheading">Exams</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card mb-3 widget-chart card-hover-shadow-2x text-start">
+                    <div class="icon-wrapper border-light rounded">
+                        <div class="icon-wrapper-bg bg-light"></div>
+                        <i class="lnr-book icon-gradient bg-malibu-beach"></i>
+                    </div>
+                    <div class="widget-chart-content">
+                        <div class="widget-numbers">@dc.Subjects</div>
+                        <div class="widget-subheading">Subjects</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card mb-3 widget-chart card-hover-shadow-2x text-start">
+                    <div class="icon-wrapper border-light rounded">
+                        <div class="icon-wrapper-bg bg-light"></div>
+                        <i class="pe-7s-graph2 icon-gradient bg-malibu-beach"></i>
+                    </div>
+                    <div class="widget-chart-content">
+                        <div class="widget-numbers">@dc.PassingPercentage%</div>
+                        <div class="widget-subheading">Passing Percentage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-lg-6">
+                <div class="main-card mb-3 card" style="height: 44vh;">
+                    <div class="card-body">
+                        <h5 class="card-title">Charts of Exams</h5>
+                        <Chart Config="barConfig" @ref="_barChart" Height="25vh" Style="margin-bottom: 75px;"></Chart>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-6">
+                <div class="main-card mb-3 card" style="height: 44vh;">
+                    <div class="card-body">
+                        <h5 class="card-title">Chart of Users</h5>
+                        <Chart Config="_config1" @ref="_chart1" Height="28vh" Style="margin-bottom: 75px;"></Chart>
+                        @if (dcu.Count[0] == 0 && dcu.Count[1] == 0)
+                        {
+                            <div class="text-muted">No record to display.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card-shadow-primary card-border mb-3 card" style="height:42vh">
+                        <div class="p-3">
+                            <h6 class="text-muted text-uppercase font-size-md opacity-5 fw-normal">Top Rank</h6>
+                            <ul class="rm-list-borders list-group list-group-flush">
+                                @if (tp.Count() > 0)
+                                {
+                                    foreach (var item in tp)
+                                    {
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">@item.Name</div>
+                                                        <div class="widget-subheading">@item.Type</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No record to display.</div>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card-shadow-primary card-border mb-3 card" style="height:42vh">
+                        <div class="p-3">
+                            <h6 class="text-muted text-uppercase font-size-md opacity-5 fw-normal">Recent Examinees</h6>
+                            <ul class="rm-list-borders list-group list-group-flush">
+                                @if (dre.Count() > 0)
+                                {
+                                    foreach (var item in dre)
+                                    {
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+                                                    <div class="widget-content-left me-3">
+                                                        <img width="42" class="rounded-circle" src="/MainLayout/images/avatars/default-avatar-grey.png" alt="">
+                                                    </div>
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">@item.Name</div>
+                                                        <div class="widget-subheading">@item.Type</div>
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="font-size-xlg text-muted">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No record to display.</div>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card-shadow-primary card-border mb-3 card" style="height:42vh">
+                        <div class="m-3">
+                            <h6 class="text-muted text-uppercase font-size-md opacity-5 fw-normal">Gender Statistics</h6>
+                            <div class="p-2">
+                                <Chart Config="donutConfig" @ref="_donutChart" Height="25vh" Style="margin-bottom: 0px;"></Chart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+
+    ChartOfExam[] attemptsChart;
+    ChartOfExam[] examsChart;
+    ChartOfGender[] genderChart;
+    ChartOfUsers[] userChart;
+
+    DashboardCount dc = new DashboardCount();
+    DashboardChartOfExam dce = new DashboardChartOfExam();
+    DashboardChartOfUser dcu = new DashboardChartOfUser();
+    DashboardGenderStatistics dgs = new DashboardGenderStatistics();
+    List<DashboardTopRank> tp = new List<DashboardTopRank>();
+    List<DashboardRecentExaminees> dre = new List<DashboardRecentExaminees>();
+
+    private PieChartConfig _config1;
+    private Chart _chart1;
+    private DoughnutChartConfig donutConfig;
+    private Chart _donutChart;
+    private BarChartConfig barConfig;
+    private Chart _barChart;
+
+    public void Dispose() => Interceptor.DisposeEvent();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Interceptor.RegisterEvent();
+        Task.Run(() => LoadDashboard());
+
+        this.StateHasChanged();
+    }
+
+    async void LoadDashboard()
+    {
+        Task.Run(() => LoadCount());
+        Task.Run(() => LoadBarChart());
+        Task.Run(() => LoadPieChart());
+        Task.Run(() => LoadDonutChart());
+        Task.Run(() => LoadTopRank());
+        Task.Run(() => LoadRecentExaminees());
+    }
+
+    #region Dashboard
+    private async void LoadCount()
+    {
+        dc = await service.GetDashboardCount();
+        StateHasChanged();
+    }
+
+    private async void LoadBarChart()
+    {
+        dce = await service.GetChartOfExams();
+
+        barConfig = new BarChartConfig()
+            {
+                Options = new Options()
+                {
+                    Plugins = new Plugins()
+                    {
+                        Legend = new Legend()
+                        {
+                            Align = LegendAlign.Center,
+                            Display = true,
+                            Position = PSC.Blazor.Components.Chartjs.Enums.LegendPosition.Right
+                        }
+                    },
+                    Scales = new Scales()
+                    {
+                        X = new XAxes()
+                        {
+                            Stacked = false,
+                            Ticks = new Ticks()
+                            {
+                                MaxRotation = 0,
+                                MinRotation = 0
+                            }
+                        },
+                        Y = new YAxes()
+                        {
+                            Stacked = false,
+                        }
+                    },
+                    IndexAxis = "y",
+                    Responsive = true,
+                    MaintainAspectRatio = false
+                }
+            };
+
+
+
+        foreach (string month in dce.Months)
+        {
+            barConfig.Data.Labels.Add(month);
+        }
+
+        List<string> color1 = new List<string>();
+        color1.Add("rgba(2,144,139)");
+
+
+        barConfig.Data.Datasets.Add(new BarDataset()
+            {
+                Label = "Exams",
+                Data = dce.ExamsCount.ToList(),
+                //Data = test.ToList(),
+                BackgroundColor = color1,
+                BorderColor = color1,
+                BorderWidth = 1
+            }
+        );
+
+        List<string> color2 = new List<string>();
+        color2.Add("rgb(0,96,118)");
+
+        barConfig.Data.Datasets.Add(new BarDataset()
+            {
+                Label = "Attempts",
+                Data = dce.AttemptsCount.ToList(),
+                BackgroundColor = color2,
+                BorderColor = color2,
+                BorderWidth = 1
+            });
+        StateHasChanged();
+    }
+
+    private async void LoadPieChart()
+    {
+        dcu = await service.GetChartOfUsers();
+
+        _config1 = new PieChartConfig()
+            {
+                Options = new Options()
+                {
+                    Responsive = true,
+                    MaintainAspectRatio = false
+                }
+            };
+
+        if (dcu.Count[0] == 0 && dcu.Count[1] == 0)
+        {
+            List<decimal> ronald = new List<decimal>();
+            ronald.Add(100);
+
+            _config1.Data.Datasets.Add(new PieDataset()
+                {
+                    Label = "None",
+                    Data = ronald,
+                    HoverOffset = 4,
+                    BackgroundColor = Colors.Palette1
+
+                });
+        }
+        else
+        {
+
+            foreach (string item in dcu.UserType)
+            {
+                _config1.Data.Labels.Add(item);
+            }
+
+
+            _config1.Data.Datasets.Add(new PieDataset()
+                {
+                    Label = "",
+                    Data = dcu.Count,
+                    HoverOffset = 4,
+                    BackgroundColor = Colors.PaletteBorder1
+
+                });
+        }
+
+
+
+        StateHasChanged();
+    }
+
+    private async void LoadDonutChart()
+    {
+        dgs = await service.GetGenderStatistics();
+
+        donutConfig = new DoughnutChartConfig()
+            {
+                Options = new Options()
+                {
+                    Responsive = true,
+                    MaintainAspectRatio = false
+                }
+            };
+
+        foreach (string item in dgs.Gender)
+        {
+            donutConfig.Data.Labels.Add(item);
+        }
+
+        if (dgs.Count[0] == 0 && dgs.Count[1] == 0)
+        {
+            List<decimal> ronald = new List<decimal>();
+            ronald.Add(50);
+            ronald.Add(50);
+
+            donutConfig.Data.Datasets.Add(new DoughnutDataset()
+                {
+                    Label = "None",
+                    Data = ronald,
+                    BackgroundColor = Colors.Gender,
+                    HoverOffset = 4,
+                });
+
+        }
+        else
+        {
+            donutConfig.Data.Datasets.Add(new DoughnutDataset()
+                {
+                    Label = "My First Dataset",
+                    Data = dgs.Count,
+                    //Data = null,
+                    BackgroundColor = Colors.Gender,
+                    HoverOffset = 4
+                });
+        }
+    }
+
+    private async void LoadTopRank()
+    {
+        tp = new List<DashboardTopRank>();
+        tp = await service.GetTopRank();
+    }
+
+    private async void LoadRecentExaminees()
+    {
+        dre = new List<DashboardRecentExaminees>();
+        dre = await service.GetRecentExaminees();
+    }
+
+    #endregion
+
+}

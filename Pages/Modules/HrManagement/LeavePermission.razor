@@ -1,0 +1,46 @@
+﻿@page "/module-leavepermission"
+@inject IStaffing serviceStaffing
+@inject IJSRuntime JSRuntime
+@inject IPosition service
+@inject IJobCategory serviceJobCategory
+@inject SweetAlertService _swal
+@using HRMSv4.Client.Service
+@using HRMSv4.Shared.HrMgmt
+@using HRMSv4.Shared.OnBoarding
+@using DevExpress.Blazor
+@inject ILeavePermission _leavePermissionService
+
+<AuthorizeView Roles="Job Provider, Administrator">
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Permission To Leave
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Permission To Leave</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<LeavePermissionTable EmployeeId=@EmployeeId></LeavePermissionTable>
+</AuthorizeView>
+
+@code {
+
+    public int EmployeeId { get; set; } = 0;
+
+    int count;
+    List<LeavePermissionView> leavePermissions = new List<LeavePermissionView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+}

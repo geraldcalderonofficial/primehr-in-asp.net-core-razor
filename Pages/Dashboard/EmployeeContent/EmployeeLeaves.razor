@@ -1,0 +1,24 @@
+﻿@inject IStaffing serviceStaffing
+@inject IJSRuntime JSRuntime
+@inject IPosition service
+@inject IJobCategory serviceJobCategory
+@inject SweetAlertService _Swal
+@using HRMSv4.Client.Service
+@using HRMSv4.Shared.HrMgmt
+@using HRMSv4.Shared.OnBoarding
+@using DevExpress.Blazor
+@inject ILeaveApplication _leaveApplication
+
+<LeaveApplicationTable EmployeeId=@EmployeeId></LeaveApplicationTable>
+
+@code {
+    [Parameter] public int EmployeeId { get; set; } = 0;
+
+    int count;
+    List<LeaveApplicationView> leaveApplication = new List<LeaveApplicationView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}

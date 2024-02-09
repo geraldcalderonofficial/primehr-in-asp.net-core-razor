@@ -1,0 +1,620 @@
+﻿@using HRMSv4.Client.Shared.MainComponents
+@using HRMSv4.Shared.Exam
+@using System.Globalization
+@inject IExam service
+@page "/sampleq"
+
+<style>
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-top: 5%;
+    }
+
+    #myHeading img {
+        float: left;
+        margin-right: 10px;
+        position: relative;
+        top: 2px;
+    }
+
+    body {
+        /*background-color: #1fc8db;*/
+        /*   background-image: linear-gradient(141deg, #9fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);*/
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .demo {
+        margin: 60px auto;
+    }
+
+    .radiogroup {
+        width: 500px;
+        margin: 70px auto;
+        position: relative;
+    }
+
+        .radiogroup ul {
+            list-style: none;
+        }
+
+            .radiogroup ul li {
+                border-bottom: 2px solid #000000;
+            }
+
+                .radiogroup ul li:last-child {
+                    border-bottom: 1px solid transparent;
+                }
+
+    .control input {
+        position: absolute;
+        left: 30px;
+        opacity: 0;
+    }
+
+    .control {
+        display: block;
+        position: relative;
+        padding-left: 60px;
+        padding-top: 8px;
+        padding-bottom: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+        .control span {
+            color: #000000;
+            transition: color 0.5s;
+        }
+
+    .control-indicator {
+        position: absolute;
+        top: 6px;
+        left: 10px;
+        height: 25px;
+        width: 25px;
+        background-color: transparent;
+        border: 4px solid #000000;
+        border-radius: 50%;
+        transition: border-color 0.5s;
+    }
+
+        .control-indicator:after {
+            content: '';
+            position: absolute;
+            display: block;
+            left: 3px;
+            top: 4px;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            transition: border-color 0.5s, background-color 0.5s;
+        }
+
+    .control input:focus ~ span,
+    .control input:hover ~ span {
+        color: #FBBC05;
+    }
+
+    .control input:focus ~ .control-indicator,
+    .control input:hover ~ .control-indicator {
+        border-color: #FBBC05;
+    }
+
+    .control input:checked ~ span {
+        color: #c0392b;
+    }
+
+    .control input:checked ~ .control-indicator {
+        border-color: #c0392b;
+    }
+
+        .control input:checked ~ .control-indicator:after {
+            background-color: #c0392b;
+        }
+
+    h1 {
+        margin-left: 20px;
+        color: white;
+    }
+
+    .answer {
+        display: block;
+        border-radius: 4px;
+        padding: 13px 20px 13px 60px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: background .15s linear,color .15s linear;
+        text-transform: none;
+        font-size: 14px;
+        border: 2px solid #d0d9df;
+    }
+
+</style>
+
+<!-- Intro Quizzes -->
+<BusyIndicator Message="Please wait while loading data..." Data="res">
+
+    <div class="main-card mb-3 card">
+        <div id="Questionaire" hidden=@ShowQuestionaire>
+            @if (res.Question != null)
+            {
+                @if (res.Question.Count > 0)
+                {
+                    @foreach (var item in res.Question)
+                    {
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            Subject: @item.SubjectName
+                            <div class="sub-label-left"> <span class="sub-label-right" style="color:#043b8d; margin-left: 15px;">@ProgressValue%</span> Total Progress</div>
+                            <div class="col">
+                                <div class="widget-progress-wrapper">
+                                    <div class="progress-bar-sm progress-bar-animated-alt progress" style="border-radius: unset !important;">
+                                        <div class="progress-bar bg-focus" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: @ProgressValue%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body" style="padding-bottom: 15px;">
+                            @if (item.Type.ToLower() == "Multiple Choice".ToLower())
+                            {
+                                <div class="row" style="margin-bottom: -80px;">
+                                    <div class="col-sm-6">
+                                        <div class="widget-numbers widget-numbers-sm text-primary">
+                                            <span>@item.RowNumber</span>
+                                        </div>
+                                        @if (@item.DifficultyLevel == "Easy")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-success">Easy</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Medium")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-warning">Medium</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Hard")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-danger">Hard</div>
+                                        }
+                                        <h2 tabindex="0" style="font-size: 1rem !important;"> @item.Question?</h2>
+                                    </div>
+                                    <div class="col-sm-6 radiogroup">
+                                        <ul class="answers">
+                                            <li>
+                                                <label class="control control-radio" for="1">
+                                                    <input type="radio" id="1" name="que" @onchange="args=>TogglePattern(args, item.Option1)">
+                                                    <span>@item.Option1</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="control control-radio" for="2">
+                                                    <input type="radio" id="2" name="que" @onchange="args=>TogglePattern(args, item.Option2)">
+                                                    <span>@item.Option2</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="control control-radio" for="3">
+                                                    <input type="radio" id="3" name="que" @onchange="args=>TogglePattern(args, item.Option3)">
+                                                    <span>@item.Option3</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="control control-radio" for="4">
+                                                    <input type="radio" id="4" name="que" @onchange="args=>TogglePattern(args, item.Option4)">
+                                                    <span>@item.Option4</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                Questiontype = item.Type;
+                                ApplicantExamAnswerId = item.ApplicantExamAnswerId;
+
+                            } @*End of multiple choice *@
+
+                            @if (item.Type.ToLower() == "True/False".ToLower())
+                            {
+                                <div class="row" style="margin-bottom: -80px;">
+                                    <div class="col-sm-6">
+                                        <div class="widget-numbers widget-numbers-sm text-primary">
+                                            <span>@item.RowNumber</span>
+                                        </div>
+                                        @if (@item.DifficultyLevel == "Easy")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-success">Easy</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Medium")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-warning">Medium</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Hard")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-danger">Hard</div>
+                                        }
+                                        <h2 style="font-size: 1rem !important;" tabindex="0"> @item.Question?</h2>
+                                    </div>
+                                    <div class="col-sm-6 radiogroup">
+                                        <ul class="answers">
+                                            <li>
+                                                <label class="control control-radio" for="1">
+                                                    <input type="radio" id="1" name="fruit" bind=@isTrue @onchange="args=>ToggleBoolean(args, isTrue)">
+                                                    <span>True</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="control control-radio" for="2">
+                                                    <input type="radio" id="2" name="fruit" bind=@isFalse @onchange="args=>ToggleBoolean(args, isFalse)" />
+                                                    <span>False</span>
+                                                    <div class="control-indicator"></div>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                Questiontype = item.Type;
+                                ApplicantExamAnswerId = item.ApplicantExamAnswerId;
+                            } @*End of true/false *@
+
+                            @if (item.Type.ToLower() == "Essay/Practical".ToLower())
+                            {
+                                <div class="row" style="margin-bottom: -80px;">
+                                    <div class="col-sm-6">
+                                        <div class="widget-numbers widget-numbers-sm text-primary">
+                                            <span>@item.RowNumber</span>
+                                        </div>
+                                        @if (@item.DifficultyLevel == "Easy")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-success">Easy</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Medium")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-warning">Medium</div>
+                                        }
+                                        @if (@item.DifficultyLevel == "Hard")
+                                        {
+                                            <div class="mb-2 me-2 badge bg-danger">Hard</div>
+                                        }
+                                        <h2 tabindex="0" style="font-size: 1rem !important;"> @item.Question?</h2>
+                                    </div>
+
+                                    <div class="col-sm-6 radiogroup">
+                                        <!-- Question here-->
+                                        <div class="text-center">
+                                            <h3>Enter you answer below</h3>
+                                            <RadzenHtmlEditor @bind-Value=@htmlEditorValue style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                                                <RadzenHtmlEditorUndo />
+                                                <RadzenHtmlEditorRedo />
+                                                <RadzenHtmlEditorSeparator />
+                                                <RadzenHtmlEditorBold />
+                                                <RadzenHtmlEditorItalic />
+                                                <RadzenHtmlEditorUnderline />
+                                                <RadzenHtmlEditorStrikeThrough />
+                                                <RadzenHtmlEditorSeparator />
+                                                <RadzenHtmlEditorColor />
+                                                <RadzenHtmlEditorBackground />
+                                                <RadzenHtmlEditorRemoveFormat />
+                                            </RadzenHtmlEditor>
+                                        </div>
+                                        <!-- End of Question -->
+                                    </div>
+                                </div>
+                                Questiontype = item.Type;
+                                ApplicantExamAnswerId = item.ApplicantExamAnswerId;
+                            } @*End of Essay *@
+                        </div>
+                    }
+                }
+            }
+
+            @if (res.TotalQuestionCount > 1)
+            {
+                @*       Console.WriteLine(res.CurrentPageIndex);
+            Console.WriteLine(res.PageCount);*@
+
+                if (res.CurrentPageIndex > 1)
+                {
+                    <button class="@(res.CurrentPageIndex  == 1 ? "page-item disabled" : "page-item") mb-2 me-2 ml-2 btn-icon btn-pill btn btn-outline-secondary float-start" @onclick="@(e => NextHandlerClick(@res.CurrentPageIndex, false))" href="javascript:PreviousClick(@res.CurrentPageIndex);">
+                        <i class="pe-7s-left-arrow btn-icon-wrapper"></i>Previous question
+                    </button>
+                }
+                if (res.CurrentPageIndex != res.PageCount)
+                {
+                    <button class="mb-2 me-2 btn-icon btn-pill btn btn-outline-success float-end" @onclick="@(e => NextHandlerClick(@res.CurrentPageIndex, true))">
+                        <i class="pe-7s-right-arrow btn-icon-wrapper"></i>Next question
+                    </button>
+                    @*@(res.CurrentPageIndex  == res.PageCount ? "page-item disabled" : "*@
+                    @* @(res.TotalQuestionLeftCount  == 0 ? "page-item disabled" : "page-item")*@
+                }
+                else
+                {
+                    <button class="page-item mb-2 me-2 btn-icon btn-pill btn btn-outline-success float-end" @onclick="@(e => FinishHandlerClick(@res.CurrentPageIndex, true))">
+                        <i class="pe-7s-right-arrow btn-icon-wrapper"></i>Submit answers
+                    </button>
+                }
+            }
+
+        </div>
+
+        @if (ShowFinal)
+        {
+            <FinalResult ApplicantExamId="@ApplicantExamId"></FinalResult>
+        }
+
+    </div>
+</BusyIndicator>
+<!-- Intro Quizzes-->
+@code {
+    [Parameter] public int ApplicantExamId { get; set; }
+
+    private string userId { get; set; }
+
+    private bool CurrentValue { get; set; } = false;
+    private bool isNext { get; set; } = false;
+    private bool ShowQuestionaire { get; set; } = false;
+    private bool ShowFinal { get; set; } = false;
+
+    private int ApplicantExamAnswerId { get; set; }
+    public bool HideIntro { get; set; } = false;
+    public bool Timer { get; set; } = false;
+
+    public bool HideFinish { get; set; } = true;
+    public bool ElapseNotification { get; set; } = true;
+
+    //public bool IsBooleanChecked { get; set; } = false;
+    //public bool isFalseChecked { get; set; }
+
+    private int ProgressValue { get; set; } = 0;
+    private int PercentageValue { get; set; } = 0;
+    public bool IsFalseChecked { get; set; } = false;
+
+    string isTrue = "true";
+    string isFalse = "false";
+    string TrueFalseValue { get; set; } = string.Empty;
+
+    private string htmlEditorValue { get; set; } = string.Empty;
+    private string selectedOption { get; set; } = string.Empty;
+
+    private string SubjectTitle { get; set; } = string.Empty;
+
+    private QuestionQueueView res = new QuestionQueueView();
+
+    private string Questiontype { get; set; } = string.Empty;
+    private int pageIndex = 10;
+    private int questionResults = 0;
+
+    private int comSelected { get; set; } = 0;
+
+    private static System.Timers.Timer aTimer;
+    private int counter = 60;
+    public void StartTimer()
+    {
+        aTimer = new System.Timers.Timer(1000);
+        aTimer.Elapsed += CountDownTimer;
+        aTimer.Enabled = true;
+    }
+
+    //RenderFragment GetRenderFragment(Type type)
+    //{
+    //    RenderFragment renderFragment = renderTreeBuilder =>
+    //    {
+    //        renderTreeBuilder.OpenComponent(0, type);
+    //        renderTreeBuilder.AddAttribute(1, "ApplicantExamId", 16);
+    //        renderTreeBuilder.CloseComponent();
+    //    };
+    //    return renderFragment;
+    //}
+
+    //ComponentBase[] components = {
+    //    new Questionnaire()
+    //};
+
+    //Type[] comptypes => components.Select(c => c.GetType()).ToArray();
+
+    public void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (counter > 0)
+        {
+            counter -= 1;
+        }
+        else
+        {
+            aTimer.Enabled = false;
+            ElapseNotification = false;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await Task.Delay(1000); // simulate loading
+
+        res = await service.GetApplicantExam(ApplicantExamId, 0, true, false);
+        questionResults = res.Question.Count();
+
+        //if (res.TotalAnsweredQuestionCount > 0) {
+        //    decimal rawr = ((decimal)res.TotalAnsweredQuestionCount / (decimal)res.TotalQuestionCount) * 100;
+
+        //    if (rawr > 0)
+        //    {
+        //        ProgressValue = Convert.ToInt32(rawr);
+        //    }
+        //}
+
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        this.StateHasChanged();
+    }
+
+    //private void CheckboxTrueChanged(ChangeEventArgs e)
+    //{
+    //    isFalseChecked = false;
+    //    StateHasChanged();
+    //}
+
+    //private void CheckboxFalseChanged(ChangeEventArgs e)
+    //{
+    //    isFalseChecked = true;
+    //    StateHasChanged();
+    //}
+
+    public async Task GetData(int CurrentIndex)
+    {
+        res = await service.GetApplicantExam(ApplicantExamId, CurrentIndex, true, false);
+        questionResults = res.Question.Count();
+
+        StartTimer();
+
+        if (questionResults == 0)
+        {
+            Timer = true;
+        }
+        StateHasChanged();
+    }
+
+
+    async Task TogglePattern(ChangeEventArgs args, string item)
+    {
+        selectedOption = item;
+    }
+
+    async void FinishHandlerClick(int CurrentPageIndex = 0, bool isPage = false)
+    {
+        PostQuestion(CurrentPageIndex, isPage);
+
+        ShowQuestionaire = true;
+        ShowFinal = true;
+        //Timer = true;
+
+        StateHasChanged();
+    }
+
+    async void NextHandlerClick(int CurrentPageIndex = 0, bool isPage = false)
+    {
+        PostQuestion(CurrentPageIndex, isPage);
+    }
+
+    async void PostQuestion(int CurrentPageIndex = 0, bool isPage = false)
+    {
+        string QuestionAnswer = string.Empty;
+
+        /* Insert Answer to database */
+        if (Questiontype == "Multiple Choice")
+        {
+            QuestionAnswer = selectedOption;
+        }
+        if (Questiontype == "True/False")
+        {
+            QuestionAnswer = TrueFalseValue;
+        }
+        if (Questiontype == "Essay/Practical")
+        {
+            QuestionAnswer = new MarkupString(htmlEditorValue).ToString();
+            //var markupString2 = (MarkupString)htmlEditorValue;
+        }
+        if (Questiontype == "Others")
+        {
+
+        }
+
+        ApplicantExamAnswer answer = new ApplicantExamAnswer();
+
+        if (!string.IsNullOrWhiteSpace(QuestionAnswer))
+        {
+            answer.ApplicantExamAnswerId = ApplicantExamAnswerId;
+            answer.Answer = QuestionAnswer;
+            answer.UpdatedBy = userId;
+
+            var data = await service.SaveAns(answer);
+
+            if (data.IsSuccessStatusCode)
+            {
+                if (isPage)
+                {
+                    res = await service.GetApplicantExam(ApplicantExamId, CurrentPageIndex, true, false);
+                    questionResults = res.Question.Count();
+                    /* Change Progress Bar value*/
+                    if (CurrentPageIndex > 0)
+                    {
+                        if (!string.IsNullOrWhiteSpace(QuestionAnswer))
+                        {
+                            /* This will compute for total answered question, convert total into percentage */
+                            decimal rawr = ((decimal)res.TotalAnsweredQuestionCount / (decimal)res.TotalQuestionCount) * 100;
+                            //decimal rawr = ((decimal)CurrentPageIndex / (decimal)res.TotalQuestionCount) * 100;
+
+                            if (rawr > 0)
+                            {
+                                ProgressValue = Convert.ToInt32(rawr);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    res = await service.GetApplicantExam(ApplicantExamId, CurrentPageIndex, false, false);
+                    questionResults = res.Question.Count();
+                }
+            }
+        }
+        else /* Previous button */
+        {
+            if (isPage)
+            {
+                res = await service.GetApplicantExam(ApplicantExamId, CurrentPageIndex, true, false);
+                questionResults = res.Question.Count();
+
+                /* Change Progress Bar value*/
+                if (CurrentPageIndex > 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(QuestionAnswer))
+                    {
+                        /* This will compute for total answered question, convert total into percentage */
+                        decimal rawr = ((decimal)res.TotalAnsweredQuestionCount / (decimal)res.TotalQuestionCount) * 100;
+                        //decimal rawr = ((decimal)CurrentPageIndex / (decimal)res.TotalQuestionCount) * 100;
+                        if (rawr > 0)
+                        {
+                            ProgressValue = Convert.ToInt32(rawr);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                res = await service.GetApplicantExam(ApplicantExamId, CurrentPageIndex, false, false);
+                questionResults = res.Question.Count();
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    void OnPaste(HtmlEditorPasteEventArgs args)
+    {
+        //console.Log($"Paste: {args.Html}");
+    }
+
+    void OnChange(string html)
+    {
+        //console.Log($"Change: {html}");
+    }
+
+    void OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+        //console.Log($"Execute: {args.CommandName}");
+    }
+
+    async Task ToggleBoolean(ChangeEventArgs args, string item)
+    {
+        TrueFalseValue = item;
+    }
+}

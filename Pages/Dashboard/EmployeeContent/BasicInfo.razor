@@ -1,0 +1,205 @@
+﻿@inject IEmployee empService
+@using HRMSv4.Shared.OnBoarding
+
+<BusyIndicator Message="Please wait while loading data..." Data="employee">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-header-text">Basic Information</h5>
+                    <div class="btn-actions-pane-right text-capitalize">
+                        @*<button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-primary btn-sm" hidden="@viewBasicInfo" onclick="@(()=>EditBasic())"><i class="fa fa-edit"></i></button>*@
+                    </div>
+                </div>
+                <div class="card-block" style="padding:1.25rem">
+                    <div id="view-info" class="row">
+                        @*hidden="@viewBasicInfo"*@
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <table class="table" style="margin-bottom:0px; display:inline-block; width:100%; overflow-x:auto; border-bottom-width:0px !important">
+                                <tr>
+                                    <th class="social-label b-none p-t-0">
+                                        Date of Birth
+                                    </th>
+                                    <td class="social-user-name b-none p-t-0 text-muted"><label class="mx-5">@employee.BirthDate</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Place of Birth</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.BirthPlace</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-labe p-t-0 l b-none">Gender</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Gender</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Religion</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Religion</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Weight</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Weight</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Height</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Height</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none p-b-0">Blood Type</th>
+                                    <td class="social-user-name b-none p-t-0 text-muted"><label class="mx-5">@employee.BloodType</label></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <table class="table table-responsive m-b-0" style="margin-bottom:0px; display:inline-block; width:100%; overflow-x:auto;">
+                                <tr>
+                                    <th class="social-label b-none p-t-0">Nationality</th>
+                                    <td class="social-user-name b-none p-t-0 text-muted"><label class="mx-5">@employee.Nationality</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">House No. / Subdv.</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.ResedentialHouseBlockNumber</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Street</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.ResedentialStreetName</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Barangay</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Barangay</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Town / City</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Municipality</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Province</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.Province</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none p-b-0">Zipcode</th>
+                                    <td class="social-user-name b-none  p-t-0  text-muted"><label>@employee.ResedentialZipCode</label></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <table class="table table-responsive m-b-0" style="margin-bottom:0px; display:inline-block; width:100%; overflow-x:auto;">
+                                <tr>
+                                    <th class="social-label b-none p-t-0">Mobile Number</th>
+                                    <td class="social-user-name b-none p-t-0 text-muted"><label class="mx-5">@employee.MobileNo</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Landline</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.LandlineNo</label></td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label p-t-0  b-none">Email Address</th>
+                                    <td class="social-user-name b-none p-t-0  text-muted"><label class="mx-5">@employee.EmailAddress</label></td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-header-text">Account Information</h5>
+                    <div class="btn-actions-pane-right text-capitalize">
+                        @*<button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-primary btn-sm" hidden="@viewAcctInfo" onclick="@(()=> EditAcct())"><i class="fa fa-edit"></i></button>*@
+                    </div>
+                </div>
+                <div class="card-block" style="padding:1.25rem">
+                    <div id="view-account-info" class="row">
+                        @*hidden="@viewAcctInfo"*@
+                        <div class="col-lg-4 col-md-12">
+                            <table class="table table-responsive m-b-0" style="margin-bottom:0px; display:inline-block; width:100%; overflow-x:auto;">
+                                <tr>
+                                    <th class="social-label b-none p-t-0">SSS No.</th>
+                                    <td class="social-user-name b-none p-t-0 text-muted">@employee.SssNumber</td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label b-none">GSIS No.</th>
+                                    <td class="social-user-name b-none text-muted">@employee.GsisNumber</td>
+                                </tr>
+                                <tr>
+                                    <th class="social-label b-none">Philhealth No.</th>
+                                    <td class="social-user-name b-none text-muted">@employee.PhilhealthNumber</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-4 col-md-12">
+                            <form>
+                                <table class="table table-responsive m-b-0">
+                                    <tr>
+                                        <th class="social-label b-none p-t-0">HDMF No.</th>
+                                        <td class="social-user-name b-none p-t-0 text-muted">@employee.PagibigNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="social-label b-none">TIN No.</th>
+                                        <td class="social-user-name b-none text-muted">@employee.Tin</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="social-label b-none">Account No.</th>
+                                        <td class="social-user-name b-none text-muted">@employee.BankAccountNumber</td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+    [Parameter]
+    public int employeeId { get; set; }
+
+    [Parameter]
+    public bool isLoaded { get; set; }
+
+    [Parameter]
+    public string empId { get; set; }
+
+    EmployeeListView employee = new EmployeeListView();
+
+    protected override async Task OnInitializedAsync()
+    {
+        employee = null;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                _navigation.NavigateTo("/");
+            }
+            else
+            {
+                if (employeeId > 0)
+                {
+                    await Task.Delay(1000); // simulate loading
+                    employee = await empService.View(employeeId);
+                }
+                //else
+                //{
+                //    /* Get Link to AspNetUser current user id */
+                //    await _Swal.FireAsync("Oops!", "Login user does not have a link to employee table.", "info");
+                //}
+                this.StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+
+        }
+    }
+}

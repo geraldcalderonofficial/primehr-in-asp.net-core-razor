@@ -1,0 +1,197 @@
+﻿@inject SweetAlertService Swal;
+@using HRMSv4.Client.Shared.Modals;
+@using HRMSv4.Shared.Exam
+@inject IJobVacancies service
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using DevExpress.Blazor
+
+<Title Value=@("Job Application") />
+
+<BusyIndicator Message="Please wait while loading data..." Data="jobvacancies">
+    <div class="main-card mb-3 card">
+        <DxGrid Data="@jobvacancies" PageSize="10"
+                ShowFilterRow="true"
+                PagerPosition="GridPagerPosition.Bottom"
+                PageSizeSelectorVisible="true"
+                PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                PageSizeSelectorAllRowsItemVisible="true"
+                PagerSwitchToInputBoxButtonCount="10"
+                PagerVisibleNumericButtonCount="10">
+
+            <Columns>
+                <DxGridDataColumn FieldName="Type" />
+                <DxGridDataColumn FieldName="Position"/>
+                <DxGridDataColumn FieldName="EmploymentStatus" />
+                <DxGridDataColumn FieldName="OrganizationalLevel" />
+                <DxGridDataColumn FieldName="Rate" />
+                <DxGridDataColumn FieldName="ClosingDate" />
+                <DxGridDataColumn FieldName="IsClose">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as JobVacancyListView);
+                        }
+                        @if (temp.IsClose)
+                        {
+                            <div class="badge bg-danger" style="min-width: 4rem">Closed</div>
+                        }
+                        else
+                        {
+                            <div class="badge bg-success" style="min-width: 4rem">Posted</div>
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="ApprovedDeclinedBy" Caption="Approved/Declined By" />
+                <DxGridDataColumn FieldName="" Caption="Action" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as JobVacancyListView);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Apply for job" data-bs-original-title="Apply for job" @onclick="(() => Apply(temp))">
+                            <i class="lnr-pointer-up"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</BusyIndicator>
+
+@code {
+    IEnumerable<HRMSv4.Shared.OnBoarding.JobVacancyListView> jobvacancies;
+    [CascadingParameter] public IModalService Modal { get; set; }
+    IList<HRMSv4.Shared.OnBoarding.JobVacancyListView> selectedJob;
+    [Parameter]
+    public int employeeId { get; set; }
+
+    [Parameter]
+    public bool isLoaded { get; set; }
+
+    string userId = "";
+    object Employees { get; set; }
+    GridDevExtremeDataSource<JobVacancyListView> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        jobvacancies = null;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        jobvacancies = await service.GetListByEmployee("0", employeeId);
+
+        var tempList = jobvacancies.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<JobVacancyListView>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "JobVacancyId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        Employees = gridDevExtremeDataSource;
+
+
+        StateHasChanged();
+    }
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    if (employeeId > 0)
+    //    {
+    //        /* Ronald was here 4/20/2022 GetAll remarks */
+    //        await Task.Delay(1000); // simulate loading
+    //        //jobvacancies = await service.GetListByEmployee("0", employeeId);
+    //        await UpdateDataAsync();
+    //        this.StateHasChanged();
+    //    }
+    //}
+
+    async Task SelectedJobVacancy(JobVacancyListView selectedRow)
+    {
+
+    }
+
+    async Task TakeExam(JobVacancyListView es)
+    {
+        //SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+        //    {
+        //        Title = "Confirm",
+        //        Text = "Confirming you want to take job exam?",
+        //        Icon = "question",
+        //        CancelButtonColor = "#414141",
+        //        ShowCancelButton = true,
+        //        ConfirmButtonText = "Yes",
+        //        CancelButtonText = "Cancel"
+        //    });
+
+        //if (!string.IsNullOrWhiteSpace(result.Value))
+        //{
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        var userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        var data = new ApplicantExamListView
+                {
+                    EmployeeId = employeeId,
+                    JobVacancyId = es.JobVacancyId,
+                    userId = userId
+                };
+
+        Response res = await service.TakeExam(data);
+
+        //if (res.StatusCode == 200)
+        //{
+        //    await _Swal.FireAsync(new SweetAlertOptions
+        //            {
+        //                Title = "Success",
+        //                Text = res.Value,
+        //                Icon = "success"
+        //            });
+        //}
+        //else
+        //{
+        //    await _Swal.FireAsync(new SweetAlertOptions
+        //            {
+        //                Title = "Oops!",
+        //                Text = res.Value,
+        //                Icon = "warning"
+        //            });
+        //}
+        //}
+    }
+
+    async Task Apply(JobVacancyListView es)
+    {
+        if (es.IsApplied)
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Oops!",
+                    Text = "You already applied for this job.",
+                    Icon = "warning"
+                });
+        }
+        else
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(HRMSv4.Client.Shared.Modals.JobVacancyApplyModal.JobVacancyId), es.JobVacancyId);
+            parameters.Add(nameof(HRMSv4.Client.Shared.Modals.JobVacancyApplyModal.EmployeeId), employeeId);
+            var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.JobVacancyApplyModal>("Apply", parameters);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                /* Ronald was here 4/20/2022 GetAll remarks */
+                //jobvacancies = await service.GetListByEmployee("0", employeeId);
+                //await esGrid.Reload();
+                //await TakeExam(es);
+                await UpdateDataAsync();
+                this.StateHasChanged();
+            }
+        }
+
+
+    }
+}

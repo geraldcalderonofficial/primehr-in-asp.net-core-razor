@@ -1,0 +1,344 @@
+﻿@using HRMSv4.Client.Shared.Modals.Selection.Exam
+@using HRMSv4.Shared.Exam
+@inject IExam service
+@using static HRMSv4.Shared.Exam.Subject
+@using DevExpress.Blazor
+
+<BusyIndicator Message="Please wait while loading data..." Data="examList">
+    <div class="tab-pane active show" id="exam">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <div class="card-header">
+                        <div class="col-12 mt-2">
+                            <h5 class="card-header-text float-start">Exam</h5>
+                            <button class="mb-2 me-2 btn btn-outline btn-outline-primary float-end" onclick="@InsertExamRow" style="margin-bottom: 10px;"> + New </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <DxGrid Data="@Exams" @ref="MyGrid"
+                                PageSize="15" ValidationEnabled="false"
+                                SelectionMode="GridSelectionMode.Single"
+                                AllowSelectRowByClick="true"
+                                @bind-SelectedDataItem="SelectedDataItem"
+                                VerticalScrollableHeight="39vh"
+                                SelectedDataItemsChanged="OnSelectChanged">
+                            <Columns>
+                                <DxGridDataColumn FieldName="ExamTitle" />
+                                <DxGridDataColumn FieldName="PositionName" />
+                                <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                                    <CellDisplayTemplate>
+                                        @{
+                                            var temp = (context.DataItem as ExamView);
+                                        }
+                                        @if (temp.ExamId != 0)
+                                        {
+                                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditExamRow(temp.ExamId))">
+                                                <i class="lnr-pencil"></i>
+                                            </button>
+                                            <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteExamRow(temp))">
+                                                <i class="lnr-trash"></i>
+                                            </button>
+                                        }
+
+                                    </CellDisplayTemplate>
+                                </DxGridDataColumn>
+                            </Columns>
+                        </DxGrid>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        @if (examList.Count() == 0)
+                        {
+                            <div class="text-muted">No records to display.</div>
+                        }
+                        else if (SelectedDataItem != null)
+                        {
+                            <DxGrid Data="exams" @ref="MyGrid2"
+                                PageSize="20" ShowGroupPanel="true"
+                                AutoExpandAllGroupRows="true"
+                                PopupEditFormCssClass="pw-800">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Title" GroupIndex="0" />
+                                    <DxGridDataColumn FieldName="SubjectName" />
+                                    <DxGridDataColumn FieldName="Percentage" />
+                                    <DxGridDataColumn FieldName="DifficultyLevel" />
+                                    <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                                        <CellDisplayTemplate>
+                                            @{
+                                                var temp = (context.DataItem as ExamListView);
+                                            }
+                                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditSubjectRow(temp.ExamSubjectId))">
+                                                <i class="lnr-pencil"></i>
+                                            </button>
+                                            <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteSubjectRow(temp))">
+                                                <i class="lnr-trash"></i>
+                                            </button>
+                                        </CellDisplayTemplate>
+                                    </DxGridDataColumn>
+
+                                </Columns>
+                            </DxGrid>
+
+
+                        }
+                        else
+                        {
+                            <div class="text-muted">Please select exam.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    IEnumerable<ExamView> examList;
+    IEnumerable<ExamListView> exams;
+    string userId = "";
+    IGrid? MyGrid { get; set; }
+    IGrid? MyGrid2 { get; set; }
+    object Exams { get; set; }
+    object ExamsDetails { get; set; }
+    GridDevExtremeDataSource<ExamView> gridDevExtremeDataSource;
+    GridDevExtremeDataSource<ExamListView> gridDevExtremeDataSource2;
+
+    object SelectedDataItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        //exams = await service.GetAllExam(0);
+        examList = await service.GetAllExamOnly();
+        var queryExam = examList.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<ExamView>(queryExam);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "ExamId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        Exams = gridDevExtremeDataSource;
+
+
+        //SelectedDataItem = subjListView.FirstOrDefault();
+        //OnSelectChanged();
+
+        StateHasChanged();
+    }
+
+    async Task InsertExamRow()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(ExamSubjectModal.ExamList), examList);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.Selection.Exam.ExamSubjectModal>("New Exam", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            //exams = await service.GetAllExam(0);
+            //examList = await service.GetAllExamOnly();
+            //selectedExamList = null;
+            //selectedExamList = examList.Take(1).ToList();
+            UpdateDataAsync();
+        }
+    }
+
+    async void OnSelectChanged()
+    {
+        var exm = SelectedDataItem as ExamView;
+
+        await Task.Delay(1000); // simulate loading
+        exams = await service.GetAllExam(exm.ExamId);
+        var queryExamDetails = exams.AsQueryable();
+
+        gridDevExtremeDataSource2 = new GridDevExtremeDataSource<ExamListView>(queryExamDetails);
+        gridDevExtremeDataSource2.CustomizeLoadOptions = (loadOptions) =>
+        {
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "ExamSubjectId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        ExamsDetails = gridDevExtremeDataSource2;
+
+        //selectedSubject = subj.SubjectId;
+
+        StateHasChanged();
+    }
+
+    async Task EditExamRow(int id)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Would you like to edit selected exam?",
+                Icon = "question",
+                AllowOutsideClick = false,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(Exam.ExamId), id);
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true
+                };
+            var _modalStatus = Modal.Show<ExamSubjectModal>("Edit Exam", parameters, options);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                UpdateDataAsync();
+                SelectedDataItem = null;
+                OnSelectChanged();
+                this.StateHasChanged();
+            }
+        }
+    }
+
+    async Task DeleteExamRow(ExamView el)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                AllowOutsideClick = false,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HttpResponseMessage httRes = await service.DeleteExam(el.ExamId);
+
+            if (httRes.IsSuccessStatusCode)
+            {
+                //exams = await service.GetAllExam(0);
+                //examList = await service.GetAllExamOnly();
+                //await examGrid.Reload();
+                //await examListGrid.Reload();
+                //selectedExamList = null;
+                //selectedExamList = examList.Take(1).ToList();
+                UpdateDataAsync();
+                StateHasChanged();
+                await _Swal.FireAsync("Success", "A record was successfully deleted.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task EditSubjectRow(int id)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Would you like to edit selected subject?",
+                Icon = "question",
+                AllowOutsideClick = false,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("ExamSubjectId", id);
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true
+                };
+            var _modalStatus = Modal.Show<ExamSubjectEditModal>("Edit Exam Subject", parameters, options);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                exams = await service.GetAllExam(0);
+                //examGrid.Reset();
+                //selectedExamList = null;
+                //selectedExamList = examList.Take(1).ToList();
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task DeleteSubjectRow(ExamListView el)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                AllowOutsideClick = false,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HttpResponseMessage httRes = await service.DeleteExamSubject(el.ExamSubjectId);
+
+            if (httRes.IsSuccessStatusCode)
+            {
+                exams = await service.GetAllExam(0);
+                //await examGrid.Reload();
+                //selectedExamList = null;
+                //selectedExamList = examList.Take(1).ToList();
+                StateHasChanged();
+                await _Swal.FireAsync("Success", "A record was successfully deleted.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+}

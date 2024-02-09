@@ -1,0 +1,432 @@
+﻿@using HRMSv4.Client.Interface
+@using HRMSv4.Shared.HrMgmt;
+@page "/module-leavemanagement"
+@inject ILeaveDashboard service
+
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Leave Management
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <div class="d-inline-block dropdown">
+                <button type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                    <span class="btn-icon-wrapper pe-2 opacity-7">
+                        <i class="fa fa-business-time fa-w-20"></i>
+                    </span>
+                    Actions
+                </button>
+                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-leave">
+                                <i class="nav-link-icon fas fa-walking"></i>
+                                <span>Leave</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-leaveapplication">
+                                <i class="nav-link-icon far fa-clipboard"></i>
+                                <span> Application</span>
+
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-leavecredit">
+                                <i class="nav-link-icon ion-android-checkmark-circle"></i>
+                                <span> Credits</span>
+
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/module-leavemonetization">
+                                <i class="nav-link-icon fas fa-money-bill"></i>
+                                <span> Monetization</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-sm-12">
+        <div class="row">
+            <div class="col-md-6 col-xl-3">
+                <div class="card mb-3 widget-content bg-night-fade">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Sick</div>
+                            <div class="widget-subheading">Leave</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white">
+                                <span>@count.SlCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card mb-3 widget-content bg-arielle-smile">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Vacation</div>
+                            <div class="widget-subheading">Leave</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white">
+                                <span>@count.VlCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card mb-3 widget-content bg-happy-green">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Forced</div>
+                            <div class="widget-subheading">Leave</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white">
+                                <span>@count.FlCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card mb-3 widget-content bg-love-kiss">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Other</div>
+                            <div class="widget-subheading">Leaves</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white">
+                                <span>@count.OthersCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Approvals
+                        <div class="btn-actions-pane-right">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th class="text-center">Leave Type</th>
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Days</th>
+                                    @*<th class="text-center">Actions</th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (requests.Count() > 0)
+                                {
+                                    foreach (var item in requests)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(item.Image))
+                                                {
+                                                    if (item.Image == "default-avatar-grey.png")
+                                                    {
+
+                                                        <div class="widget-content p-0">
+                                                            <div class="widget-content-wrapper">
+                                                                <div class="widget-content-left me-3">
+                                                                    <div class="widget-content-left">
+                                                                        <img width="40" class="rounded-circle"
+                                                             src="/images/avatars/default-avatar-grey.png" alt="">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="widget-content-left flex2">
+                                                                    <div class="widget-heading">@item.FullName</div>
+                                                                    <div class="widget-subheading opacity-7">@item.Position</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="widget-content p-0">
+                                                            <div class="widget-content-wrapper">
+                                                                <div class="widget-content-left me-3">
+                                                                    <div class="widget-content-left">
+                                                                        <img width="40" class="rounded-circle"
+                                                             src="Uploads/Employees/Avatar/@item.Image" alt="">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="widget-content-left flex2">
+                                                                    <div class="widget-heading">@item.FullName</div>
+                                                                    <div class="widget-subheading opacity-7">@item.Position</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <div class="widget-content p-0">
+                                                        <div class="widget-content-wrapper">
+                                                            <div class="widget-content-left me-3">
+                                                                <div class="widget-content-left">
+                                                                    <img width="40" class="rounded-circle"
+                                                             src="/images/avatars/default-avatar-grey.png" alt="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="widget-content-left flex2">
+                                                                <div class="widget-heading">@item.FullName</div>
+                                                                <div class="widget-subheading opacity-7">@item.Position</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                            </td>
+                                            <td class="text-center">@item.LeaveTypeName</td>
+                                            <td class="text-center">
+                                                @if (item.Days > 1)
+                                                {
+                                                    @*@item.StartDate.ToString("dddd dd MMMM yyyy") +"-"+ @item.EndDate.ToString("dddd dd MMMM yyyy");*@
+
+                                                }
+                                                else
+                                                {
+                                                    @item.StartDate.ToString("dddd dd MMMM yyyy")
+                                                }
+
+                                            </td>
+                                            <td class="text-center" style="width: 150px;">
+                                                @item.Days
+                                            </td>
+                                          @*  <td class="text-center">
+                                                <div class="widget-content-right widget-content-actions">
+                                                    <button class="border-0 btn-transition btn btn-outline-success">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+                                                    <button class="border-0 btn-transition btn btn-outline-danger">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </td>*@
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No records.</div>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-block text-center card-footer">
+                        <a href="/module-leave" class="btn-wide btn btn-info">See All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <h5 class="card-title">Charts of Exams</h5>
+                        <Chart Config="barConfig" @ref="_barChart"></Chart>
+
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    </div>
+    <div class="col-lg-4 col-sm-12">
+        <div class="card-shadow-primary card-border mb-3 card" style="height: 71.7vh; overflow-x:hidden; overflow-y:auto">
+            <div class="p-3">
+                <h3 class="text-uppercase widget-heading">The Next 7 days</h3>
+                @if (sevendays.Count() > 0)
+                {
+                    @foreach (var item in sevendays)
+                    {
+                        <h6 class="text-muted text-uppercase font-size-md opacity-5 fw-normal mt-4">@item.Date</h6>
+                        @if (item.IsHoliday)
+                        {
+                            <div class="text-center">
+
+                                @foreach (var hldy in item.HolidayName)
+                                {
+                                    <div class="badge bg-warning ms-2">@hldy</div>
+                                }
+
+                            </div>
+                        }
+                        else
+                        {
+                            @if (item.Employees.Count() > 0)
+                            {
+                                @foreach (var emp in item.Employees)
+                                {
+                                    <ul class="rm-list-borders list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <div class="widget-content p-0">
+                                                <div class="widget-content-wrapper">
+
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">@emp.Fullname</div>
+                                                        @* <div class="widget-subheading">Web Developer</div>*@
+                                                    </div>
+                                                    <div class="widget-content-right">
+                                                        <div class="text-muted">
+                                                            @emp.LeaveType
+                                                            <small class="text-info ps-2">
+                                                                <i class="fa fa-dot-circle "></i>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center">
+                                    <div class="badge bg-success ms-2">Everyone is in</div>
+                                </div>
+                            }
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    private BarChartConfig barConfig;
+    private Chart _barChart;
+
+    List<LeaveApplicationView> requests = new List<LeaveApplicationView>();
+    List<DashboardNextSevenDays> sevendays = new List<DashboardNextSevenDays>();
+    DashboardLeaveCount count = new DashboardLeaveCount();
+
+    protected override async Task OnInitializedAsync()
+    {
+        requests = await service.GetLatestRequests();
+        count = await service.GetCount();
+        sevendays = await service.GetNextSevenDays();
+        //LoadBarChart();
+
+        StateHasChanged();
+    }
+
+    private async void LoadBarChart()
+    {
+        barConfig = new BarChartConfig()
+            {
+                Options = new Options()
+                {
+                    Plugins = new Plugins()
+                    {
+                        Legend = new Legend()
+                        {
+                            Align = LegendAlign.Center,
+                            Display = true,
+                            Position = PSC.Blazor.Components.Chartjs.Enums.LegendPosition.Right
+                        }
+                    },
+                    Scales = new Scales()
+                    {
+                        X = new XAxes()
+                        {
+                            Stacked = false,
+                            Ticks = new Ticks()
+                            {
+                                MaxRotation = 0,
+                                MinRotation = 0
+                            }
+                        },
+                        Y = new YAxes()
+                        {
+                            Stacked = false,
+                        }
+                    },
+                    IndexAxis = "x",
+                    Responsive = true,
+                    MaintainAspectRatio = false
+                }
+            };
+
+        barConfig.Data.Labels.Add("January");
+        barConfig.Data.Labels.Add("February");
+        barConfig.Data.Labels.Add("March");
+        barConfig.Data.Labels.Add("April");
+        barConfig.Data.Labels.Add("May");
+        barConfig.Data.Labels.Add("June");
+
+        List<string> color1 = new List<string>();
+        color1.Add("rgba(2,144,139)");
+
+
+        List<decimal> test = new List<decimal>();
+        test.Add(1);
+        test.Add(2);
+        test.Add(3);
+        test.Add(4);
+        test.Add(5);
+        test.Add(6);
+
+        List<decimal> test2 = new List<decimal>();
+        test2.Add(6);
+        test2.Add(5);
+        test2.Add(4);
+        test2.Add(3);
+        test2.Add(2);
+        test2.Add(1);
+
+        barConfig.Data.Datasets.Add(new BarDataset()
+            {
+                Label = "SL",
+                Data = test,
+                BackgroundColor = color1,
+                BorderColor = color1,
+                BorderWidth = 1
+            }
+        );
+
+        List<string> color2 = new List<string>();
+        color2.Add("rgb(0,96,118)");
+
+        barConfig.Data.Datasets.Add(new BarDataset()
+            {
+                Label = "VL",
+                Data = test2,
+                BackgroundColor = color2,
+                BorderColor = color2,
+                BorderWidth = 1
+            });
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,179 @@
+﻿@using HRMSv4.Client.Shared.Modals.EmployeeModals
+@inject IEmpServiceRecords _serviceRecords
+@inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@using DevExpress.Blazor
+
+<BusyIndicator Message="Please wait while loading data..." Data="_empServiceRecord">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="col-12 mt-2">
+                        <h5 class="card-header-text float-start">Service Record</h5>
+
+                        @if (role == "Administrator" || role == "Job Provider")
+                        {
+                            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@PrintServiceRecord" style="margin-bottom: 10px; width:200px"> Print </button>
+
+                        }
+                        
+                    </div>
+                </div>
+                <div class="card-block">
+                    <div class="col-sm-12 col-xl-12 col-md-12 p-2">
+                        <div class="card">
+                            <DxGrid @ref="MyGrid"
+                                    Data="@_empServiceRecord"
+                                    ShowFilterRow="true"
+                                    KeyFieldName="ServiceRecordId"
+                                    PagerVisible="true"
+                                    PageSize="10"
+                                    CustomizeCellDisplayText="Grid_CustomizeCellDisplayText">
+
+                                <Columns>
+                                    <DxGridDataColumn AllowSort="true" FieldName="PositionName" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="DateStartDt" Caption="Date Start" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="DateEndDt" Caption="Date End" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="Movement" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="Step" Width="5%" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="RateType" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="MotherUnit" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="OfficeAssignment" />
+                                    <DxGridDataColumn AllowSort="true" FieldName="Remarks" />
+
+                                </Columns>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</BusyIndicator>
+
+@code {
+    [Parameter]
+    public int employeeId { get; set; }
+
+    [Parameter]
+    public bool isLoaded { get; set; }
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    //RadzenDataGrid<ServiceRecordListView> _serviceGrid;
+    IEnumerable<ServiceRecordListView> _empServiceRecord;
+    string formNo = "1";
+    string role = "";
+    string userId = "";
+    object ServiceRecords { get; set; }
+    GridDevExtremeDataSource<ServiceRecordListView> gridDevExtremeDataSource;
+
+    IGrid? MyGrid { get; set; }
+
+    DateTime defaultDate = new DateTime(1900, 01, 01);
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _empServiceRecord = null;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    void Grid_CustomizeCellDisplayText(GridCustomizeCellDisplayTextEventArgs e)
+    {
+        if (e.FieldName == "DateEndDt")
+        {
+            DateTime selectedDate = new DateTime();
+            selectedDate = DateTime.Parse(e.Value.ToString());
+
+            if (selectedDate.Date == DateTime.Today.Date)
+            {
+                e.DisplayText = "up to date";
+            }
+
+
+        }
+    }
+
+
+    async Task UpdateDataAsync()
+    {
+        _empServiceRecord = await _serviceRecords.GetServiceRecords(employeeId);
+
+        //var tempList = _empServiceRecord.ToList().AsQueryable();
+
+        //gridDevExtremeDataSource = new GridDevExtremeDataSource<ServiceRecordListView>(tempList);
+        //gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        //{
+        //    loadOptions.PrimaryKey = new[] { "ServiceRecordId" };
+        //    loadOptions.PaginateViaPrimaryKey = true;
+
+        //};
+
+        //ServiceRecords = gridDevExtremeDataSource;
+
+        foreach (var item in _empServiceRecord)
+        {
+            var targetDate = DateTime.Parse(item.DateEnd);
+            var defaultDate = DateTime.Parse("01/01/1900");
+            bool res = DateTime.Compare(targetDate.Date, defaultDate.Date) == 0;
+            if (res)
+            {
+                item.DateEnd = "-";
+                StateHasChanged();
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    if (employeeId > 0)
+    //    {
+    //        await Task.Delay(1000); // simulate loading
+    //        _empServiceRecord = await _serviceRecords.GetServiceRecords(employeeId);
+    //        foreach (var item in _empServiceRecord)
+    //        {
+    //            var targetDate = DateTime.Parse(item.DateEnd);
+    //            var defaultDate = DateTime.Parse("01/01/1900");
+    //            bool res = DateTime.Compare(targetDate, defaultDate) == 0;
+    //            if (res)
+    //            {
+    //                item.DateEnd = "-";
+    //                StateHasChanged();
+    //            }
+    //        }
+    //        StateHasChanged();
+    //    }
+    //}
+
+    async Task PrintServiceRecord()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(ServiceRecordPrintModal.employeeId), employeeId);
+
+        var formModal = employeeId > 0 ? Modal.Show<ServiceRecordPrintModal>("Print Service Record ", parameters, options) : null;
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false)
+        {
+
+
+        }
+    }
+}

@@ -1,0 +1,482 @@
+﻿@page "/tk-employeeschedules"
+@using DevExpress.Blazor
+@using HRMSv4.Client.Shared.Modals.TimeKeeping.Schedule
+@using HRMSv4.Shared.Timekeeping
+@using System.Reflection
+@using System.Globalization
+@inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ILevelOrganization levelService
+@inject IRateType rtService
+@inject ISchedule service
+@inject SweetAlertService Swal;
+
+<style>
+    .input-group-text {
+        display: flex;
+        align-items: center;
+        padding: unset !important;
+        font-size: 0.88rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        text-align: center;
+        white-space: nowrap;
+        background-color: unset !important;
+        border: unset !important;
+        /* background-color: #eff9ff; */
+        /* border: 1px solid #ced4da; */
+        border-radius: 0.25rem;
+        margin: unset !important;
+    }
+
+    .customTextBox .dxbs-btn-group {
+        top: 0px;
+    }
+
+</style>
+
+@if (HideActions)
+{
+    <HRMSv4.Client.Shared.MainComponents.Fab OnClick="ClickHandler" ScheduleMode="true"></HRMSv4.Client.Shared.MainComponents.Fab>
+}
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Employee Schedules
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <div class="d-inline-block dropdown">
+                <button type="button" data-bs-toggle="dropdown" aria-haspopup="true" style="font-size:0.91rem;"
+                        aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                    <span class="btn-icon-wrapper pe-2 opacity-7">
+                        <i class="fa fa-business-time fa-w-20"></i>
+                    </span>
+                    Actions
+                </button>
+                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/tk-weeklyscheduletemplate">
+                                <i class="nav-link-icon pe-7s-note2"></i>
+                                <span>Weekly Schedule Template</span>
+                            </a>
+                        </li>
+                        @*<li class="nav-item">
+                        <a class="nav-link" href="">
+                        <i class="nav-link-icon pe-7s-id"></i>
+                        <span>Monthly Schedule</span>
+                        </a>
+                        </li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="mb-3 col-xl-4 col-sm-12">
+                        <label>Organization Level</label>
+                        @*<button onclick="@GetOrgLevelModal" class="btn btn-light"><i class="fa fa-search"></i></button>*@
+                        @*<DxTextBox @bind-Text="@orgLevelname" SizeMode="SizeMode.Medium"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        BindValueMode="BindValueMode.OnInput"
+                        NullText="Select organizational level.."
+                        ReadOnly="true"
+                        CssClass="cw-320 w-100 customTextBox" />*@
+                        <DxComboBox Data="orgLevelList" NullText="Select level organization"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    ValueChanged="(string _) => GetOrgLevelModal(_)"
+                                    CssClass="cw-480" SizeMode="SizeMode.Medium"
+                                    Value="orgLevelname" />
+                        @*<input @bind-value="@orgLevelname" placeholder="Search organization level..." type="text" class="form-control" disabled>*@
+                    </div>
+                    <div class="mb-3 col-xl-4 col-sm-12">
+                        <label class="" for="exampleEmail55">Rate Type</label>
+                        <DxComboBox Data="@rates"
+                                    TextFieldName="@nameof(RateType.RateTypeName)"
+                                    ValueChanged="@((RateType rateType) => SelectedRateTypeChanged(rateType))"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    CssClass="cw-480" SizeMode="SizeMode.Medium" 
+                                    Value="selectedRate" />
+                    </div>
+                    <div class="mb-3 col-xl-4 col-sm-12" hidden="true">
+                        <label class="" for="exampleEmail55">Date</label>
+                        <div class="row">
+                            <DxDateEdit PickerDisplayMode="DatePickerDisplayMode.ScrollPicker" Date="dt"
+                                        ScrollPickerFormat="MMMM yyyy" DisplayFormat="MMMM yyyy" SizeMode="SizeMode.Medium"
+                                        DateChanged="@((DateTime dtTemp) => OnDateChanged(dtTemp))"></DxDateEdit>
+
+                        </div>
+                    </div>
+                    <div class=" mb-3 col" align="right">
+                        <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" style="margin-bottom: 10px; width:200px" onclick="@Print"> Print</button>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <DxGrid Data="@schedList"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            KeyFieldName="EmployeeId"
+                            AllowSelectRowByClick="true"
+                            PageSize="50" PagerPosition="GridPagerPosition.TopAndBottom"
+                            PagerVisibleNumericButtonCount="50"
+                            ShowGroupPanel="true"
+                            AutoExpandAllGroupRows="true"
+                            ShowFilterRow="true"
+                            @bind-SelectedDataItems="@SelectedEmployees">
+                        <Columns>
+                            <DxGridDataColumn FieldName="OrgLevelName" GroupIndex="0" />
+                            <DxGridDataColumn FieldName="EmployeeNumber" Width="100px" />
+                            <DxGridDataColumn FieldName="Fullname" />
+                            <DxGridDataColumn FieldName="EmploymentStatusName" />
+                            <DxGridDataColumn FieldName="PositionName" />
+                            <DxGridDataColumn FieldName="ScheduleType" TextAlignment="GridTextAlignment.Center" Width="15%">
+                                <CellDisplayTemplate>
+                                    @if ((int)context.Value == 1)
+                                    {
+                                        <div class="mb-2 me-2 badge bg-info">Default</div>
+                                    }
+                                    else if ((int)context.Value == 2)
+                                    {
+                                        <div class="mb-2 me-2 badge bg-success">No Schedule</div>
+                                    }
+                                    else if ((int)context.Value == 3)
+                                    {
+                                        <div class="mb-2 me-2 badge bg-warning">Custom</div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                        </Columns>
+                    </DxGrid>
+
+                    @*  <DxGrid Data="@schedList">
+                    <Columns>
+                    @foreach(var item in schedList.col)
+                    </Columns>
+                    </DxGrid>*@
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    List<ScheduleListView> schedList = new List<ScheduleListView>();
+    List<RateType> rates = new List<RateType>();
+    IReadOnlyList<object> SelectedEmployees { get; set; }
+    //List<ScheduleListView> SelectedEmployees = new List<ScheduleListView>();
+    bool HideActions = true;
+    string? orgLevelname = null;
+    int selectedOrgLevel { get; set; }
+    int selectedRateType { get; set; } = 0;
+    DateTime defaultNewDate = DateTime.Parse("1900-01-01 00:00:00");
+    DateTime dt { get; set; } = DateTime.Now;
+    string userId { get; set; }
+    List<string> orgLevelList = new();
+    List<ScheduleListView> schedViewList = new();
+    RateType? selectedRate = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        var r = await rtService.Get(true);
+        rates = r.ToList();
+        OnDateChanged(DateTime.Now);
+        schedList = await service.GetEmployeeSchedule(0, 0, dt);
+        schedViewList = schedList;
+        schedList.ForEach(a => orgLevelList.Add(a.OrgLevelName));
+        orgLevelList = orgLevelList.OrderBy(a=>a).Distinct().ToList();
+    }
+
+    async Task Print()
+    {
+        string selectedOrg = "";
+        if (orgLevelname == null)
+        {
+            selectedOrg = "0";
+        }
+        else
+        {
+            selectedOrg = orgLevelname;
+        }
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                //Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true,
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(PrintScheduleModal.lvl), selectedOrg);
+        var _modalStatus = Modal.Show<PrintScheduleModal>("Print Schedule", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        ReportSchedule result = new ReportSchedule();
+        result = modalResult.Data != null ? modalResult.Data as ReportSchedule : null;
+        string selectedDate = modalResult.Data.ToString();
+        if (!modalResult.Cancelled)
+        {
+            var psgcCode = await localStorage.GetItemAsync<string>("AdminPsgcCode");
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            string username = "";
+            username = user.FindFirst(c => c.Type.Contains("givenname"))?.Value;
+            string org = selectedOrg.Replace(",", "");
+            string mon = result.SelectedDate.Month.ToString();
+            string yr = result.SelectedDate.Year.ToString();
+
+            string psgcAndUser = string.Format("{0};{1}", psgcCode, username);
+            string arrayOfParemeters = string.Format("{0}${1}${2}${3}", org, mon, yr, psgcAndUser);
+            string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+            string url = $"/viewer/{"EmployeeSchedules"}/{_encryptedParameter}";
+            await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+        }
+    }
+    async Task GetOrgLevelModal(string orgLvl)
+    {
+        if(orgLvl == null)
+        {
+            schedList = await service.GetEmployeeSchedule(0, 0, dt);
+            schedList.ForEach(a => orgLevelList.Add(a.OrgLevelName));
+            orgLevelList = orgLevelList.OrderBy(a => a).Distinct().ToList();
+            orgLevelname = null; 
+        }
+        else
+        {
+            orgLevelname = orgLvl;
+            schedList = schedViewList.Where(_ => _.OrgLevelName == orgLvl).ToList();
+
+            StateHasChanged();
+        }
+
+
+        //var parameters = new ModalParameters();
+        //parameters.Add(nameof(SharedLevelOrganization.IsPlantilla), true);
+
+        //var options = new ModalOptions()
+        //    {
+        //        DisableBackgroundCancel = true,
+        //        Animation = ModalAnimation.FadeIn(0.2),
+        //        ContentScrollable = true,
+        //    };
+
+        //var moviesModal = Modal.Show<SharedLevelOrganization>("Organization Level", parameters, options);
+        //var result = await moviesModal.Result;
+
+        //if (!result.Cancelled)
+        //{
+        //    selectedOrgLevel = result.Data != null ? int.Parse(result.Data.ToString()) : 0;
+
+        //    var getLevel = await levelService.Get(selectedOrgLevel);
+        //    orgLevelname = getLevel.Name;
+        //    schedList = await service.GetEmployeeSchedule(selectedOrgLevel, selectedRateType, defaultNewDate);
+
+        //    StateHasChanged();
+        //}
+
+    }
+
+    async void SelectedRateTypeChanged(RateType rt)
+    {
+        if (rt == null)
+        {
+            selectedRate = null;
+            selectedRateType = 0;
+            schedList = await service.GetEmployeeSchedule(selectedOrgLevel, selectedRateType, defaultNewDate);
+        }
+        else
+        {
+            selectedRate = rt;
+            selectedRateType = rt.RateTypeId;
+            schedList = await service.GetEmployeeSchedule(selectedOrgLevel, selectedRateType, defaultNewDate);
+        }
+
+        StateHasChanged();
+    }
+
+    async void OnDateChanged(DateTime dtTemp)
+    {
+        dt = dtTemp;
+        schedList = await service.GetEmployeeSchedule(selectedOrgLevel, selectedRateType, dtTemp);
+        StateHasChanged();
+    }
+
+    private RenderFragment BuildColumnsGrid()
+    {
+        PropertyInfo[] props = schedList.FirstOrDefault().GetType().GetProperties();
+        RenderFragment columns = b =>
+        {
+            foreach (var prop in props)
+            {
+                if (prop.PropertyType == typeof(string))
+                {
+                    b.OpenComponent(0, typeof(DxGridDataColumn));
+                    b.AddAttribute(0, "FieldName", prop.Name);
+                    b.CloseComponent();
+                }
+            }
+        };
+        return columns;
+    }
+
+    async Task ClickHandler(string action)
+    {
+        try
+        {
+            List<ScheduleListView> emps = new List<ScheduleListView>();
+            //emps = (List<ScheduleListView>)SelectedEmployees;
+
+            if (SelectedEmployees == null)
+            {
+                await Swal.FireAsync("Oops!", "Select employee.", "warning");
+                return;
+            }
+            else
+            {
+                emps = SelectedEmployees.Cast<ScheduleListView>().ToList();
+            }
+
+            if (action == "Generate")
+            {
+                var options = new ModalOptions()
+                    {
+                        DisableBackgroundCancel = true,
+                        ContentScrollable = false,
+                    };
+                var parameters = new ModalParameters();
+                parameters.Add(nameof(GenerateScheduleModal.selectedEmployee), emps);
+                parameters.Add(nameof(GenerateScheduleModal.selectedDate), dt);
+                var _modalStatus = Modal.Show<GenerateScheduleModal>("Generate Schedule", parameters, options);
+                var modalResult = await _modalStatus.Result;
+                if (modalResult.Cancelled == false)
+                {
+                    //weekList = new List<WeeklyScheduleDay>();
+                    //weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+                    var getLevel = await levelService.Get(selectedOrgLevel);
+                    schedList = await service.GetEmployeeSchedule(selectedOrgLevel, 0, dt);
+                    this.StateHasChanged();
+                }
+            }
+
+            if (action == "Manage")
+            {
+                SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Are you sure?",
+                        Text = "You are about to customize the schedule.",
+                        Icon = "warning",
+                        ShowCancelButton = true,
+                        ConfirmButtonText = "Yes, I am sure!",
+                        CancelButtonText = "Cancel",
+                        CancelButtonColor = "#dc3741"
+
+                    });
+                if (!string.IsNullOrEmpty(result.Value))
+                {
+
+                    var options = new ModalOptions()
+                        {
+                            DisableBackgroundCancel = true,
+                            ContentScrollable = false,
+                        };
+                    var parameters = new ModalParameters();
+                    parameters.Add(nameof(ManageScheduleModal.selectedEmployeeFromList), emps);
+                    parameters.Add(nameof(ManageScheduleModal.selectedDate), dt);
+                    var _modalStatus = Modal.Show<ManageScheduleModal>("Manage Schedule", parameters, options);
+                    var modalResult = await _modalStatus.Result;
+                    if (modalResult.Cancelled == false)
+                    {
+                        //weekList = new List<WeeklyScheduleDay>();
+                        //weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+                        var getLevel = await levelService.Get(selectedOrgLevel);
+                        schedList = await service.GetEmployeeSchedule(selectedOrgLevel, 0, dt);
+                        this.StateHasChanged();
+                    }
+
+                }
+            }
+
+            if (action == "Details")
+            {
+                var options = new ModalOptions()
+                    {
+                        DisableBackgroundCancel = true,
+                        ContentScrollable = false,
+                    };
+                var parameters = new ModalParameters();
+                parameters.Add(nameof(ScheduleDetailModal.selectedEmployee), emps);
+                parameters.Add(nameof(ScheduleDetailModal.selectedDate), dt);
+                string title = "Schedule for " + CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(dt.Month) + " " + dt.Year.ToString();
+
+                var _modalStatus = Modal.Show<ScheduleDetailModal>(title, parameters, options);
+                var modalResult = await _modalStatus.Result;
+                if (modalResult.Cancelled == false)
+                {
+                    //weekList = new List<WeeklyScheduleDay>();
+                    //weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+                    var getLevel = await levelService.Get(selectedOrgLevel);
+                    schedList = await service.GetEmployeeSchedule(selectedOrgLevel, 0, dt);
+                    this.StateHasChanged();
+                }
+            }
+
+            if (action == "Clear")
+            {
+
+                string date = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(dt.Month) + " " + dt.Year.ToString();
+                SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Are you sure?",
+                        Text = "Default scheduled employees are not included in this operation. Do you really want to clear schedules?",
+                        Icon = "warning",
+                        ShowCancelButton = true,
+                        ConfirmButtonText = "Yes, I am sure!",
+                        CancelButtonText = "Cancel",
+                        CancelButtonColor = "#dc3741"
+
+                    });
+
+                if (!string.IsNullOrEmpty(result.Value))
+                {
+                    ///show loading
+                    ScheduleDetailModel md = new ScheduleDetailModel
+                        {
+                            SelectedEmployees = emps,
+                            MonthYear = dt,
+                            UserId = userId
+                        };
+
+
+                    var res = await service.ClearSchedule(md);
+
+                    if (res.StatusCode == 200)
+                    {
+                        await _Swal.FireAsync("Success", res.Value, "success");
+                        schedList = await service.GetEmployeeSchedule(selectedOrgLevel, 0, dt);
+                        StateHasChanged();
+                    }
+                    else
+                    {
+                        await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+}

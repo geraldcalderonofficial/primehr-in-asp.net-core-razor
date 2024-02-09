@@ -1,0 +1,74 @@
+﻿@page "/register-success/{email}"
+<a href="/" style="cursor: pointer;"><div class="app-logo-inverse mx-auto mb-1" style="height:52px!important; width:200px !important"></div></a>
+<div class="modal-dialog w-100 mx-auto">
+    <div class="modal-content" style="padding: 35px;">
+        <div class="modal-body">
+            <div class="h5 modal-title text-center">
+                <div class="swal2-icon swal2-success swal2-animate-success-icon">
+                    <div class="swal2-success-circular-line-left" style="background-color: rgb(255, 255, 255);"></div>
+                    <span class="swal2-success-line-tip"></span>
+                    <span class="swal2-success-line-long"></span>
+                    <div class="swal2-success-ring"></div>
+                    <div class="swal2-success-fix" style="background-color: rgb(255, 255, 255);"></div>
+                    <div class="swal2-success-circular-line-right" style="background-color: rgb(255, 255, 255);"></div>
+                </div>
+                <h4 class="mt-2">
+                    <div>Registration success</div>
+                    <span class="widget-subtitle text-success">You registration is successful.</span>
+                </h4>
+            </div>
+        </div>
+        <div>
+            <p>Thank you. We have send you email to <strong>@email</strong>. Please click the link in that messsage to activate your account.</p>
+        </div>
+
+        <div class="divider"></div>
+        <h6 class="mb-0 text-center">
+            <a href="/login" class="text-primary">Go Login Page</a>
+        </h6>
+    </div>
+</div>
+<div class="text-center">
+    Copyright ©2022 Nspire, <a href="https://www.primehr.ph">PrimeHR v4</a> ®
+    @{
+        Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        <b>Build : @string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)</b>
+    }
+</div>
+
+@*<div class="app-container app-theme-white body-tabs-shadow" style="padding:0 !important;">
+    <div class="app-container">
+    <div class="bg-plum-plate bg-animation">
+    <div class="d-flex justify-content-center align-items-center">
+    <div class="mx-auto app-login-box col-md-8">
+    <div class="app-logo-inverse mx-auto mb-3"></div>
+    <div class="modal-dialog w-100 mx-auto">
+    <div class="modal-content">
+    <div class="modal-body">
+    <div class="h5 modal-title text-center">
+    <h1 class="text-success font-30 font-bold">Congratulations</h1>
+    <span>REGISTRATION SUCCES</span>
+    </div>
+    <div>
+    <p>Thank you. We have send you email to <strong>@email</strong>. Please click the link in that messsage to activate your account.</p>
+    </div>
+    <div class="divider"></div>
+    <h6 class="mb-0 text-center">
+    <a href="/" class="btn btn-primary mrg-top-20" style="color:white">Go To Home Page</a>
+    </h6>
+    </div>
+    <div class="modal-footer clearfix">
+    </div>
+    </div>
+    </div>
+    <div class="text-center text-white opacity-8 mt-3">Copyright © HRMS PRIME 2022</div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>*@
+
+@code {
+    [Parameter]
+    public string? email { get; set; }
+}

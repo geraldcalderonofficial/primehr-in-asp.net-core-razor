@@ -1,0 +1,172 @@
+﻿@inject IRecruitmentPlan service
+@inject IDisability disabilityService
+@using DevExpress.Blazor
+@using HRMSv4.Shared.Masterdata
+
+<BusyIndicator Message="Please wait while loading data..." Data="tvpList">
+    @* <div class="tab-pane" id="tab-animated-1" role="tabpanel">*@
+    @*<h1>asd</h1>*@
+    <DxGrid Data="tvpList" @ref="MyGrid"
+            KeyFieldName="TargetVacantPositionId"
+            ValidationEnabled="false"
+            PopupEditFormCssClass="pw-800"
+            EditMode="GridEditMode.EditRow"
+            EditModelSaving="Grid_EditModelSaving">
+        <Columns>
+            <DxGridDataColumn FieldName="OrganizationLevel" />
+            <DxGridDataColumn FieldName="Position" />
+            <DxGridDataColumn FieldName="TargetPublicationDate">
+                <CellEditTemplate>
+                    @{
+                        var record = (TargetVacantPositionListView)context.EditModel;
+                    }
+                    <DxDateEdit @bind-Date="@record.TargetPublicationDate"></DxDateEdit>
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="TargetOnboardDate">
+                <CellEditTemplate>
+                    @{
+                        var record = (TargetVacantPositionListView)context.EditModel;
+                    }
+                    <DxDateEdit @bind-Date="@record.TargetOnboardDate"></DxDateEdit>
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="RecruitmentBudget">
+                <CellEditTemplate>
+                    @{
+                        var record = (TargetVacantPositionListView)context.EditModel;
+                    }
+                    <DxMaskedInput @bind-Value="@record.RecruitmentBudget"
+                                   CssClass="cw-320"
+                                   Mask="n2"/>
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Disability" Caption="Disability">
+                <CellEditTemplate>
+                    @{
+                        var record = (TargetVacantPositionListView)context.EditModel;
+                    }
+                    <DxComboBox Data="@disabilities"
+                                ListRenderMode="ListRenderMode.Virtual"
+                                FilteringMode="DataGridFilteringMode.Contains"
+                                TextFieldName="@nameof(Disability.DisabilityName)"
+                                ValueFieldName="@nameof(Disability.DisabilityId)"
+                                @bind-Value="@record.ApplicantDisabilityId"
+                                CssClass="cw-480" />
+                    
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as TargetVacantPositionListView);
+                    }
+                    <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(temp))">
+                        <i class="lnr-pencil"></i>
+                    </button>
+                </CellDisplayTemplate>
+                <CellEditTemplate>
+                    <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                        <i class="lnr-checkmark-circle"></i>
+                    </button>
+                    <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                        <i class="lnr-cross"></i>
+                    </button>
+                </CellEditTemplate>
+            </DxGridDataColumn>
+        </Columns>
+    </DxGrid>
+    @*</div>*@
+</BusyIndicator>
+@code {
+    [Parameter]
+    public string id { get; set; } //recruitmentplanId
+    IGrid? MyGrid { get; set; }
+    int recruitmentPlanId { get; set; }
+    IEnumerable<Disability> disabilities;
+    List<TargetVacantPositionListView> tvpList = new List<TargetVacantPositionListView>();
+    string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        string DecodedUrl = string.Empty;
+        string paramId = _crypto.ConvertHexToString(id, System.Text.Encoding.Unicode);
+
+        recruitmentPlanId = int.Parse(paramId);
+
+        var a = await disabilityService.GetAll();
+
+        List<Disability> disList = new List<Disability>();
+
+        disList.Add(new Disability
+            {
+                DisabilityId = 0,
+                DisabilityName = "None"
+            });
+
+        disList.AddRange(a.ToList());
+
+        disabilities = disList;
+
+        if (!string.IsNullOrWhiteSpace(paramId))
+        {
+
+            //tvpList = await service.GetTargets(recruitmentPlanId);
+
+
+            //if (tvpList.Count() == 0)
+            //{
+                TargetCreateModel tcm = new TargetCreateModel
+                    {
+                        RecruitmentPlanId = recruitmentPlanId,
+                        UserId = userId
+                    };
+                var res = await service.CreateTargets(tcm);
+                if (res.StatusCode == 200)
+                {
+                    tvpList = await service.GetTargets(recruitmentPlanId);
+                }
+                else
+                {
+                    await _Swal.FireAsync("Oops...", "Something went wrong.", "error");
+                }
+            //}
+
+            StateHasChanged();
+        }
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var boom = e.EditModel as TargetVacantPositionListView;
+        boom.UpdatedBy = userId;
+       
+        var res = await service.UpdateTarget(boom);
+        if (res.StatusCode == 200)
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Success",
+                    Text = res.Value,
+                    Icon = "success",
+                    CancelButtonColor = "#414141",
+                    ShowCancelButton = false,
+                    ConfirmButtonText = "Ok",
+                });
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", res.Value, "error");
+        }
+        
+    }
+
+    async Task UpdateDataAsync()
+    {
+        tvpList = await service.GetTargets(recruitmentPlanId);
+    }
+}

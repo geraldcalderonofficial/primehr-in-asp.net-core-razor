@@ -1,0 +1,68 @@
+﻿@page "/timekeeping-schedule"
+@using DevExpress.Blazor
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Schedule Management
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <div class="d-inline-block dropdown">
+                <button type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                    <span class="btn-icon-wrapper pe-2 opacity-7">
+                        <i class="fa fa-business-time fa-w-20"></i>
+                    </span>
+                    Actions
+                </button>
+                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/tk-weeklyscheduletemplate">
+                                <i class="nav-link-icon pe-7s-note2"></i>
+                                <span>Weekly Schedule Template</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">
+                                <i class="nav-link-icon pe-7s-id"></i>
+                                <span>Monthly Schedule</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-2">
+    <div class="card-body">
+        <DxScheduler StartDate="@DateTime.Today"
+                     DataStorage="@DataStorage"
+                     CssClass="w-100" ActiveViewType="SchedulerViewType.Month">
+            <DxSchedulerMonthView MonthCount="1" ShowWorkDaysOnly="false" CellMinWidth="120"></DxSchedulerMonthView>
+        </DxScheduler>
+    </div>
+</div>
+
+@code {
+    DxSchedulerDataStorage DataStorage = new DxSchedulerDataStorage()
+        {
+            //AppointmentsSource = RecurringAppointmentCollection.GetAppointments(),
+            AppointmentMappings = new DxSchedulerAppointmentMappings()
+            {
+                Type = "AppointmentType",
+                Start = "StartDate",
+                End = "EndDate",
+                Subject = "Caption",
+                AllDay = "AllDay",
+                Location = "Location",
+                Description = "Description",
+                LabelId = "Label",
+                StatusId = "Status",
+                RecurrenceInfo = "Recurrence"
+            }
+        };
+}

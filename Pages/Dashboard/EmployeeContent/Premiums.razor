@@ -1,0 +1,83 @@
+﻿@using HRMSv4.Shared.Payroll;
+@inject IEmpPremium service
+@using DevExpress.Blazor
+
+<BusyIndicator Message="Please wait while loading data..." Data="empPremiums">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="col-12 mt-2">
+                        <h5 class="row card-header-text float-start">Schedule Logs</h5>
+                       @* <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@PrintServiceRecord" style="margin-bottom: 10px; width:200px"> Print </button>*@
+                    </div>
+                </div>
+                <div class="card-block">
+                    <div class="col-sm-12 col-xl-12 col-md-12 p-2">
+                        <div class="card">
+                            <DxGrid Data="@EmployeePremiums" PageSize="10"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    PagerVisibleNumericButtonCount="10">
+
+                                <Columns>
+                                    <DxGridDataColumn FieldName="PremiumType" TextAlignment="GridTextAlignment.Left" Width="250px" />
+                                    <DxGridDataColumn FieldName="PersonalAmount" TextAlignment="GridTextAlignment.Right" Width="150px" />
+                                    <DxGridDataColumn FieldName="Cutoff" TextAlignment="GridTextAlignment.Left" Width="150px" />
+
+                                </Columns>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+
+@code {
+    [Parameter]
+    public int employeeId { get; set; }
+
+    List<EmployeePremiumView> empPremiums;
+
+    string userId = "";
+    object EmployeePremiums { get; set; }
+    GridDevExtremeDataSource<EmployeePremiumView> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        empPremiums = null;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        empPremiums = await service.GetPremiums(employeeId);
+
+        var tempList = empPremiums.ToList().AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<EmployeePremiumView>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "EmployeePremiumContributionId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        EmployeePremiums = gridDevExtremeDataSource;
+
+
+        StateHasChanged();
+    }
+
+    async Task PrintServiceRecord()
+    {
+
+    }
+}

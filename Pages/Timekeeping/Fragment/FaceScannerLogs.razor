@@ -1,0 +1,522 @@
+﻿@using DevExpress.Blazor
+@using HRMSv4.Client.Interface.Timekeeping
+@using HRMSv4.Shared.Timekeeping
+@using Newtonsoft.Json
+@inject IDevices _device
+@inject IEmployeeLogs _logs
+<style>
+    .dxbs-grid-header-content {
+        justify-content: center;
+    }
+
+    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: inherit !important;
+        height: inherit !important;
+    }
+
+    .form-check-input {
+        position: relative !important;
+        margin-top: 0.3rem;
+        margin-left: unset !important;
+    }
+</style>
+
+<div class="p-2">
+    <div class="row py-3" style="align-items: center">
+        <div class="col-md-6">
+            <div id="flyout-overview-target-container" style="margin-left: 10px; display: inline-block;">
+                <DxButton RenderStyle="ButtonRenderStyle.None" Click="() => IsOpen = !IsOpen"> <i class="fa fa-filter" Click="() => IsOpen = !IsOpen"></i> Filter logs</DxButton>
+            </div>
+            <div class="p-2">
+                <DxFlyout @bind-IsOpen=@IsOpen
+                          Position=FlyoutPosition.RightStart
+                          CloseOnOutsideClick=false
+                          HeaderVisible=true
+                          FooterVisible=true
+                          HeaderText="Filter Logs"
+                          PositionTarget="#flyout-overview-target-container"
+                          PreventCloseOnPositionTargetClick="true" style="width: 400px; padding 10px;">
+                    <BodyTemplate>
+                        <div class="p-2 mb-3">
+                            @if (IsMobile)
+                            {
+                                <span class="custom-flyout-header">Poul</span>
+                                <span class="custom-flyout-body">Designer</span>
+                            }
+                            else
+                            {
+                                <div class="d-block-flex mb-2">
+                                    <label class="form-label">From</label>
+                                    <DxDateEdit @bind-Date="@FromDateTime"
+                                            NullText="Select a date..."
+                                            SizeMode="SizeMode.Medium"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="cw-320">
+                                    </DxDateEdit>
+                                </div>
+                                <div class="d-block-flex mb-3">
+                                    <label class="form-label">To</label>
+                                    <DxDateEdit @bind-Date="@ToDateTime"
+                                            NullText="Select a date..."
+                                            SizeMode="SizeMode.Medium"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="cw-320">
+                                    </DxDateEdit>
+                                </div>
+                                <DxComboBox Data="@Persons"
+                                        AllowUserInput="true"
+                                        NullText="Select persons ..."
+                                        SizeMode="SizeMode.Medium"
+                                        Value="@PersonValue"
+                                        ValueChanged="@((string newValue) => PersonOnChanged(newValue))"
+                                        Caption="Type:" />
+                            }
+                        </div>
+                    </BodyTemplate>
+                    <FooterTextTemplate>
+                        <div class="w-100">
+                            <DxButton CssClass="float-start" RenderStyle="ButtonRenderStyle.Secondary" Click=@(()=> IsOpen = false) Text="Close"></DxButton>
+                            <DxButton CssClass="float-end popup-button" RenderStyle="ButtonRenderStyle.Primary" Text="Submit" Click="() => FilterScannerLogs()" />
+                        </div>
+                    </FooterTextTemplate>
+                </DxFlyout>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div style="display: flex; float: right;align-items: center">
+                <DxCheckBox @bind-Checked="@FsValue">Select All</DxCheckBox>
+                <div class="col">
+                    <DxComboBox Data="@Data"
+                                TextFieldName="@nameof(Device.DeviceName)"
+                                SizeMode="SizeMode.Medium"
+                                CssClass="cw-480"
+                                @bind-Value="@Value">
+                        <DxListEditorColumn FieldName="@nameof(Device.DeviceName)"
+                                            Caption="Name" />
+                        <DxListEditorColumn FieldName="@nameof(Device.DeviceType)"
+                                            Caption="Type" />
+                    </DxComboBox>
+                </div>
+                <div onclick="@GetStationLogs"><button class="m-0 btn btn-outline-2x btn-outline-primary" style="margin-bottom: 10px;"> <i class="ion-android-arrow-down" style="color:green"></i> Harvest device logs</button></div>
+            </div>
+        </div>
+    </div>
+
+    <DxGrid @ref="Grid" Data="MasterGridData"
+            SelectionMode="GridSelectionMode.Single" AllowSelectRowByClick="true">
+        <Columns>
+            <DxGridDataColumn FieldName="ImageLog" Caption="Photo" Width="10p%" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as HRMSv4.Shared.Timekeeping.FaceScannerLog);
+                    }
+                    @if (!string.IsNullOrWhiteSpace(temp.ImageLog))
+                    {
+                        if (temp.ImageLog == "default-avatar-grey.png")
+                        {
+                            <div class="avatar-icon-wrapper mb-3 avatar-icon-sm">
+                                <div class="avatar-icon">
+                                    <img src="/images/avatars/default-avatar-grey.png" alt="@temp.EmployeeIdString">
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0);" @onclick="@(e => ShowImage("Uploads/Employees/FaceImage/Logs/" + @temp.ImageLog))">
+                                <div class="avatar-icon-wrapper mb-3 avatar-icon-sm">
+                                    <div class="avatar-icon">
+                                        <img src="Uploads/Employees/FaceImage/Logs/@temp.ImageLog" alt="@temp.EmployeeIdString">
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="avatar-icon-wrapper mb-3 avatar-icon-sm">
+                            <div class="avatar-icon">
+                                <img src="/images/avatars/default-avatar-grey.png" alt="@temp.EmployeeIdString">
+                            </div>
+                        </div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+
+            <DxGridDataColumn FieldName="LogDateTime" Caption="Log Date Time">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as HRMSv4.Shared.Timekeeping.FaceScannerLog);
+                    }
+                    @(temp.LogDateTime != null ? temp.LogDateTime.ToString("yyyy-MM-dd hh:mm:ss tt") : "")
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Name" Caption="Name" Width="30%" />
+            <DxGridDataColumn FieldName="DeviceLogId" Caption="Log Id" Width="10p%" TextAlignment="GridTextAlignment.Center" />
+            <DxGridDataColumn FieldName="Remarks" Caption="Remarks" />
+            <DxGridDataColumn FieldName="TypeOfLog" Caption="Status" AllowSort="false" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as HRMSv4.Shared.Timekeeping.FaceScannerLog);
+                    }
+
+                    @if (temp.TypeOfLog == "1")
+                    {
+                        <div class="mb-2 me-2 badge rounded-pill bg-success">Time in</div>
+                    }
+                    else
+                    {
+                        if (temp.TypeOfLog == "2")
+                        {
+                            <div class="mb-2 me-2 badge rounded-pill bg-warning">Time out</div>
+                        }
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+
+        </Columns>
+    </DxGrid>
+</div>
+@code {
+    IGrid? Grid { get; set; }
+    object MasterGridData { get; set; }
+
+    bool IsOpen { get; set; } = false;
+    bool IsMobile { get; set; }
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    bool _allDevics { get; set; } = false;
+
+    IEnumerable<Device> Data { get; set; }
+
+    string Text { get; set; } = "Employee";
+    string PersonValue { get; set; } = "Employee";
+    IEnumerable<string> Persons = new List<string>() { "Employee", "Visitor" };
+
+    bool FsValue { get; set; }
+
+    Device Value { get; set; }
+
+    IReadOnlyList<object> selectedStations { get; set; }
+
+    DateTime? FromDateTime { get; set; } = DateTime.Now;
+    DateTime? ToDateTime { get; set; } = DateTime.Now;
+    GridDevExtremeDataSource<FaceScannerLogView> gridDevExtremeDataSource;
+
+    async void PersonOnChanged(string _personValue)
+    {
+        PersonValue = _personValue;
+        var facelogs = await _logs.List(PersonValue);
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<FaceScannerLogView>(facelogs.AsQueryable());
+        MasterGridData = gridDevExtremeDataSource;
+        Grid.Reload();
+        StateHasChanged();
+    }
+
+    async Task FilterScannerLogs()
+    {
+        IsOpen = false;
+
+        var facelogs = await _logs.GetFascannerLogs(FromDateTime.Value, ToDateTime.Value, PersonValue);
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<FaceScannerLogView>(facelogs.AsQueryable());
+        MasterGridData = gridDevExtremeDataSource;
+        Grid.Reload();
+        StateHasChanged();
+    }
+
+    async void ShowImage(string img)
+    {
+        await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Employee Capture Image",
+                ImageUrl = img,
+                ImageHeight = 600,
+                ImageWidth = 400
+            });
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        //await Task.Delay(1000); // simulate loading
+
+        var facelogs = await _logs.List(PersonValue);
+
+        //devexpress server side - iqueryable
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<FaceScannerLogView>(facelogs.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "FaceScannerLogId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        MasterGridData = gridDevExtremeDataSource;
+
+        Data = await _device.All();
+        Value = Data.FirstOrDefault();
+        StateHasChanged();
+    }
+
+    public class getImageResponse
+    {
+        public string code { get; set; }
+        public List<data> data { get; set; }
+        public string msg { get; set; }
+        public string result { get; set; }
+        public string success { get; set; }
+        public string ImageLog { get; set; }
+    }
+
+    public class data
+    {
+        public string direction { get; set; }
+        public string id { get; set; }
+        public string mask { get; set; }
+        public string path { get; set; }
+        public string personId { get; set; }
+        public string temperature { get; set; }
+        public string time { get; set; }
+        public string type { get; set; }
+    }
+
+    async Task DataGathering(string ip, string port)
+    {
+        try
+        {
+            string startDateTime = DateTime.Now.ToString("yyyy-MM-dd");
+            string endDateTime = DateTime.Now.ToString("yyyy-MM-dd");
+            FaceScannerLog lastDeviceId;
+
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Face Scanner Logs",
+                    Text = "Confirming you want to download latest face scanner logs.",
+                    Icon = "question",
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "Cancel",
+                    CancelButtonColor = "#dc3741"
+                });
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                /* Get Last id and date */
+                await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Loading...",
+                        Html = "Please wait a moment...",
+                        ShowConfirmButton = false,
+                        AllowOutsideClick = false,
+                        Timer = 5000,
+                        TimerProgressBar = true
+                    });
+
+                lastDeviceId = await Task.Run(() => _logs.GetDeviceLogId()); ;
+
+                await _Swal.CloseAsync();
+
+                await Task.CompletedTask;
+
+                if (lastDeviceId.DeviceLogId == 0)
+                {
+                    var options = new ModalOptions()
+                        {
+                            DisableBackgroundCancel = true,
+                            Animation = ModalAnimation.FadeIn(0.2),
+                            ContentScrollable = true,
+                        };
+
+                    var moviesModal = Modal.Show<HRMSv4.Client.Shared.Modals.TimeKeeping.CalendarConfirm>("Select date start", options);
+                    var modalRes = await moviesModal.Result;
+
+                    if (!modalRes.Cancelled)
+                    {
+                        startDateTime = Convert.ToDateTime(modalRes.Data).ToString("yyyy-MM-dd");
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    startDateTime = lastDeviceId.LogDateTime.ToString("yyyy-MM-dd");
+                }
+
+                /* For single selection */
+                if (!FsValue)
+                {
+                    var http = new HttpClient();
+
+                    http.BaseAddress = new Uri("http://" + ip + ":" + port + "/");
+                    http.DefaultRequestHeaders.Accept.Clear();
+                    http.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string pass = Value.Password;
+
+                    var data = new FormUrlEncodedContent(new[]
+                {
+                new KeyValuePair<string, string>("pass", pass),
+                new KeyValuePair<string, string>("personId", "-1"),
+                new KeyValuePair<string, string>("length", "-1"),
+                new KeyValuePair<string, string>("index", "0"),
+                new KeyValuePair<string, string>("startTime", startDateTime + " 00:00:00"),
+                new KeyValuePair<string, string>("endTime", endDateTime +  " 23:59:59"),
+                new KeyValuePair<string, string>("model", "-1"),
+                new KeyValuePair<string, string>("order", "1")
+    });
+
+                    HttpResponseMessage response = await http.PostAsync("newFindRecords", data);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string res = await response.Content.ReadAsStringAsync();
+
+                        if (string.IsNullOrWhiteSpace(res))
+                        {
+                            SweetAlertResult resultv2 = await _Swal.FireAsync(new SweetAlertOptions
+                                {
+                                    Title = "Face Scanner Logs",
+                                    Text = "There are no data to harvest in selected device/s.",
+                                    Icon = "info",
+                                    ShowCancelButton = false,
+                                    ConfirmButtonText = "Ok"
+                                });
+                            if (!string.IsNullOrEmpty(resultv2.Value))
+                            {
+                                return;
+                            }
+                        }
+
+                        var convertedJson = JsonConvert.DeserializeObject<getImageResponse>(res);
+
+                        List<FaceScannerLog> fsl = new List<FaceScannerLog>();
+
+                        if (convertedJson.success == "true")
+                        {
+                            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+                            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+                            foreach (var item in convertedJson.data)
+                            {
+                                DateTime convertedUnixtime = DateTimeFromUnixTimestampMillis(Convert.ToInt64(item.time));
+
+                                if (item.path == "null")
+                                {
+                                    item.path = "default-avatar-grey.png";
+                                }
+
+                                if (item.personId != "null")
+                                {
+                                    var _data = new FaceScannerLog
+                                        {
+                                            FaceScannerDeviceId = Value.DeviceId,
+                                            LogDateTime = convertedUnixtime,
+                                            DeviceLogId = int.Parse(item.id),
+                                            EmployeeIdString = item.personId,
+                                            TypeOfLog = item.direction,
+                                            CreatedBy = userId,
+                                            Remarks = Value.SerialNumber,
+                                            ImageLog = item.path
+                                        };
+
+                                    fsl.Add(_data);
+                                }
+                            }
+
+                            /* Save to database */
+                            Response httResponse = await _logs.InsertEmployeeLogs(fsl);
+
+                            if (httResponse.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", httResponse.Value, "success");
+                                var facelogs = await _logs.List(PersonValue);
+                                gridDevExtremeDataSource = new GridDevExtremeDataSource<FaceScannerLogView>(facelogs.AsQueryable());
+                                MasterGridData = gridDevExtremeDataSource;
+                                Grid.Reload();
+                                StateHasChanged();
+                            }
+                        }
+                        else
+                        {
+                            await _Swal.FireAsync("Error", convertedJson.msg, "error");
+                        }
+                    }
+                    else
+                    {
+                        string res = await response.Content.ReadAsStringAsync();
+                        var convertedJson = JsonConvert.DeserializeObject<getImageResponse>(res);
+                        await _Swal.FireAsync("Error", convertedJson.msg, "error");
+                    }
+                }
+                else
+                {
+                    Data = await _device.All();
+
+                    foreach (var item in Data)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.DeviceIp))
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await _Swal.FireAsync("Error", "Failed to fetch data, device is unreachable.", "error");
+        }
+    }
+
+    async void GetStationLogs()
+    {
+        try
+        {
+            if (_allDevics == false)
+            {
+                await DataGathering(Value.DeviceIp, Value.DevicePort);
+            }
+            else
+            {
+                /* Multiple devices logs */
+
+                IEnumerable<Device> _station;
+
+                _station = await _device.All();
+
+                foreach (var item in _station)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.DeviceIp))
+                    {
+                        await DataGathering(item.DeviceIp, item.DevicePort);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+
+    private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    public static long GetCurrentUnixTimestampMillis()
+    {
+        return (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+    }
+    public static DateTime DateTimeFromUnixTimestampMillis(long millis)
+    {
+        return UnixEpoch.AddMilliseconds(millis).ToLocalTime();
+    }
+
+    public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+    {
+        // Unix timestamp is seconds past epoch
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+        return dateTime;
+    }
+}

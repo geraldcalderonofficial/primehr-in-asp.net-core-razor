@@ -1,0 +1,662 @@
+﻿@page "/browse"
+
+<header class="header sticky-bar">
+    <div class="container">
+        <div class="main-header">
+            <div class="header-left">
+                <div class="header-logo"><a class="d-flex" href="index.html"><img alt="" src="images/primehr-logo.svg"></a></div>
+            </div>
+            <div class="header-nav">
+                <!--  <nav class="nav-main-menu">
+                    <ul class="main-menu">
+                      <li><a href="#">Home</a></li>
+                      <li><a href="#">About Us</a></li>
+                      <li><a href="#">Services</a>
+                        <ul class="sub-menu">
+                          <li><a href="#">Services 1</a></li>
+                          <li><a href="#">Services 2</a></li>
+                        </ul>
+                      </li>
+                      <li><a href="#">Contact Us</a></li>
+                    </ul>
+                  </nav>-->
+                <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>
+            </div>
+            <div class="header-right">
+                <div class="block-signin"><a class="text-link-bd-btom hover-up" href="page-register.html">Register</a><a class="btn btn-default btn-shadow ml-40 hover-up" href="page-signin.html">Sign in</a></div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-content-area">
+            <div class="perfect-scroll">
+                <div class="mobile-search mobile-header-border mb-30">
+                    <form action="#">
+                        <input type="text" placeholder="Search…"><i class="fi-rr-search"></i>
+                    </form>
+                </div>
+                <div class="mobile-menu-wrap mobile-header-border">
+                    <!-- mobile menu start-->
+                    <nav>
+                        <ul class="mobile-menu font-heading">
+                            <li>
+                                <a href="#">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#">Services</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#">Services 1</a></li>
+                                    <li><a href="#">Services 2</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Contact Us</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="mobile-menu font-heading">
+                            <li><a href="#">Register</a></li>
+                            <li><a href="#">Login</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+    <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-content-area">
+            <div class="perfect-scroll">
+                <div class="mobile-search mobile-header-border mb-30">
+                    <form action="#">
+                        <input type="text" placeholder="Search…"><i class="fi-rr-search"></i>
+                    </form>
+                </div>
+                <div class="mobile-menu-wrap mobile-header-border">
+                    <!-- mobile menu start-->
+                    <nav>
+                        <ul class="mobile-menu font-heading">
+                            <li>
+                                <a href="#">Home</a>
+                            </li>
+                            <li>
+                                <a href="#">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#">Services</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#">Services 1</a></li>
+                                    <li><a href="#">Services 2</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Contact Us</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="mobile-menu font-heading">
+                            <li><a href="#">Register</a></li>
+                            <li><a href="#">Login</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<main class="main">
+    <section class="section-box-2">
+        <div class="container">
+            <div class="banner-hero banner-single banner-single-bg">
+                <div class="block-banner text-center">
+                    <h3 class="wow animate__animated animate__fadeInUp"><span class="color-brand-2">8 Jobs</span> Available Now</h3>
+                    <!--  <div class="font-sm color-text-paragraph-2 mt-10 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero repellendus magni, <br class="d-none d-xl-block">atque delectus molestias quis?</div>-->
+                    <div class="form-find text-start mt-40 wow animate__animated animate__fadeInUp" data-wow-delay=".2s">
+                        <form>
+                            <input class="form-input input-keysearch mr-10" type="text" placeholder="Your keyword... ">
+                            <button class="btn btn-default btn-find font-sm">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-box mt-30">
+        <div class="container">
+            <div class="row flex-row-reverse">
+                <div class="col-lg-9 col-md-12 col-sm-12 col-12 float-right">
+                    <div class="content-page">
+                        <div class="box-filters-job">
+                            <div class="row">
+                                <div class="col-xl-6 col-lg-5"><span class="text-small text-showing">Showing <strong>41-60 </strong>of <strong>944 </strong>jobs</span></div>
+                                <div class="col-xl-6 col-lg-7 text-lg-end mt-sm-15">
+                                    <div class="display-flex2">
+                                        <div class="box-border mr-10">
+                                            <span class="text-sortby">Show:</span>
+                                            <div class="dropdown dropdown-sort">
+                                                <button class="btn dropdown-toggle" id="dropdownSort" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static"><span>12</span><i class="fi-rr-angle-small-down"></i></button>
+                                                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownSort">
+                                                    <li><a class="dropdown-item active" href="#">10</a></li>
+                                                    <li><a class="dropdown-item" href="#">12</a></li>
+                                                    <li><a class="dropdown-item" href="#">20</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="box-border">
+                                            <span class="text-sortby">Sort by:</span>
+                                            <div class="dropdown dropdown-sort">
+                                                <button class="btn dropdown-toggle" id="dropdownSort2" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static"><span>Newest Post</span><i class="fi-rr-angle-small-down"></i></button>
+                                                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownSort2">
+                                                    <li><a class="dropdown-item active" href="#">Newest Post</a></li>
+                                                    <li><a class="dropdown-item" href="#">Oldest Post</a></li>
+                                                    <li><a class="dropdown-item" href="#">Rating Post</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="box-view-type"><a class="view-type" href="search-filter.html"><img src="images/icons/icon-list.svg" alt=""></a><a class="view-type" href="search-filter2.html"><img src="images/icons/icon-grid-hover.svg" alt=""></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row display-list">
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-1.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Schools Division Office</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Driver</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-2.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Mariveles District Hospital</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Medical Officer IV</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-3.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Local Government Unit</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Draftsman II</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-4.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Office Of The Provincial Governor</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Engineer III</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-1.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Afab Isolation Facility</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Administrative Officer I</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-2.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">NDRRMC</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Accountant I</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-3.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Isaac And Catalina Medical Center</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">Dentist III</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-12">
+                                <div class="card-grid-2 hover-up">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="card-grid-2-image-left">
+                                                <div class="image-box"><img src="images/job-details/brand-4.png" alt=""></div>
+                                                <div class="right-info"><a class="name-job" href="">Public Employment Service Office</a><span class="location-small">Philippines</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-block-info">
+                                        <h4><a href="job-details.html">System Analyst</a></h4>
+                                        <div class="mt-5"><span class="card-briefcase">Fulltime</span><span class="card-time"><span>4</span><span> mins ago</span></span></div>
+                                        <p class="font-sm color-text-paragraph mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur</p>
+
+                                        <div class="card-2-bottom mt-20">
+                                            <div class="row">
+                                                <div class="col-lg-7 col-7">
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Plantilla Item:</strong></span><span class="text-muted"> G58726</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Status:</strong></span><span class="text-muted"> Job Order</span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Category:</strong></span><span class="text-muted"> </span></div>
+                                                    <div class="col-lg-7 col-7"><span class=""><strong>Closing Date:</strong></span><span class="text-muted"> Dec 31, 2022</span></div>
+                                                </div>
+                                                <div class="col-lg-5 col-5 text-end">
+                                                    <div class="btn btn-apply-now" data-bs-toggle="modal" data-bs-target="#ModalApplyJobForm">Apply now</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                    <div class="paginations">
+                        <ul class="pager">
+                            <li><a class="pager-prev" href="#"></a></li>
+                            <li><a class="pager-number" href="#">1</a></li>
+                            <li><a class="pager-number" href="#">2</a></li>
+                            <li><a class="pager-number" href="#">3</a></li>
+                            <li><a class="pager-number" href="#">4</a></li>
+                            <li><a class="pager-number" href="#">5</a></li>
+                            <li><a class="pager-number active" href="#">6</a></li>
+                            <li><a class="pager-number" href="#">7</a></li>
+                            <li><a class="pager-next" href="#"></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-12 col-sm-12 col-12">
+                    <div class="sidebar-shadow none-shadow mb-30">
+                        <div class="sidebar-filters">
+                            <div class="filter-block head-border mb-30">
+                                <h5>Advance Filter <a class="link-reset" href="#">Reset</a></h5>
+                            </div>
+                            <div class="filter-block mb-30">
+                                <div class="form-group select-style select-style-icon">
+                                    <select class="form-control form-icons select-active">
+                                        <option>Manila</option>
+                                        <option>Pampanga</option>
+                                        <option>Bulacan</option>
+                                        <option>Rizal</option>
+                                    </select><i class="fi-rr-marker"></i>
+                                </div>
+                            </div>
+                            <!--Collapse-->
+                            <div class="col-12">
+                                <div id="accordion" class="accordion-wrapper mb-3">
+                                    <div class="card">
+                                        <div id="headingOne" class="card-header">
+                                            <button type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne1" aria-expanded="true"
+                                                    aria-controls="collapseOne" class="text-start m-0 p-0 btn btn-link btn-block">
+                                                <h5 class="medium-heading mb-15">Employment Status</h5>
+                                            </button>
+                                        </div>
+                                        <div data-parent="#accordion" id="collapseOne1"
+                                             aria-labelledby="headingOne" class="collapse show">
+                                            <div class="card-body">
+                                                <div class="filter-block">
+                                                    <div class="form-group">
+                                                        <ul class="list-checkbox">
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox" checked="checked"><span class="text-small">All</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">180</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Permanent</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">12</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Casual</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">23</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Job Order</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">43</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Emergency</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">65</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Substitute</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Temporary</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Contract Of Service</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Co-Terminous</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Volunteer</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Contractual</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Elected</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Appointed</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Probationary</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Regular</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">On The Job Training</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">76</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div id="headingTwo" class="b-radius-0 card-header">
+                                            <button type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne2" aria-expanded="false"
+                                                    aria-controls="collapseTwo" class="text-start m-0 p-0 btn btn-link btn-block">
+                                                <h5 class="medium-heading mb-15">Job Categories</h5>
+                                            </button>
+                                        </div>
+                                        <div data-parent="#accordion" id="collapseOne2" class="collapse">
+                                            <div class="card-body">
+                                                <div class="filter-block">
+                                                    <div class="form-group">
+                                                        <ul class="list-checkbox">
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox" checked="checked"><span class="text-small">All</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">24</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Finance</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">45</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Marketing</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">IT/Computer</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Electronics</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Industrial</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Administrative</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Executive</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Accounting</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Security</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Staff</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Teaching</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                            <li>
+                                                                <label class="cb-container">
+                                                                    <input type="checkbox"><span class="text-small">Other</span><span class="checkmark"></span>
+                                                                </label><span class="number-item">57</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer class="footer mt-50">
+    <div class="container">
+        <div class="footer-bottom mt-50">
+            <div class="row">
+                <div class="col-md-6"><span class="font-xs color-text-paragraph">Copyright &copy; 2022. Nspire All Right Reserved </span></div>
+                <div class="col-md-6 text-md-end text-start">
+                    <div class="footer-social"><a class="font-xs color-text-paragraph" href="#">Privacy Policy</a><a class="font-xs color-text-paragraph mr-30 ml-30" href="#">Terms &amp; Conditions</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    @code {
+
+    }

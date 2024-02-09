@@ -1,0 +1,174 @@
+﻿@using HRMSv4.Shared.HrMgmt
+@using DevExpress.Blazor
+@inject IGeneralPolicy service
+
+<style>
+    .form-check-input.custom-control-input {
+        width: 4vh !important;
+        height: 3vh !important;
+    }
+</style>
+
+<div class="row" hidden="@hideView">
+    <div class="col-sm-12">
+        <div class="">
+            <div class="card-header">
+                <h5 class="card-header-text">Step Increment Policy</h5>
+                <div class="btn-actions-pane-right text-capitalize">
+                    <button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-focus btn-sm" onclick="@ToEdit"><i class="pe-7s-note"></i></button>
+                </div>
+            </div>
+            <div class="card-block" style="padding:1.25rem">
+                <div id="view-info" class="row col-12">
+                    <div class="col-6">
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">Years of Service</div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">@sipView.YearsOfService</label>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">Activate auto-detect for qualified employees</div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">@sipView.AutoDetectQualifiedEmployees</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">NOSI Report Format</div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">@sipView.NosiReportFormat</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-12" hidden="@hideEdit">
+    <div class="">
+        <div class="card-header">
+            <h5 class="card-header-text">Leave Policy</h5>
+            <div class="btn-actions-pane-right text-capitalize">
+            </div>
+        </div>
+        <div class="card-block" style="padding:1.25rem">
+            <div id="view-info" class="row col-12">
+                <div class="col-6">
+                    <div class="row mb-2">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <div class="text-muted">Years Of Service</div>
+                        </div>
+                        <div class="col-md-8">
+                            <DxMaskedInput @bind-Value="sip.YearsOfService"
+                                           CssClass="cw-320" SizeMode="SizeMode.Medium"
+                                           Mask="@NumericMask.WholeNumber">
+                            </DxMaskedInput>
+
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <div class="text-muted">Auto Detect Qualified Employees</div>
+                        </div>
+                        <div class="col-md-8">
+                            <DxCheckBox Id="ConstantValue" CheckType="CheckType.Switch"
+                                        LabelPosition="LabelPosition.Left"
+                                        @bind-Checked="@sip.AutoDetectQualifiedEmployees"
+                                        Alignment="CheckBoxContentAlignment.SpaceBetween">
+                            </DxCheckBox>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row mb-2">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <div class="text-muted">NOSI Report Format</div>
+                        </div>
+                        <div class="col-md-8">
+                            <DxComboBox Data="@reportFormats" @bind-Value="@sip.NosiReportFormat" SizeMode="SizeMode.Medium" />
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="" style="display: unset !important;">
+            <div class="float-end">
+                <button type="button" id="next-btn" class="btn-shadow btn-wide me-3 btn btn-outline-secondary" onclick="@Cancel">Cancel</button>
+                <button type="button" id="prev-btn" class="btn-shadow btn-wide btn btn-outline-primary" onclick="@Save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    StepIncrementPolicy sipView = new StepIncrementPolicy();
+    StepIncrementPolicy sip = new StepIncrementPolicy();
+    string userId = string.Empty;
+    List<string> reportFormats = new List<string> { "Format 1", "Format 2", "Format 3"};
+    bool hideEdit { get; set; } = true;
+    bool hideView { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sipView = await service.GetStepIncrement();
+    }
+
+    async void ToEdit()
+    {
+        hideEdit = false;
+        hideView = true;
+        sip = await service.GetStepIncrement();
+
+    }
+
+    void Cancel()
+    {
+        hideEdit = true;
+        hideView = false;
+        StateHasChanged();
+    }
+
+    async void Save()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you really want to update the step increment policy?",
+                Text = "Warning this action cannot be undone.",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+
+        if (result.IsConfirmed)
+        {
+            
+            var res = await service.UpdateStepIncrement(sip);
+            if (res.StatusCode == 200)
+            {
+                Cancel();
+                await _Swal.FireAsync("Success", res.Value, "success");
+                sipView = await service.GetStepIncrement();
+                StateHasChanged();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", res.Value, "error");
+            }
+        }
+    }
+}

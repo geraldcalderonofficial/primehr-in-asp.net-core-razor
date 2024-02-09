@@ -1,0 +1,179 @@
+﻿@page "/masterdata-jobcategory"
+@using DevExpress.Blazor
+@inject IJSRuntime JSRuntime
+@using HRMSv4.Client.Helpers
+@using HRMSv4.Client.Service
+@inject IJobCategory service
+@using System.Linq.Dynamic.Core
+<AuthorizeView Roles="Job Provider, Administrator" Context="_temp">
+    <HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Job Categories" Text="Job Categories" Path="/masterdata/jobcategories" />
+    <div class="main-card mb-3 card">
+        <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+            <div class="col-lg-16" align="right">
+                <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@HandleNewRecord" style="margin-bottom: 10px; width:200px"> Add Job Category </button>
+            </div>
+
+            <DxGrid @ref="MyGrid" Data="@Data"
+                    ShowFilterRow
+                    KeyFieldName="JobCategoryId"
+                    PagerVisible="true"
+                    ValidationEnabled="false"
+                    EditModelSaving="Grid_EditModelSaving"
+                    EditMode="GridEditMode.EditRow"
+                    PageSize="20">
+                <Columns>
+                    <DxGridDataColumn FieldName="Category">
+                        <CellEditTemplate>
+                            @{
+                                var record = (HRMSv4.Shared.OnBoarding.JobCategory)context.EditModel;
+                            }
+                            <DxTextBox @bind-Text="@record.Category" NullText="Enter job category" />
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" Width="8rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                        <CellDisplayTemplate>
+                            @{
+                                var dataItem = (context.DataItem as HRMSv4.Shared.OnBoarding.JobCategory);
+                            }
+                            <button class="border-0 btn-transition btn btn-outline-dark" data-toggle="tooltip" data-placement="left" title="Edit Job Category" @onclick="@(() => MyGrid.StartEditDataItemAsync(dataItem))">
+                                <i class="lnr-pencil"></i>
+                            </button>
+                            <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Delete" @onclick="@(() => DeleteRow(dataItem))">
+                                <i class="lnr-trash"></i>
+                            </button>
+                        </CellDisplayTemplate>
+                        <CellEditTemplate>
+                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                                <i class="lnr-checkmark-circle"></i>
+                            </button>
+                            <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Cancel" data-bs-original-title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                                <i class="lnr-cross"></i>
+                            </button>
+                        </CellEditTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+
+        </div>
+    </div>
+</AuthorizeView>
+
+@code {
+    IGrid? MyGrid { get; set; }
+    IEnumerable<HRMSv4.Shared.OnBoarding.JobCategory> categories;
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.JobCategory> gridDevExtremeDataSource;
+    object Data { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        GetData();
+    }
+    public async void GetData()
+    {
+        var queryList = await service.GetAll();
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.JobCategory>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "JobCategoryId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var newSched = (HRMSv4.Shared.OnBoarding.JobCategory)e.EditModel;
+        }
+        else
+        {
+            var temp = (HRMSv4.Shared.OnBoarding.JobCategory)e.EditModel;
+        }
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        HRMSv4.Shared.OnBoarding.JobCategory targetItem = e.EditModel as HRMSv4.Shared.OnBoarding.JobCategory;
+        //targetItem.Category = GetValidString(targetItem.Category);
+
+        if (string.IsNullOrEmpty(targetItem.Category))
+        {
+            await _Swal.FireAsync("Oops...", "Please enter category", "warning");
+            return;
+        }
+
+
+        var result = await service.GetCheckDuplicate(targetItem);
+        if (result.StatusCode == 200)
+        {
+            await _Swal.FireAsync("Success", result.Value, "success");
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", result.Value, "warning");
+        }
+
+
+        GetData();
+
+    }
+    async Task HandleNewRecord()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.JobCategory cat)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+            res = await service.Delete(cat.JobCategoryId);
+
+            if (res.StatusCode == 200)
+            {
+                GetData();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        //await NwindDataService.RemoveEmployeeAsync((EditableEmployee)e.DataItem);
+        //await UpdateDataAsync();
+    }
+
+    string GetValidString(string str)
+    {
+        string validString = "";
+        if (str != null)
+        {
+            string[] newStr = str.Split(' ');
+            List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+            foreach (string str1 in validList)
+            {
+                if (validString != "") return validString += " " + str1;
+                validString = str1;
+            }
+        }
+        return validString;
+    }
+}

@@ -1,0 +1,194 @@
+﻿@page "/masterdata-eligibility"
+@using DevExpress.Blazor
+@using System.Linq.Dynamic.Core
+@using HRMSv4.Client.Helpers
+@inject ICscEligibility service
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Eligibility" Text="Eligibility" Path="/masterdata/eligibility" />
+<style>
+    .form-check-input.custom-control-input {
+        width: 3% !important;
+        height: 9% !important;
+    }
+
+    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: inherit !important;
+        height: inherit !important;
+    }
+</style>
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@HandleNewRecord" Disabled=@(eligibilityToInsert != null) style="margin-bottom: 10px; width:200px"> Add Eligibility </button>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                ShowFilterRow
+                KeyFieldName="EligibilityId"
+                PagerVisible="true"
+                ValidationEnabled="false"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                EditMode="GridEditMode.EditRow"
+                PageSize="20">
+            <Columns>
+                <DxGridDataColumn Width="20rem" FieldName="EligibilityTitle">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.CscEligibility)context.EditModel;
+                        }
+                        <DxTextBox @bind-Text="@record.EligibilityTitle" SizeMode="SizeMode.Medium" NullText="Enter eligibility title"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="EligibilityType">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.CscEligibility)context.EditModel;
+                        }
+                        <DxComboBox Data=typeArr
+                                    @bind-Value="@record.EligibilityType" SizeMode="SizeMode.Medium" NullText="Select eligibility type"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="EligibilityLevel">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.CscEligibility)context.EditModel;
+                        }
+                        <DxComboBox Data=lvlArr
+                                    @bind-Value="@record.EligibilityLevel" SizeMode="SizeMode.Medium"  NullText="Select eligibility level"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="IsExamRequired">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.CscEligibility)context.EditModel;
+                        }
+                        <DxCheckBox @bind-Checked="@record.IsExamRequired" />
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FilterRowEditorVisible="false" Width="8rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var dataItem = (context.DataItem as HRMSv4.Shared.OnBoarding.CscEligibility);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-dark" data-toggle="tooltip" data-placement="left" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(dataItem))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Delete" @onclick="@(() => DeleteRow(dataItem))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                    <CellEditTemplate>
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                            <i class="lnr-checkmark-circle"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Cancel" data-bs-original-title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                            <i class="lnr-cross"></i>
+                        </button>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+
+@code {
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.CscEligibility> gridDevExtremeDataSource;
+    HRMSv4.Shared.OnBoarding.CscEligibility eligibilityToInsert;
+    IGrid? MyGrid { get; set; }
+    object Data { get; set; }
+    string[] typeArr = { "Regular Eligibility", "Special Eligibility" };
+    string[] lvlArr = { "1st Level", "2nd Level", "1st Level - 2nd Level" };
+    protected override async Task OnInitializedAsync()
+    {
+        GetData();
+    }
+    public async void GetData()
+    {
+        var queryList = await service.GetAll();
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.CscEligibility>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "EligibilityId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.CscEligibility eligibility)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            if (eligibility == eligibilityToInsert)
+            {
+                eligibilityToInsert = null;
+            }
+            res = await service.Delete(eligibility.EligibilityId);
+            if (res.StatusCode == 200)
+            {
+                GetData();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        HRMSv4.Shared.OnBoarding.CscEligibility targetItem = e.EditModel as HRMSv4.Shared.OnBoarding.CscEligibility;
+        targetItem.EligibilityTitle = GetValidString(targetItem.EligibilityTitle);
+        targetItem.EligibilityType = GetValidString(targetItem.EligibilityType);
+        targetItem.EligibilityLevel = GetValidString(targetItem.EligibilityLevel);
+
+        if (!string.IsNullOrWhiteSpace(targetItem.EligibilityTitle) && !string.IsNullOrWhiteSpace(targetItem.EligibilityType) && !string.IsNullOrWhiteSpace(targetItem.EligibilityLevel))
+        {
+            var result = await service.GetCheckDuplicate(targetItem);
+            if (result.StatusCode == 400)
+            {
+                await _Swal.FireAsync("Oops...", result.Value, "warning");
+            }
+            GetData();
+        }
+    }
+    string GetValidString(string str)
+    {
+        string validString = "";
+        if (str != null)
+        {
+            string[] newStr = str.Split(' ');
+            List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+            foreach (string str1 in validList)
+            {
+                if (validString != "") return validString += " " + str1;
+                validString = str1;
+            }
+        }
+        return validString;
+    }
+    async Task HandleNewRecord()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+}

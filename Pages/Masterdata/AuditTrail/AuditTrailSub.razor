@@ -1,0 +1,200 @@
+﻿@inherits ComponentBase
+@using DevExpress.Blazor
+@using System.Text.Json
+@using Newtonsoft.Json
+@inject IAuditTrail auditTrailService
+<style>
+    #audit-detail {
+        background-color: rgba(243, 255, 255, 0.878);
+        color: rgb(64, 107, 216);
+        padding: 5px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+
+        #audit-detail i {
+            position: relative;
+            top: 3px;
+            font-size: 1.2rem;
+        }
+
+    .container-fitContent {
+        padding: 5px 8px;
+        border-radius: 5px;
+        width: fit-content;
+    }
+</style>
+<BusyIndicator Message="Please wait while loading data..." Data="audit">
+    <div id="audit-detail">
+        <i class="pe-7s-info"></i>
+        <span>Detail for Trail ID: </span>
+        <strong>@audit.Id</strong>
+    </div>
+    <div class="w-100">
+        <div class="row">
+            <div class="col-1">
+                <p>Primary Key</p>
+            </div>
+            <div class="col-10">
+                <div class="container-fitContent" style="background-color: rgb(226, 224, 222);">
+                    @{
+                        string updatedStr = audit.PrimaryKey.Substring(1, audit.PrimaryKey.Length - 2);
+                        string[] valSplitted = updatedStr.Split(':');
+                        var trimFirst = valSplitted[0].ToCharArray().Skip(1).ToArray();
+                        valSplitted[0] = string.Join("", trimFirst);
+                        var trimLast = valSplitted[0].ToCharArray().SkipLast(1).ToArray();
+                        valSplitted[0] = string.Join("", trimLast);
+                        <span>@valSplitted[0] : @valSplitted[1]</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1">
+                <p>Old Values</p>
+            </div>
+            <div class="col-10">
+                @{
+                    foreach (var item in subAudit)
+                    {
+                        if (item.LastValue == null) continue;
+                        string firstFinal = item.LastValue[0];
+                        string lastFinal = item.LastValue[1];
+                        if (firstFinal[0].ToString() == "\"")
+                        {
+                            var trimedFirstStr = firstFinal.ToCharArray().Skip(1).ToArray();
+                            firstFinal = string.Join("", trimedFirstStr);
+                        }
+                        if (firstFinal.EndsWith("\""))
+                        {
+                            var trimedLastStr = firstFinal.ToCharArray().SkipLast(1).ToArray();
+                            firstFinal = string.Join("", trimedLastStr);
+                        }
+                        if (lastFinal[0].ToString() == "\"")
+                        {
+                            var trimedFirstStr = lastFinal.ToCharArray().Skip(1).ToArray();
+                            lastFinal = string.Join("", trimedFirstStr);
+                        }
+                        if (lastFinal.EndsWith("\""))
+                        {
+                            var trimedLastStr = lastFinal.ToCharArray().SkipLast(1).ToArray();
+                            lastFinal = string.Join("", trimedLastStr);
+                        }
+                        if (firstFinal == "CreatedAt" || firstFinal == "UpdatedAt" || firstFinal == "DeletedAt")
+                        {
+                            lastFinal = lastFinal.Split("T")[0];
+                        }
+                        if (firstFinal == "CreatedBy" || firstFinal == "UpdatedBy" || firstFinal == "DeletedBy")
+                        {
+                            if (!string.IsNullOrEmpty(lastFinal))
+                            {
+                                string normalizeName = audit.Name.ToLower();
+                                string formatedName = normalizeName[0].ToString().ToUpper() + normalizeName.Substring(1);
+                                lastFinal = formatedName;
+                            }
+                        }
+                        <div class="container-fitContent d-inline-block mb-2 mr-2" style="background-color: rgb(255, 150, 1); color: white">
+                            <span><strong>@firstFinal</strong><span> : @lastFinal</span></span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1">
+                <p>New Values</p>
+            </div>
+            <div class="col-10">
+                @{
+                    foreach (var item in subAudit)
+                    {
+                        if (item.NewValue == null) continue;
+                        string firstFinal = item.NewValue[0];
+                        string lastFinal = item.NewValue[1];
+                        if (firstFinal[0].ToString() == "\"")
+                        {
+                            var trimedFirstStr = firstFinal.ToCharArray().Skip(1).ToArray();
+                            firstFinal = string.Join("", trimedFirstStr);
+                        }
+                        if (firstFinal.EndsWith("\""))
+                        {
+                            var trimedLastStr = firstFinal.ToCharArray().SkipLast(1).ToArray();
+                            firstFinal = string.Join("", trimedLastStr);
+                        }
+                        if (lastFinal[0].ToString() == "\"")
+                        {
+                            var trimedFirstStr = lastFinal.ToCharArray().Skip(1).ToArray();
+                            lastFinal = string.Join("", trimedFirstStr);
+                        }
+                        if (lastFinal.EndsWith("\""))
+                        {
+                            var trimedLastStr = lastFinal.ToCharArray().SkipLast(1).ToArray();
+                            lastFinal = string.Join("", trimedLastStr);
+                        }
+                        if (firstFinal == "CreatedAt" || firstFinal == "UpdatedAt" || firstFinal == "DeletedAt")
+                        {
+                            lastFinal = lastFinal.Split("T")[0];
+                        }
+                        if (firstFinal == "CreatedBy" || firstFinal == "UpdatedBy" || firstFinal == "DeletedBy")
+                        {
+                            if (!string.IsNullOrEmpty(lastFinal))
+                            {
+                                string normalizeName = audit.Name.ToLower();
+                                string formatedName = normalizeName[0].ToString().ToUpper() + normalizeName.Substring(1);
+                                lastFinal = formatedName;
+                            }
+                        }
+                        <div class="container-fitContent d-inline-block mb-2 mr-2" style="background-color: rgb(255, 150, 1); color: white">
+                            <span><strong>@firstFinal</strong><span> : @lastFinal</span></span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+    [Parameter] public HRMSv4.Shared.AuditLogView audit { get; set; }
+    IGrid? MyGrid { get; set; }
+
+    List<SubAuditLogView> subAudit = new List<SubAuditLogView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //no curly braces
+            string lastValUpdatedStr = audit.LastValue.Substring(1, audit.LastValue.Length - 2);
+            string newValUpdatedStr = audit.NewValue.Substring(1, audit.NewValue.Length - 2);
+
+            //convert to array
+            string[] lastValSplitted = lastValUpdatedStr.Split(',');
+            string[] newValSplitted = newValUpdatedStr.Split(',');
+
+            //
+            List<KeyValuePair<string, string>> lastValPairList = (from c in lastValSplitted
+                                                                  select new KeyValuePair<string, string>(c.Split(':')[0], c.Split(':')[1])).ToList();
+            List<KeyValuePair<string, string>> newValPairList = (from c in newValSplitted
+                                                                 select new KeyValuePair<string, string>(c.Split(':')[0], c.Split(':')[1])).ToList();
+            foreach (var item in lastValPairList)
+            {
+                subAudit.Add(new SubAuditLogView
+                    {
+                        LastValue = new string[] { item.Key, item.Value }
+                    });
+            }
+            foreach (var item in newValPairList)
+            {
+                subAudit.Add(new SubAuditLogView
+                    {
+                        NewValue = new string[] { item.Key, item.Value }
+                    });
+            }
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+}

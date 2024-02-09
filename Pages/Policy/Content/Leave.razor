@@ -1,0 +1,279 @@
+﻿@using HRMSv4.Shared.HrMgmt
+@using DevExpress.Blazor
+@inject ILeavePolicy service
+
+<style>
+    .form-check-input.custom-control-input {
+        width: 4vh !important;
+        height: 3vh !important;
+    }
+</style>
+
+<div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card-header">
+                
+                <div class="btn-actions-pane-right text-capitalize">
+                    <div class="d-inline-block dropdown">
+                        <button type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                            <span class="btn-icon-wrapper pe-2 opacity-7">
+                                <i class="fa fa-business-time fa-w-20"></i>
+                            </span>
+                            Actions
+                        </button>
+                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" onclick="@(()=>Masterdata("leavecredits"))">
+                                        <i class="nav-link-icon pe-7s-file"></i>
+                                        <span>Annual Leave Credits</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" hidden="@hideView">
+        <div class="col-sm-12">
+            <div class="">
+                <div class="card-header">
+                    <h5 class="card-header-text">Leave Policy</h5>
+                    <div class="btn-actions-pane-right text-capitalize">
+                        <button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-focus btn-sm" onclick="@ToEdit"><i class="pe-7s-note"></i></button>
+                    </div>
+                </div>
+                <div class="card-block" style="padding:1.25rem">
+                    <div id="view-info" class="row col-12">
+                        <div class="col-6">
+                            <div class="row mb-2">
+                                <div class="col-md-4 align-items-center d-flex">
+                                    <div class="text-muted">Offset Leave Credit to Absence</div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">@lpView.OffsetLeaveCreditToAbsence</label>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 align-items-center d-flex">
+                                    <div class="text-muted">Constant Factor Value</div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">@lpView.ConstantFactorValue</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row mb-2">
+                                <div class="col-md-4 align-items-center d-flex">
+                                    <div class="text-muted">Leave Card Report Format</div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">@lpView.LeaveCardReportFormat</label>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 align-items-center d-flex">
+                                    <div class="text-muted">Leave Application Report Format</div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">@lpView.LeaveApplicationReportFormat</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12" hidden="@hideEdit">
+        <div class="">
+            <div class="card-header">
+                <h5 class="card-header-text">Leave Policy</h5>
+                <div class="btn-actions-pane-right text-capitalize">
+                </div>
+            </div>
+            <div class="card-block" style="padding:1.25rem">
+                <div id="view-info" class="row col-12">
+                    <div class="col-6">
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">Offset Leave Credit To Absence</div>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                                <DxCheckBox id="CreditAbsence" CheckType="CheckType.Switch"
+                                            LabelPosition="LabelPosition.Left"
+                                            @bind-Checked="@lp.OffsetLeaveCreditToAbsence"
+                                            Alignment="CheckBoxContentAlignment.SpaceBetween">
+                                </DxCheckBox>
+
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">ConstantFactorValue</div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <DxCheckBox Id="ConstantValue" CheckType="CheckType.Switch"
+                                                    LabelPosition="LabelPosition.Left"
+                                                    CheckedChanged="@((bool t) => CheckedChanged(t))"
+                                                    Alignment="CheckBoxContentAlignment.SpaceBetween">
+                                        </DxCheckBox>
+                                    </div>
+                                    <div class="col">
+                                        <DxMaskedInput @bind-Value="lp.ConstantFactorValue"
+                                                       CssClass="cw-320" SizeMode="SizeMode.Medium"
+                                                       Mask="n7" hidden="@hideConstant">
+                                        </DxMaskedInput>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">Leave Card Report Format</div>
+                            </div>
+                            <div class="col-md-8">
+                                <DxComboBox Data="@leaveCardFormats" @bind-Value="@lp.LeaveCardReportFormat" SizeMode="SizeMode.Medium" />
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <div class="text-muted">Leave Application Report Format</div>
+                            </div>
+                            <div class="col-md-8">
+                                <DxComboBox Data="@leaveApplicationFormats" @bind-Value="@lp.LeaveApplicationReportFormat" SizeMode="SizeMode.Medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="" style="display: unset !important;">
+                <div class="float-end">
+                    <button type="button" id="next-btn" class="btn-shadow btn-wide me-3 btn btn-outline-secondary" onclick="@Cancel">Cancel</button>
+                    <button type="button" id="prev-btn" class="btn-shadow btn-wide btn btn-outline-primary" onclick="@Save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    bool hideEdit { get; set; } = true;
+    bool hideView { get; set; } = false;
+
+    List<string> leaveCardFormats = new List<string> { "Format 1", "Format 2", "Format 3", "Format 4" };
+    List<string> leaveApplicationFormats = new List<string> { "Format 1", "Format 2", "Format 3", "Format 4", "Format 5" };
+
+    LeavePolicy lp = new LeavePolicy();
+    LeavePolicyView lpView = new LeavePolicyView();
+    string userId = string.Empty;
+
+    bool constantIsDefault { get; set; } = false;
+    bool isOffsetLeaveCreditToAbsence { get; set; } = false;
+    bool hideConstant { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lpView = await service.GetLeavePolicy();
+    }
+
+    void CheckedChanged(bool value)
+    {
+        constantIsDefault = value;
+
+        if (constantIsDefault) hideConstant = false;
+        else hideConstant = true;
+
+        if (constantIsDefault)
+        {
+            lp.ConstantFactorValue = 0.0459770M;
+        }
+    }
+
+    async void ToEdit()
+    {
+        hideEdit = false;
+        hideView = true;
+        lp = await service.GetLeavePolicyId();
+        if (lp.OffsetLeaveCreditToAbsence == null)
+        {
+            lp.OffsetLeaveCreditToAbsence = false;
+            StateHasChanged();
+        }
+        
+
+    }
+
+    void Cancel()
+    {
+        hideEdit = true;
+        hideView = false;
+        StateHasChanged();
+    }
+
+    async void Save()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you really want to update the leave policy?",
+                Text = "Warning this action cannot be undone.",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+
+        if (result.IsConfirmed)
+        {
+
+            var res = await service.AddUpdateLeave(lp);
+            if (res.StatusCode == 200)
+            {
+                Cancel();
+                await _Swal.FireAsync("Success", res.Value, "success");
+                lpView = await service.GetLeavePolicy();
+                StateHasChanged();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", res.Value, "error");
+            }
+        }
+    }
+
+    async void Masterdata(string temp)
+    {
+        if (temp == "leavecredits")
+        {
+            var options = new ModalOptions()
+                {
+                    DisableBackgroundCancel = true,
+                    ContentScrollable = false,
+                };
+
+            var _modalStatus = Modal.Show<AnnualLeaveCreditsModal>("Annual Leave Credits", options);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                //weekList = new List<WeeklyScheduleDay>();
+                //weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+                //this.StateHasChanged();
+            }
+        }
+    }
+}

@@ -1,0 +1,259 @@
+﻿@page "/module-applicant-assessment/{pamId}"
+@using DevExpress.Blazor
+@using HRMSv4.Client.Pages.Modules.Selection.Interview.CompetencyComponents
+@using HRMSv4.Client.Shared.Modals.Selection.Interview
+@inject IPositionCompetency _PositionCompService
+@inject IPersonalActionMemo _pamService
+@inject IJobVacancies _jobVacancyService
+@inject IEmployee _empService
+@inject IApplicantCompetency _appComptencyService
+@inject IPosition _posService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime JSRuntime
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Applicant Competency
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/module-applicant-interview">Applicants Interview</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Competency</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<div class="mb-3 profile-responsive card">
+    <div class="dropdown-menu-header">
+        <div class="dropdown-menu-header-inner bg-dark">
+            <div class="menu-header-image opacity-2" style="background-image: url('images/dropdown-header/abstract2.jpg');"></div>
+            <div class="menu-header-content btn-pane-right">
+                <div class="avatar-icon-wrapper me-3 avatar-icon-xl btn-hover-shine">
+                    <div class="avatar-icon rounded">
+                        <img src="/MainLayout/images/avatars/default-avatar.png" alt="Avatar 5">
+                    </div>
+                </div>
+                <div>
+                    <h5 class="menu-header-title" style="color: white;">Applicant Name: @FullName</h5>
+                    <h6 class="menu-header-subtitle" style="color: white;">Position: @Position</h6>
+                    <h6 class="menu-header-subtitle" style="color: white;">Date Applied: @DateApplied</h6>
+                </div>
+                @*<div class="menu-header-btn-pane">
+                <button class="btn btn-success" @onclick="@(args=>showEmployee())">View Profile</button>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="main-card mb-3 card">
+    <div class="card-header d-flex justify-content-between align-items-center m-2">
+        <div class="w-100">
+            Scoring Form
+        </div>
+        <div class="w-100">
+            <button class="col-3 mb-2 mt-2 me-2 btn btn-outline-2x btn-outline-primary float-end" @onclick="(() => SubmitAssessment())">
+                <span class="ladda-label">Submit Assessment</span>
+            </button>
+            <button class="col-3 mb-2 mt-2 me-2 btn btn-outline-secondary float-end" @onclick="(() => PrintForm())">
+                <span class="ladda-label">Print Assessment</span>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <DxAccordion ExpandMode="ExpandMode" ExpandCollapseAction="ExpandCollapseAction">
+                    <Items>
+                        @if (competency.Count() > 0)
+                        {
+                            @foreach (var item in competency)
+                            {
+                                @switch (item.Value)
+                                {
+                                    case "Core Competency":
+                                        <DxAccordionItem Text="Core Competency" ExpandedChanged="@(args => AddComponent("Core Competency"))">
+                                            <ContentTemplate>
+                                                @if (list.Any())
+                                                {
+                                                    @foreach (var item in list)
+                                                    {
+                                                        @item
+                                                    }
+                                                }
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        break;
+                                    case "Functional Competency":
+                                        <DxAccordionItem Text="Functional Competency" ExpandedChanged="@(args => AddComponent("Functional Competency"))">
+                                            <ContentTemplate>
+                                                @if (list.Any())
+                                                {
+                                                    @foreach (var item in list)
+                                                    {
+                                                        @item
+                                                    }
+                                                }
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        break;
+                                    case "Leadership Competency":
+                                        <DxAccordionItem Text="Leadership Competency" ExpandedChanged="@(args => AddComponent("Leadership Competency"))">
+                                            <ContentTemplate>
+                                                @if (list.Any())
+                                                {
+                                                    @foreach (var item in list)
+                                                    {
+                                                        @item
+                                                    }
+                                                }
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <p>Competency Level for this position is not yet generated</p>
+                        }
+
+
+                    </Items>
+                </DxAccordion>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string pamId { get; set; }
+    [CascadingParameter] public IModalService Modal { get; set; }
+    AccordionExpandMode ExpandMode { get; set; } = AccordionExpandMode.SingleOrNone;
+    AccordionExpandCollapseAction ExpandCollapseAction { get; set; } = AccordionExpandCollapseAction.HeaderClick;
+
+    List<SelectListItems> competency = new List<SelectListItems>();
+
+    bool ShowCore { get; set; } = false;
+    bool ShowLeadership { get; set; } = false;
+    bool ShowFunctional { get; set; } = false;
+
+    RenderFragment RenderFragmentParent;
+    public List<RenderFragment> list { get; set; }
+    int selectPosId = 0;
+    public string? FullName { get; set; }
+    public string? DateApplied { get; set; }
+    public string? Position { get; set; }
+    public string? EmpNo { get; set; }
+    public int? _assessmentId { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        list = new List<RenderFragment>();
+        int decryptedParam = int.Parse(_crypto.ConvertHexToString(pamId, System.Text.Encoding.Unicode));
+        var selectedPam = await _pamService.GetById(decryptedParam);
+        var selectedJobVacancy = selectedPam.JobVacancyId.HasValue ? await _jobVacancyService.GetById(selectedPam.JobVacancyId.Value) : null;
+        var selectedListComp = selectedJobVacancy.PositionId > 0 ? await _PositionCompService.Get(selectedJobVacancy.PositionId) : null;
+        var selectedComp = selectedListComp.DistinctBy(c => c.CompetencyType).ToList();
+        selectPosId = selectedJobVacancy.PositionId;
+        var selectedPosition = await _posService.Get(selectPosId);
+        var emp = await _empService.Get(selectedPam.EmployeeId.Value);
+        FullName = emp.FullName;
+        EmpNo = emp.EmployeeNumber;
+        DateApplied = selectedPam.DateCreated.ToShortDateString();
+        Position = selectedPosition.PositionTitle;
+
+        competency = (from a in selectedComp
+                      select new SelectListItems
+                          {
+                              Text = a.CompetencyType,
+                              Value = a.CompetencyType,
+                          }).ToList();
+        var getSelected = await _appComptencyService.GetSelectedAssessment(decryptedParam);
+        if (getSelected != null)
+        {
+            _assessmentId = getSelected.CompetencyAssessmentId;
+        }
+    }
+
+    public async Task AddComponent(string selectedValue)
+    {
+        list = new List<RenderFragment>();
+        list.Add(CreateDynamicComponent(selectedValue));
+        this.StateHasChanged();
+    }
+
+    async Task SubmitAssessment()
+    {
+        //save employee assessment
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true
+
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(SubmitCompetencyModal.AssessmentId), _assessmentId);
+
+        var formModal = _assessmentId > 0 ? Modal.Show<SubmitCompetencyModal>("Submit Result ", parameters, options) : Modal.Show<SubmitCompetencyModal>("Submit Result", options);
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false)
+        {
+
+        }
+    }
+
+    async Task PrintForm()
+    {
+        var psgcCode = await localStorage.GetItemAsync<string>("AdminPsgcCode");
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        string arrayOfParemeters = _assessmentId.ToString();
+        string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+        string url = $"/viewer/{"CompetencyAssessmentReport"}/{_encryptedParameter}";
+        await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+    }
+
+    RenderFragment CreateDynamicComponent(string value) => builder =>
+      {
+          if (value == "Core Competency")
+          {
+              builder.OpenComponent(0, typeof(CoreComponent));
+              builder.AddAttribute(1, "PositionId", selectPosId);
+              builder.AddAttribute(2, "AssessmentId", _assessmentId);
+          }
+          else if (value == "Functional Competency")
+          {
+              builder.OpenComponent(0, typeof(FunctionalComponent));
+              builder.AddAttribute(1, "PositionId", selectPosId);
+              builder.AddAttribute(2, "AssessmentId", _assessmentId);
+          }
+          else if (value == "Leadership Competency")
+          {
+              builder.OpenComponent(0, typeof(LeadershipComponent));
+              builder.AddAttribute(1, "PositionId", selectPosId);
+              builder.AddAttribute(2, "AssessmentId", _assessmentId);
+          }
+
+          builder.CloseComponent();
+      };
+}

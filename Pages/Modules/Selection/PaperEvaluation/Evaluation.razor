@@ -1,0 +1,175 @@
+﻿@page "/evaluation/{paperEvaluationId}/{employeeId}"
+@using HRMSv4.Shared.Selection
+@inject IPaperEvaluation service
+@using System.Linq.Dynamic.Core
+@using DevExpress.Blazor
+@inject IJSRuntime jsRuntime
+@inject IPersonalActionMemo pamService
+@inject IJobVacancies jvService
+@inject IPosition posService
+
+<div class="row">
+    <div class="mb-3 profile-responsive card">
+        <div class="dropdown-menu-header">
+            <div class="dropdown-menu-header-inner bg-dark">
+                <div class="menu-header-image opacity-2" style="background-image: url('images/dropdown-header/abstract2.jpg');"></div>
+                <div class="menu-header-content btn-pane-right">
+                    <div class="avatar-icon-wrapper me-3 avatar-icon-xl btn-hover-shine">
+                        <div class="avatar-icon rounded">
+                            <img src="/images/avatars/default-avatar.png" alt="Avatar 5">
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="menu-header-title" style="color:white">Applicant Name: @Name</h5>
+                        <h6 class="menu-header-subtitle" style="color:white">Desired Position: @PositionTitle</h6>
+                    </div>
+                    <div class="menu-header-btn-pane">
+                        <button class="btn btn-success" @onclick="@(args=>showEmployee())">View Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    @* <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+    <div class="col-lg-16" align="right">
+    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="" style="margin-bottom: 10px; width:200px"> Generate Report </button>
+    </div>
+
+    </div>*@
+    <DxGrid @ref="Grid" Data="@evalItems" PageSize="100"
+            ShowGroupPanel="true"
+            PageSizeSelectorAllRowsItemVisible="false"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            EditModelSaving="Grid_EditModelSaving"
+            EditMode="GridEditMode.EditRow">
+        <Columns>
+            <DxGridDataColumn FieldName="Type" DisplayFormat="c" GroupIndex="0" GroupInterval="GridColumnGroupInterval.Custom" />
+            <DxGridDataColumn FieldName="GroupName" DisplayFormat="c" GroupIndex="1" GroupInterval="GridColumnGroupInterval.Custom" />
+            <DxGridDataColumn FieldName="ItemDescription" />
+            <DxGridDataColumn FieldName="EquivalentPointsDescription" />
+            <DxGridDataColumn FieldName="MaxPoint" />
+            <DxGridDataColumn FieldName="EarnedPoints">
+                <CellEditTemplate>
+                    @{
+                        var record = (PaperEvaluationItemListView)context.EditModel;
+                    }
+                    <input class="form-control" type="number" min="0" @bind-value=@record.EarnedPoints />
+                    @*<DxTextBox @bind-Text="@record.EarnedPoints"></DxTextBox>*@
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Percentage" />
+            <DxGridCommandColumn Name="Action" Width="140px" DeleteButtonVisible="false" NewButtonVisible="false" />
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Points" />
+        </TotalSummary>
+    </DxGrid>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public string paperEvaluationId { get; set; }
+    [Parameter]
+    public string employeeId { get; set; }
+
+
+    public int peId { get; set; }
+
+    public string Name { get; set; }
+
+    IGrid? Grid { get; set; }
+
+    EvaluationItemsListView evals = new EvaluationItemsListView();
+    List<PaperEvaluationItemListView> evalItems = new List<PaperEvaluationItemListView>();
+    PaperEvaluationItem item = new PaperEvaluationItem();
+    PaperEvaluationItemListView record = new PaperEvaluationItemListView();
+    string userId = "";
+    private string PositionTitle { get; set; } = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        string DecodedUrl = string.Empty;
+        string paramId = _crypto.ConvertHexToString(paperEvaluationId, System.Text.Encoding.Unicode);
+
+        peId = int.Parse(paramId);
+
+        var peDetails = await service.GetById(peId);
+
+        if(peDetails != null){
+            var pam = await pamService.GetById(peDetails.PersonnelActionMemoId);
+
+
+            if(pam != null){
+                var jv = await jvService.GetById(pam.JobVacancyId.Value);
+
+                if(jv!= null){
+                    var pos = await posService.Get(jv.PositionId);
+                    if (pos != null) PositionTitle = pos.PositionTitle;
+                }
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(paramId))
+        {
+            var rawr = await service.GetForEvaluation(peId);
+            evals = rawr;
+            Name = evals.ApplicantName;
+            evalItems = rawr.Items;
+        }
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Grid.ExpandAllGroupRows();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var dataObj = e.EditModel as PaperEvaluationItemListView;
+
+        if (e.IsNew) { }
+        //await service.InsertEmployeeAsync((EditableEmployee)e.EditModel);
+        else
+        {
+            dataObj.UpdatedBy = userId;
+            dataObj.isScored = "test";
+            await service.PutPaperEvaluationItem(dataObj);
+            await UpdateDataAsync();
+        }
+    }
+    void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        //if (e.FieldName == "Points")
+        //{
+        //    decimal sum = (decimal)e.GetRowValue("EarnedPoints");
+        //    e.Value = sum;
+        //}
+    }
+
+    async Task UpdateDataAsync()
+    {
+        var rawr = await service.GetForEvaluation(peId);
+        evalItems = rawr.Items;
+
+        StateHasChanged();
+    }
+
+    async void showEmployee()
+    {
+        string url = $"/dashboard/employee/{employeeId}";
+        await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+    }
+}

@@ -1,0 +1,383 @@
+﻿@inject IStaffing serviceStaffing
+@inject IJSRuntime JSRuntime
+@inject IPosition service
+@inject IJobCategory serviceJobCategory
+@inject ILocatorSlip _locatorSlipService
+@inject SweetAlertService Swal
+@using HRMSv4.Client.Service
+@using HRMSv4.Shared.OnBoarding
+@using HRMSv4.Shared.HrMgmt
+@using DevExpress.Blazor
+@using HRMSv4.Shared.SignalRData
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+
+<style>
+    [data-title] {
+        border-bottom: 1px dashed;
+        text-decoration: none
+    }
+
+        [data-title]:hover {
+            cursor: help;
+            position: relative
+        }
+
+        [data-title] span {
+            display: none
+        }
+
+        [data-title]:hover span {
+            border: #c0c0c0 1px dotted;
+            padding: 5px 20px 5px 5px;
+            display: block;
+            z-index: 200;
+            /*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+            left: 0px;
+            margin: 10px;
+            width: 250px;
+            position: absolute;
+            top: 10px;
+            text-decoration: none
+        }
+</style>
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+               Locator Slips
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div class="min-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="locatorslipstatus">Status</label>
+                    <select class="form-select form-control-sm form-control" @onchange="@SearchStatus"> 
+                        <option value="All Records">All Records</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="Pending">Pending</option>
+                    </select> 
+                </div>
+            </div>
+<div class="col-md-4">
+     <div class="position-relative mb-3">
+         <label class="form-label" for="locatorslipfromdate">From Date</label>
+            <DxDateEdit Date="@Start" Enabled="@isEnabledStart" DateChanged="@((DateTime? newValue) => OnDateChangedStart(newValue))"
+            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+            NullText="Select a date..."></DxDateEdit>
+     </div>
+</div>
+<div class="col-md-4">
+     <div class="position-relative mb-3">
+         <label class="form-label" for="locatorsliptodate">To Date</label>
+            <DxDateEdit Date="@End" Enabled="@isEnabledEnd" DateChanged="@((DateTime? newValue) => OnDateChangedEnd(newValue))"
+            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+            NullText="Select a date..."></DxDateEdit>
+     </div>
+</div>
+     </div>
+   </div>
+</div>
+<div class="min-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+       <div class="col-lg-16" align="right">
+           <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" style="margin-bottom: 10px; width:200px" onclick="@showModal"> Add </button>
+       </div>  
+        <DxGrid @ref="MyGrid" Data="locatorSlipViews"
+                ValidationEnabled="false"
+                PagerVisible="true"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                DataItemDeleting="Grid_DataItemDeleting"
+                EditMode="GridEditMode.EditRow"
+                PageSize="10">
+            <Columns>
+                        <DxGridDataColumn FieldName="EmployeeName">                           
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Position">                        
+                        </DxGridDataColumn>
+                           <DxGridDataColumn FieldName="Destination">                        
+                        </DxGridDataColumn>
+                           <DxGridDataColumn FieldName="Purpose">                      
+                        </DxGridDataColumn>
+                          <DxGridDataColumn FieldName="DateFiled" TextAlignment="GridTextAlignment.Center">              
+                        </DxGridDataColumn>
+                         <DxGridDataColumn FieldName="Duration" TextAlignment="GridTextAlignment.Center">                    
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Type" TextAlignment="GridTextAlignment.Center">                   
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Status" TextAlignment="GridTextAlignment.Center">          
+                            <CellDisplayTemplate>
+                        @{
+                            var stats = "bg-success";
+                            var temp = (context.DataItem as LocatorSlipView);
+                            if (temp.Status == "Approved") stats = "bg-success";
+                            if (temp.Status == "Declined") stats = "bg-danger";
+                            if (temp.Status == "Pending") stats = "bg-warning";
+                        }
+                         <div class="badge @stats" style="min-width: 4rem">@temp.Status</div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="LocatorSlipId" Caption="Action" TextAlignment="GridTextAlignment.Center">                
+                        <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as LocatorSlipView);
+                            var userRole = role;
+                        }
+                        @if ((temp.Status == "Pending") && userRole != "Employee")
+                        {
+                            <button data-toggle="tooltip" title="Edit" class="border-0 btn-transition btn btn-outline-success" @onclick="()=> EditRow(temp)"><span class="pe-7s-note"></span></button>
+                        }
+                        <button data-toggle="tooltip" title="Show Details" class="border-0 btn-transition btn btn-outline-primary" @onclick="()=> ShowDetails(temp)"><span class="pe-7s-user"></span></button>
+                        @if ((temp.Status == "Pending") && userRole != "Employee")
+                        {
+
+                            <button data-toggle="tooltip" title="Delete" class="border-0 btn-transition btn btn-outline-danger" @onclick="()=>DeleteRow((int)context.Value)"><span class="pe-7s-trash"></span></button>
+                        }
+                        @*<button class="btn-transition btn btn-outline-primary mr-2" @onclick="()=> EditRow(temp)"><span class="pe-7s-note"></span></button>
+                        <button class="btn-transition btn btn-outline-primary mr-2" @onclick="()=> ShowDetails(temp)"><span class="pe-7s-user"></span></button>
+                        <button class="btn-transition btn btn-outline-danger" @onclick="()=>DeleteRow((int)context.Value)"><span class="pe-7s-trash"></span></button>*@
+                        </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int EmployeeId { get; set; }
+
+    [Parameter] public LocatorSlipView locatorslipview { get; set; } = new LocatorSlipView();
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+    IGrid? MyGrid { get; set; }
+
+    string Status { get; set; }
+    bool isButtonHide = false;
+    DateTime? Start { get; set;} 
+    DateTime? End { get; set; }
+
+    bool isEnabledStart = true;
+    bool isEnabledEnd = false;
+
+    DateTime defaultDate = new DateTime(1900, 01, 01);
+    public string role = "";
+
+    int count;
+    List<LocatorSlipView> locatorSlipViews = new List<LocatorSlipView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+            if (role == "Administrator")
+            {
+                isButtonHide = false;
+            }
+            else
+            {
+                if (role == "Employee")
+                {
+                    isButtonHide = true;
+                }
+            }
+
+            var Date = DateTime.Now;
+            //Start = new DateTime(Date.Year, Date.Month, 1);
+            //End = Start.Value.AddMonths(1).AddDays(-1);
+            Status = "All Records";
+
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records", Start, End, EmployeeId);
+            StateHasChanged();
+
+            HubConnection.On<SignalRCarrier>("LocatorSlipApprovalRefresh", async survey =>
+           {
+               locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records", Start, End, EmployeeId);
+               StateHasChanged();
+           });
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+
+    }
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+
+    }
+
+    async Task showModal()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.LocatorSlipModal.EmployeeId), EmployeeId);
+
+        var employeeModal = Modal.Show<LocatorSlipModal>("Locator Slip", parameters, options);
+
+        var result = await employeeModal.Result;
+        if (!result.Cancelled)
+        {
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records",Start,End, EmployeeId);
+            this.StateHasChanged();
+        }
+    }
+
+
+    async Task EditRow(HRMSv4.Shared.HrMgmt.LocatorSlipView locatorSlip)
+    {
+        var options = new ModalOptions()
+        {
+            DisableBackgroundCancel = true,
+            Animation = ModalAnimation.FadeIn(0.2),
+        };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.LocatorSlipModal.locatorslipview), locatorSlip);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LocatorSlipModal>("Edit Locator Slip",parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records",Start,End, EmployeeId);
+            this.StateHasChanged();
+        }
+
+    }
+
+    async Task ShowDetails(HRMSv4.Shared.HrMgmt.LocatorSlipView editlocator)
+    {
+        var options = new ModalOptions()
+        {
+            DisableBackgroundCancel = true,
+            Animation = ModalAnimation.FadeIn(0.2),
+        };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.LocatorSlipModal.locatorslipview), editlocator);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.LocatorSlipDetails>("Details",parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records",Start,End, EmployeeId);
+            this.StateHasChanged();
+        }
+    }
+
+    async Task DeleteRow(int id)
+    {
+        try
+        {
+            SweetAlertResult res = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                    Title = "Are you sure?",
+                    Text = "You will not be able to recover this record!",
+                    Icon = "warning",
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "No",
+                    CancelButtonColor = "#999999"
+            });
+            if (!string.IsNullOrEmpty(res.Value))
+            {
+                var result = await _locatorSlipService.DeleteLocatorSlip(id);
+                if (result.StatusCode == 200)
+                {
+                    locatorSlipViews = await _locatorSlipService.GetLocatorSlip("All Records",Start,End, EmployeeId);
+                    StateHasChanged();
+
+                    await _Swal.FireAsync(
+                                     "Deleted",
+                                     "Record has been deleted",
+                                     "success"
+                                         );
+                }
+                else
+                {
+                    await _Swal.FireAsync(
+                                   "Opps...",
+                                   "Something went wrong",
+                                   "error"
+                                         );
+                }
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    async void SearchStatus(ChangeEventArgs e)
+    {
+        try
+        {
+            string temp = e.Value.ToString();
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip(temp, Start, End,EmployeeId);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    DateTime Date = DateTime.Today;
+    bool IsDisabled = true;
+
+    async Task OnDateChangedStart(DateTime? newValue)
+    {
+        if (newValue.HasValue) isEnabledEnd = true;
+        else isEnabledEnd = false;
+
+        Start = newValue == null ? null : newValue.Value;
+        if (newValue != DateTime.Today)
+        {
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip(Status, (Start == null ? defaultDate : Start), End, 0);
+            StateHasChanged();
+            IsDisabled = false;
+        }
+        else
+        {
+            IsDisabled = true;
+        }
+    }
+
+    async Task OnDateChangedEnd(DateTime? newValue)
+    {
+        if (newValue.HasValue) isEnabledStart = false;
+        else isEnabledStart = true;
+
+        End = newValue == null ? null : newValue.Value;
+        if (newValue != DateTime.Today)
+        {
+            locatorSlipViews = await _locatorSlipService.GetLocatorSlip(Status, Start, (End == null ? defaultDate : End), 0);
+            StateHasChanged();
+            IsDisabled = false;
+        }
+        else
+        {
+            IsDisabled = true;
+        }
+    }
+
+}

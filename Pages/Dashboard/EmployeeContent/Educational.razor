@@ -1,0 +1,266 @@
+﻿@inject IEduAttainment _EduAttainment
+@inject InfoGlobalClass _infoglobalclass
+@inject SweetAlertService Swal;
+@using static HRMSv4.Shared.OnBoarding.EducationalAttainment
+@using HRMSv4.Client.Shared.Modals
+@using DevExpress.Blazor
+
+<BusyIndicator Message="Please wait while loading data..." Data="_educationalAttainments">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="col-12 mt-2">
+                        <h5 class="card-header-text float-start">Educational Attainment</h5>
+                        <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@InsertRow2" style="margin-bottom: 10px; width:200px"> + Add </button>
+                        @*<button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@InsertRow" style="margin-bottom: 10px; width:200px"> + Add </button>*@
+                        @*<button Icon="add_circle_outline" class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />*@
+                    </div>
+                </div>
+                <div class="card-block">
+                    <!-- Educataional Tab -->
+                    <div class="col-sm-12 col-xl-12 col-md-12 p-2">
+                        <div class="card">
+                            <DxGrid Data="@EducationalAttainments" PageSize="20"
+                                    ShowFilterRow="true"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    PagerVisibleNumericButtonCount="10">
+
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Level" />
+                                    <DxGridDataColumn FieldName="School" />
+                                    <DxGridDataColumn FieldName="YearGraduated" />
+                                    <DxGridDataColumn FieldName="Course" />
+                                    <DxGridDataColumn FieldName="Awards" />
+                                    <DxGridDataColumn FieldName="HighestUnitsEarned" />
+                                    <DxGridDataColumn FieldName="InclusiveRange">
+                                         <CellDisplayTemplate>
+                                            @{
+                                                var temp = (context.DataItem as EducationalListview);
+                                            }
+                                            @if (temp.InclusiveRange == "Jan-1900 to Jan-1900")
+                                            {
+                                                <p></p>
+                                            }
+                                            else
+                                            {
+                                                <p>@(temp.InclusiveRange)</p>
+                                            }
+                                         </CellDisplayTemplate>
+                                    </DxGridDataColumn>
+                                    <DxGridDataColumn FieldName="" Caption="Action" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                                        <CellDisplayTemplate>
+                                            @{
+                                                var temp = (context.DataItem as EducationalListview);
+                                            }
+                                            <button class="border-0 btn-transition btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" data-bs-original-title="Edit" @onclick="(() => EditRow(temp))">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="border-0 btn-transition btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete" data-bs-original-title="Delete" @onclick="(() => DeleteRow(temp))">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </CellDisplayTemplate>
+                                    </DxGridDataColumn>
+                                </Columns>
+                            </DxGrid>
+                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter]
+    public int employeeId { get; set; }
+
+    [Parameter]
+    public bool isLoaded { get; set; }
+
+    private string[] _schoolLevel;
+    private string[] _schoolCourse;
+
+    DateTime? value = DateTime.Now;
+
+    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
+
+    public DateTime? StartValue { get; set; } = DateTime.Now;
+    public DateTime? EndValue { get; set; } = DateTime.Now.AddDays(10);
+
+    private string LevelSelected { get; set; }
+    private string InclusiveDates { get; set; }
+
+    IEnumerable<EducationalListview> _educationalAttainments;
+    //RadzenDataGrid<EducationalListview> schoolGrid;
+
+    string userId = "";
+    object EducationalAttainments { get; set; }
+    GridDevExtremeDataSource<EducationalListview> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _educationalAttainments = null;
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        _schoolLevel = _infoglobalclass.LevelArray;
+        _schoolCourse = _infoglobalclass.CourseArray;
+        await Task.Delay(1000); // simulate loading
+        _educationalAttainments = await _EduAttainment.GetAll(employeeId);
+
+        var tempList = _educationalAttainments.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<EducationalListview>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "EducationalAttainmentId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        EducationalAttainments = gridDevExtremeDataSource;
+
+
+        StateHasChanged();
+    }
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    try
+    //    {
+    //        _schoolLevel = _infoglobalclass.LevelArray;
+    //        _schoolCourse = _infoglobalclass.CourseArray;
+    //        await Task.Delay(1000); // simulate loading
+    //        _educationalAttainments = await _EduAttainment.GetAll(employeeId);
+    //        this.StateHasChanged();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw ex;
+    //    }
+    //}
+
+    async Task InsertRow2()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModalV2.employeeId), employeeId);
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModalV2>("New Educational Background", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            await UpdateDataAsync();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModal.employeeId), employeeId);
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true
+            };
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModal>("New Educational Background", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            await UpdateDataAsync();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditRow(EducationalListview educ)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Would you like to edit selected record?",
+                Icon = "question",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+
+
+            };
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModalV2.EducationalAttainmentId), educ.EducationalAttainmentId);
+            var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.EmployeeModals.EducationalAttainmentModalV2>("Edit Educational Background", parameters, options);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                await UpdateDataAsync();
+                this.StateHasChanged();
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task DeleteRow(EducationalListview educ)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            Response httRes = await _EduAttainment.Delete(educ.EducationalAttainmentId);
+
+            if (httRes.StatusCode == 200)
+            {
+                await UpdateDataAsync();
+
+
+                StateHasChanged();
+                //string resMsg = httRes.Value;
+                await Swal.FireAsync("Success", "A record was successfully deleted.", "success");
+            }
+            else
+            {
+                await Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+}

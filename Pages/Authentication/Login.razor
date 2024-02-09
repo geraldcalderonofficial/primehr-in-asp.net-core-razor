@@ -1,0 +1,308 @@
+﻿@page "/login"
+@inherits ComponentBase
+@layout LoginLayout
+@using HRMSv4.Client.Interface.Auth
+@using HRMSv4.Client.Interface.IProtection
+@using HRMSv4.Shared
+@using HRMSv4.Shared.Auth
+@using HRMSv4.Shared.Audit
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject GooglereCaptchaService _googlereCaptchaService
+@using System.ComponentModel.DataAnnotations
+@using System.Net
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using reCAPTCHADemo.Services;
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject IEmployee EmployeeService
+
+<EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="_loginRequest">
+    <a href="/" style="cursor: pointer;"><!--<div class="app-logo-inverse mx-auto mb-3" style="height:52px!important; width:200px !important"></div>--></a>
+    <div class="modal-dialog w-100 mx-auto">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="h5 modal-title text-center">
+                    <h4 class="mt-2">
+                        <div>Welcome back,</div>
+                        <span>Please sign in to your account below.</span>
+                    </h4>
+                </div>
+                <DataAnnotationsValidator />
+
+                <div class="">
+                    <div class="col-md-12">
+                        <div class="position-relative mb-3">
+                            <InputText id="inputUsername" class="form-control" @bind-Value="_loginRequest.UserName" autofocus placeholder="Username/Email" />
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="position-relative mb-3">
+                            <div class="input-group">
+                                <InputText type="@(showPassword ? "text" : "password")" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="@_loginRequest.Password"></InputText>
+                                <button style="border-color: lightgray;" type="button" class="btn bg-transparent border-1" @onclick="ToggleShowPassword"><i class="fa fa-eye" style="color: blue;"></i></button>
+                            </div>
+                        </div>
+                        <ValidationMessage For="@(() => _loginRequest.Password)" style="text-align: center;color: red; margin-top: 2px;margin-bottom: 2px;" />
+                    </div>
+
+                </div>
+                <div class="position-relative form-check mb-3">
+                    <InputCheckbox id="inputRememberMe" class="form-check-input" @bind-Value="@_loginRequest.RememberMe" />
+                    <label class="form-check-label" for="inputRememberMe">Remember Me</label>
+                    <a href="javascript:void(0)" @onclick="()=>ForgotPassword()" title="Forget" class="fl-right">Forgot Password?</a>
+                </div>
+
+                <div class="divider"></div>
+                <h6 class="mb-0">
+                    No account?
+                    <a href="javascript:void(0);" @onclick="()=>Register()" class="text-primary">Sign up now</a>
+                </h6>
+            </div>
+            @if (isCaptchaSet)
+            {
+                <div class="section mb-2" style="text-align: -webkit-center;text-align:-moz-center;">
+                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6LeDW0MfAAAAAKOrcnvh8vXriJ9wqXrnJcTkiEtx" OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                </div>
+            }
+            <div class="modal-footer" style="justify-content: unset !important;">
+                <button type="submit" class="btn btn-primary btn-lg " disabled="@DisablePostButton">Login</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? Password { get; set; }
+
+    [Parameter]
+    public EventCallback<string> PasswordChanged { get; set; }
+
+    private LoginRequest _loginRequest = new LoginRequest();
+
+    private bool result { get; set; } = false;
+
+    private string inputValue;
+
+    private ReCAPTCHA reCAPTCHAComponent;
+
+    private bool ValidReCAPTCHA = false;
+
+    private bool ServerVerificatiing = false;
+
+    private bool DisablePostButton = false;
+    //private bool DisablePostButton => !ValidReCAPTCHA || ServerVerificatiing;
+
+    public string Error { get; set; }
+
+    private string role { get; set; }
+
+    private bool showPassword;
+    private string? password;
+    public string? error { get; set; }
+    private bool isCaptchaSet
+    {
+        get; set;
+    }
+    private void OnSuccess()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+    private void OnExpired()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            /* This is offline/online setting of captcha added by Janela */
+            string hasCaptcha = config.GetSection("CaptchaEnabled")["status"].ToString();
+
+            if (hasCaptcha == "true")
+            {
+                isCaptchaSet = true;
+            }
+            else
+            {
+                isCaptchaSet = false;
+                ValidReCAPTCHA = true;
+            }
+        }
+        else
+        {
+            switch (role)
+            {
+                case RoleConstants.DefaultRole or RoleConstants.JobProviderRole:
+                    _navigation.NavigateTo("/dashboard/administrator");
+                    break;
+                case RoleConstants.EmployeeRole or RoleConstants.JobSeekerRole:
+                    var beforeUrlEncoded = await localStorage.GetItemAsync<string>(">>redd");
+                    if (!string.IsNullOrWhiteSpace(beforeUrlEncoded))
+                    {
+                        if (role == RoleConstants.EmployeeRole)
+                        {
+                            _navigation.NavigateTo($"/dashboard/employee/{beforeUrlEncoded}");
+                        }
+                        else
+                        {
+                            _navigation.NavigateTo($"/dashboard/applicant/{beforeUrlEncoded}");
+                        }
+                    }
+                    else
+                    {
+                        await localStorage.ClearAsync();
+                    }
+                    break;
+                default:
+                    _navigation.NavigateTo("/dashboard/super-admin");
+                    break;
+            }
+        }
+    }
+
+    public async Task OnSubmit()
+    {
+        DisablePostButton = false;
+        /* Captcha validation for success and invalid */
+        if (isCaptchaSet)
+        {
+            if (ValidReCAPTCHA)
+            {
+                var response = await reCAPTCHAComponent.GetResponseAsync();
+                try
+                {
+                    ServerVerificatiing = true;
+                    /* call login request */
+                    await LoginSubmit();
+                    StateHasChanged();
+                }
+                catch (HttpRequestException e)
+                {
+                    await _Swal.FireAsync("Oops!", e.Message, "warning");
+                    ServerVerificatiing = false;
+                    StateHasChanged();
+                }
+            }
+        }
+        else
+        {
+            StateHasChanged();
+            /* offline call login request */
+            await LoginSubmit();
+        }
+    }
+
+    public async Task LoginSubmit()
+    {
+        try
+        {
+            error = null;
+            var result = await _authInterfaceService.Login(_loginRequest);
+
+            if (!result.IsAuthSuccessful)
+            {
+                Error = result.ErrorMessage;
+                DisablePostButton = false;
+                StateHasChanged();
+                await _Swal.FireAsync("Oops!", Error, "warning");
+            }
+            else
+            {
+                var user = (await _AutService.GetAuthenticationStateAsync()).User;
+                role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+                var PsgcAdmin = user.FindFirst(c => c.Type.Contains("AdminPsgcCode"))?.Value;
+
+                /* If Employee localstorage for AdminEmployee */
+                await localStorage.SetItemAsync("AdminPsgcCode", PsgcAdmin);
+                await localStorage.SetItemAsync("ImageName", result.ImageName);
+
+                string _encryptedId = string.Empty;
+                string replacement = "ItIsSlashReplacement";
+
+                if (result.EmployeeId > 0)
+                {
+                    string _employeeeId = Convert.ToString(result.EmployeeId);
+
+                    _encryptedId = _crypto.ConvertStringToHex(_employeeeId, System.Text.Encoding.Unicode);
+
+                    /* Save EmployeeId for auto login when token is not yet expire */
+                    await localStorage.SetItemAsync(">>redd", _encryptedId);
+                }
+                switch (role)
+                {
+                    case RoleConstants.DefaultRole:
+                        _navigation.NavigateTo("/dashboard/administrator");
+                        break;
+                    case RoleConstants.JobProviderRole:
+                        _navigation.NavigateTo("/dashboard/administrator");
+                        break;
+                    case RoleConstants.JobSeekerRole:
+                    case RoleConstants.EmployeeRole:
+                        if (role == RoleConstants.EmployeeRole)
+                        {
+                            _navigation.NavigateTo($"/dashboard/employee/{_encryptedId}");
+                        }
+                        else
+                        {
+                            _navigation.NavigateTo($"/dashboard/applicant/{_encryptedId}");
+                        }
+                        break;
+                    case "Super Admin":
+                        _navigation.NavigateTo("/dashboard/super-admin");
+                        break;
+                    default:
+                        _navigation.NavigateTo("/");
+                        break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            ValidReCAPTCHA = false;
+            DisablePostButton = false;
+            StateHasChanged();
+            await _Swal.FireAsync("Oops!", e.Message, "error");
+        }
+    }
+
+    private async Task OnPasswordChanged(ChangeEventArgs e)
+    {
+        password = e?.Value?.ToString();
+
+        await PasswordChanged.InvokeAsync(password);
+    }
+
+    private void ToggleShowPassword()
+    {
+        showPassword = !showPassword;
+    }
+
+    async void Register()
+    {
+        var jobId = await localStorage.GetItemAsync<string>("jobId");
+
+        if (string.IsNullOrWhiteSpace(jobId))
+        {
+            _navigation.NavigateTo("/applicant");
+            //_navigation.NavigateTo("/register");
+        }
+        else
+        {
+            _navigation.NavigateTo("/applicant");
+
+        }
+
+    }
+
+    private void ForgotPassword()
+    {
+        _navigation.NavigateTo("/forgotpassword");
+    }
+}

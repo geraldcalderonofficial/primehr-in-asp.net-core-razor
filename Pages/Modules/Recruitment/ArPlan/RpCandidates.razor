@@ -1,0 +1,67 @@
+﻿@inject IRecruitmentPlan service
+@using DevExpress.Blazor
+@using DevExpress.Data.Linq
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+<BusyIndicator Message="Please wait while loading data..." Data="pcList">
+    <DxGrid Data="@pcList"PageSize="500" 
+            @ref="Grid"
+            ShowFilterRow="true"
+            PagerPosition="GridPagerPosition.Bottom"
+            PageSizeSelectorVisible="true"
+            PageSizeSelectorItems="@(new int[] { 5, 10, 20, 100 })"
+            PageSizeSelectorAllRowsItemVisible="true"
+            PagerSwitchToInputBoxButtonCount="10"
+            PagerVisibleNumericButtonCount="10">
+        <Columns>
+            <DxGridDataColumn FieldName="PositionTitle" DisplayFormat="c" GroupIndex="0" GroupInterval="GridColumnGroupInterval.Custom" />
+            <DxGridDataColumn FieldName="ApplicantName" MinWidth="100" />
+        </Columns>
+    </DxGrid>
+
+</BusyIndicator>
+
+@code {
+    [Parameter]
+    public string id { get; set; } //recruitmentplanId
+
+    string userId = "";
+    int recruitmentPlanId { get; set; }
+    IGrid? Grid { get; set; }
+    List<PossibleCandidateListView> pcList  = new List<PossibleCandidateListView>();
+    EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            string DecodedUrl = string.Empty;
+            string paramId = _crypto.ConvertHexToString(id, System.Text.Encoding.Unicode);
+
+            recruitmentPlanId = int.Parse(paramId);
+
+            if (!string.IsNullOrWhiteSpace(paramId))
+            {
+                pcList = await service.GetCandidateApplicants(recruitmentPlanId, userId);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+
+
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        //Grid.ExpandAllGroupRows();
+    }
+}

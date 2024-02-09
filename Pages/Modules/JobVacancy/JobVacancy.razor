@@ -1,0 +1,272 @@
+﻿@page "/module-jobvacancy"
+@inject SweetAlertService Swal;
+@using HRMSv4.Client.Shared.Modals;
+@using DevExpress.Blazor
+@inject IJobVacancies service
+
+<style>
+    .rz-cell-data {
+        overflow: visible !important;
+        white-space: normal !important;
+    }
+</style>
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Job Vacancy" Text="Job Vacancy" Path="/module/jobvacancy" />
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2 col-sm-6">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">Search Filter: </label>
+                    <DxComboBox Data="@filters" @bind-Text="@selectedFilter" SizeMode="SizeMode.Medium" ValueChanged="@((string e) => FilterAOnChanged(e))" />
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-6">
+                <div class="position-relative mb-3">
+                    <label class="form-label" for="exampleEmail55">Arranged By</label>
+                    <DxComboBox Data="@filterArrangeBy" @bind-Text="@selectedArrangement" SizeMode="SizeMode.Medium" ValueChanged="@((string e) => FilterBOnChanged(e))" />
+                </div>
+            </div>
+            <div class="col mt-2">
+                <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" style="margin-bottom: 10px; width:200px" @onclick="@InsertRow"> Add Job Vacancy</button>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="DataContributions"
+                ShowFilterRow
+                PagerVisible="true"
+                PageSize="50">
+            <Columns>
+                <DxGridDataColumn FieldName="Type" />
+                <DxGridDataColumn FieldName="Position" />
+                <DxGridDataColumn FieldName="EmploymentStatus" />
+                <DxGridDataColumn FieldName="OrganizationalLevel" />
+                <DxGridDataColumn FieldName="Rate" />
+                <DxGridDataColumn FieldName="ClosingDate" />
+                <DxGridDataColumn FilterRowEditorVisible="false" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.JobVacancyListView);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-warning" data-toggle="tooltip" data-placement="left" title="View" @onclick="@(args => SelectedJobVacancy(temp))">
+                            <i class="lnr-eye"></i>
+                        </button>
+                        @if (temp.IsClose == false)
+                        {
+                            <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Apply" @onclick="@(args => Apply(temp))">
+                                <i class="lnr-checkmark-circle"></i>
+                            </button>
+                            <button class="border-0 btn-transition btn btn-outline-dark" data-toggle="tooltip" data-placement="left" title="Edit" @onclick="@(args => EditRow(temp))">
+                                <i class="lnr-pencil"></i>
+                            </button>
+                            <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Delete" @onclick="@(args => DeleteRow(temp))">
+                                <i class="lnr-trash"></i>
+                            </button>
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+@code {
+    IEnumerable<HRMSv4.Shared.OnBoarding.JobVacancyListView> jobvacancies;
+    object DataContributions { get; set; }
+    GridDevExtremeDataSource<JobVacancyListView> gridDevExtremeDataSource;
+
+    IGrid? MyGrid { get; set; }
+
+    List<string> filters = new List<string> { "All", "Plantilla", "Non-plantilla" };
+    List<string> filterArrangeBy = new List<string> { "All", "Active", "Inactive" };
+    string selectedFilter { get; set; } = "All";
+    string selectedArrangement { get; set; } = "Active";
+
+    //JobVacancy jv = new JobVacancy();
+    [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter]
+    public int employeeId { get; set; }
+    public string FilterA { get; set; } = "1";
+    public string FilterB { get; set; } = "2";
+
+    IList<HRMSv4.Shared.OnBoarding.JobVacancyListView> selectedJob;
+
+    bool OnFirstLoad { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateDataAsync();
+
+        // jobvacancies = await service.GetList(selectedFilter, selectedArrangement);
+        // gridDevExtremeDataSource = new GridDevExtremeDataSource<JobVacancyListView>(jobvacancies.AsQueryable());
+        // gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        //{
+        //    // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+        //    // This can make SQL execution plans more efficient.
+        //    loadOptions.PrimaryKey = new[] { "JobVacancyId" };
+        //    loadOptions.PaginateViaPrimaryKey = true;
+
+        //};
+        // DataContributions = gridDevExtremeDataSource;
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine("OnAfterRenderAsync: first render");
+        }
+        else
+        {
+            OnFirstLoad = false;
+        }
+        await Task.Delay(1000);
+    }
+
+    async Task UpdateDataAsync()
+    {
+        var ronron = await service.GetList(selectedFilter, selectedArrangement);
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<JobVacancyListView>(ronron.AsQueryable());
+        DataContributions = gridDevExtremeDataSource;
+
+        //MyGrid.Reload();
+        StateHasChanged();
+    }
+
+    async Task Apply(JobVacancyListView es)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = true
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(ApplicantsModal.JobVacancyId), es.JobVacancyId);
+        var _modalStatus = Modal.Show<ApplicantsModal>("Applicant List", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            UpdateDataAsync();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = true
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.OpenJobVacancyModal.JobVacancyId), 0);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.OpenJobVacancyModal>("New Job Vacancy", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            UpdateDataAsync();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditRow(JobVacancyListView es)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Would you like to edit the selected record?",
+                Icon = "question",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(OpenJobVacancyModal.JobVacancyId), es.JobVacancyId);
+            var _modalStatus = Modal.Show<OpenJobVacancyModal>("Edit Job Vacancy", parameters);
+            var modalResult = await _modalStatus.Result;
+            if (modalResult.Cancelled == false)
+            {
+                UpdateDataAsync();
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task DeleteRow(JobVacancyListView es)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record? this process cannot be undone",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var httRes = await service.Delete(es.JobVacancyId);
+
+            if (httRes.IsSuccessStatusCode)
+            {
+                /* Ronald was here 4/20/2022 GetAll remarks */
+                jobvacancies = await service.GetList("0", FilterB);
+                StateHasChanged();
+                string resMsg = await httRes.Content.ReadAsStringAsync();
+                await Swal.FireAsync("Success", "Your record was successfully deleted.", "success");
+            }
+            else
+            {
+                await Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task SelectedJobVacancy(JobVacancyListView selectedRow)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HRMSv4.Client.Shared.Modals.JobVacancyDetailModal.JobVacancyId), selectedRow.JobVacancyId);
+        var _modalStatus = Modal.Show<HRMSv4.Client.Shared.Modals.JobVacancyDetailModal>("Job Vacancy Detail", parameters);
+        var modalResult = await _modalStatus.Result;
+        if (!modalResult.Cancelled)
+        {
+            /* Ronald was here 4/20/2022 GetAll remarks */
+            jobvacancies = await service.GetList("0", FilterB);
+            //await esGrid.Reload();
+            this.StateHasChanged();
+        }
+    }
+
+    async Task FilterAOnChanged(string value)
+    {
+        if (!OnFirstLoad)
+        {
+            selectedFilter = value;
+            UpdateDataAsync();
+        }
+    }
+
+    async Task FilterBOnChanged(string value)
+    {
+        if (!OnFirstLoad)
+        {
+            selectedArrangement = value;
+            UpdateDataAsync();
+        }
+    }
+}

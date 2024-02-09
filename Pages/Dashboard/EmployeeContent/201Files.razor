@@ -1,0 +1,660 @@
+﻿@using System.Globalization
+@using HRMSv4.Client.Helpers
+@inject ICredentials _empCredentials
+@inject IJSRuntime jsRuntime
+<BusyIndicator Message="Please wait while loading data..." Data="_fileTypes">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="main-card mb-3 card">
+                <div class="card-body">
+                    <h5 class="card-title">Select File to upload</h5>
+                    <p>Single or multiple file upload.</p>
+                    <div class="p-4 border-top">
+                        <div class="row">
+                            <div class="position-relative mb-3 col-lg-12">
+                                <RadzenLabel Text="Credential Type" />
+                                <select class="m-0 form-select form-control w-100" @bind="@CredentialProperty">
+                                    @foreach (var item in _fileTypes)
+                                    {
+                                        @if (string.IsNullOrWhiteSpace(@item.Value))
+                                        {
+                                            <option value="@item.Value" selected disabled>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="position-relative mb-3">
+                            <label for="exampleText" class="form-label">Comments</label>
+                            <textarea name="text" id="exampleText" class="form-control" @bind="@Remarks"></textarea>
+                        </div>
+                    </div>
+                    <section class="pb-4">
+                        <div class="bg-white border rounded-5">
+                            <section class="w-100 p-4 d-flex justify-content-start pb-4">
+                                <div style="width: 100%;">
+                                    <label class="text-danger mb-1">Upload up to @maxAllowedFiles, Max file size of up to 5 Megabytes</label>
+                                    @if (!bClearInputFile)
+                                    {
+                                        <InputFile class="form-control" accept="image/x-png,image/jpeg, csv, xlsx, xls, pdf" type="file" multiple OnChange="e => LoadFiles(e)" autocompleted="" />
+                                    }
+                                    <ul class="mt-1">
+                                        @foreach (var file in loadedFiles)
+                                        {
+                                            <li>
+                                                <ul style="background: #fefefe;">
+                                                    <li><strong>@file.Name</strong></li>
+                                                    <li>Last modified: <strong>@file.LastModified.ToString()</strong></li>
+                                                    <li>Size: <strong>@file.Size bytes</strong></li>
+                                                    <li>Content type: <strong>@file.ContentType</strong></li>
+                                                    <button class="btn btn-link px-3 float-end text-danger" data-mdb-toggle="collapse" @onclick="() => RemoveFile(file.Name)" role="button" aria-expanded="true" aria-controls="example4" data-ripple-color="hsl(0, 0%, 67%)" style="">
+                                                        <i class="pe-7s-trash me-md-2"></i>
+                                                        <span class="d-none d-md-inline-block">
+                                                            Remove
+                                                        </span>
+                                                    </button>
+                                                </ul>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <h6>@Message</h6>
+                                </div>
+                            </section>
+                            <div class="p-4 text-center border-top mobile-hidden">
+                                <button @onclick="@OnSubmit" class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary">
+                                    <i class="pe-7s-upload btn-icon-wrapper"></i>Upload Now
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="main-card mb-3 card">
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div class="widget-content p-0">
+                                <div class="widget-content-wrapper">
+                                    <div class="widget-content-left">
+                                        <div class="widget-heading">201 Files</div>
+                                    </div>
+                                    <div class="widget-content-right">
+                                        <button @onclick="@Refresh" class="mb-2 me-2 btn-icon-vertical btn-shadow btn-dashed btn btn-outline-link">
+                                            <i class="pe-7s-refresh-2 btn-icon-wrapper"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="widget-content p-0">
+                                @if (_empCredentialsData.Count() == 0)
+                                {
+                                    <span style="color:black;"><strong>No records to display.</strong></span>
+                                }
+                                else
+                                {
+                                    @foreach (var item in _empCredentialsData)
+                                    {
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left me-3">
+                                                <div class=" border-light rounded m-0">
+                                                    <div class="icon-wrapper-bg bg-light"></div>
+                                                    <i class="pe-7s-photo-lg icon-gradient bg-happy-itmeo"></i>
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left">
+                                                <div class="widget-heading">@item.CreatedAt</div>
+                                                <div class="widget-heading">@item.FileName</div>
+                                                <div class="widget-heading text-primary">@item.FileTypeName</div>
+                                                <div class="widget-subheading">@item.Comments</div>
+                                            </div>
+                                            <div class="widget-content-right widget-content-actions">
+                                                @if (string.IsNullOrWhiteSpace(item.ApprovedBy))
+                                                {
+                                                    <button @onclick="() => ViewImage(item.FileName)" title="View Image" class="border-0 btn-transition btn btn-outline-success">
+                                                        <i class="pe-7s-look"></i>
+                                                    </button>
+                                                    <button @onclick="() => DeleteImage(item.EmployeeCredentialId)" title="Delete" class="border-0 btn-transition btn btn-outline-danger">
+                                                        <i class="pe-7s-trash"></i>
+                                                    </button>
+                                                    <button @onclick="() => OnClickDownload(item.FileName)" title="Download" class="border-0 btn-transition btn btn-outline-danger">
+                                                        <i class="pe-7s-download "></i>
+                                                    </button>
+                                                    <AuthorizeView Roles="Job Provider, Administrator">
+                                                        <button @onclick="() => OnClickApprovedBy(item.EmployeeCredentialId)" title="Approved" class="border-0 btn-transition btn btn-outline-danger">
+                                                            <i class="fa fa-fw"></i>
+                                                        </button>
+                                                    </AuthorizeView>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</BusyIndicator>
+@*                                        <div class="widget-content-right widget-content-actions">
+                                <button @onclick="() => ViewImage(item.FileName)" class="mb-2 me-2 btn-icon btn-pill btn btn-outline-primary text-center">
+                                View
+                                <i class="pe-7s-look btn-icon-wrapper"></i>
+                                </button>
+                                <button @onclick="() => DeleteImage(item.EmployeeCredentialId)" class="mb-2 me-2 btn-icon btn-pill btn btn-outline-danger text-center">
+                                Delete
+                                <i class="pe-7s-trash btn-icon-wrapper"></i>
+                                </button>
+                                <button @onclick="() => OnClickDownload(item.FileName)" class="mb-2 me-2 btn-icon btn-pill btn btn-outline-secondary text-center">
+                                Download
+                                <i class="pe-7s-download btn-icon-wrapper"></i>
+                                </button>
+                                </div>*@
+@code {
+    [Parameter]
+    public int employeeId { get; set; }
+
+    [Parameter]
+    public bool isLoaded { get; set; }
+
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1000000 * 5; /* 5MB */
+    private int maxAllowedFiles = 3;
+
+    List<FileUploadProgress> uploadedFiles = new();
+
+    UploadedFile _uploadedData = new UploadedFile();
+
+    IEnumerable<EmployeeCredentialView> _empCredentialsData;
+
+    List<SelectListItems> _fileTypes = new List<SelectListItems>();
+
+    string NoFilesMessage = "No File upload.";
+    string Message = "No file(s) selected";
+
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    private int _totalCountSuccess = 0;
+    private int _totalCountFailed = 0;
+
+    public string? CredentialType { get; set; }
+    public string? perSelectedCredential;
+    public string? Remarks;
+
+    public string[] _credentials = new string[5] { "Type1", "Type2", "Type3", "Type4", "Type5" };
+
+    private long _uploaded = 0;
+    private double _percentage = 0;
+    private bool bClearInputFile = false;
+
+    public string? CredentialProperty
+    {
+        get { return perSelectedCredential; }
+        set
+        {
+            perSelectedCredential = value;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _fileTypes = null;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (employeeId > 0)
+        {
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string role = user.FindFirst(c => c.Type.Contains("role"))?.Value;
+
+            _fileTypes = await _empCredentials.GetFileType(role);
+            await Task.Delay(1000); // simulate loading
+            _empCredentialsData = await _empCredentials.GetByView(employeeId);
+            this.StateHasChanged();
+        }
+    }
+
+    async void RemoveFile(string filename)
+    {
+        int fileCount = loadedFiles.Count();
+
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Are you sure would you like to remove file from upload?",
+                Icon = "question",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            foreach (var file in loadedFiles)
+            {
+                if (file.Name == filename)
+                {
+                    var itemToRemove = loadedFiles.Single(r => r.Name == filename);
+                    loadedFiles.Remove(itemToRemove);
+
+                    Message = $"{loadedFiles.Count().ToString()} file(s) selected";
+
+                    if (loadedFiles.Count() <= 0) {
+                        loadedFiles.Clear();
+                    } else {
+                        loadedFiles.Count();
+                    }
+                    this.StateHasChanged();
+                }
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    void ValidFormSubmitted(UploadedFile editContext)
+    {
+        Console.WriteLine("OnValidSubmit was executed");
+    }
+
+    void InvalidFormSubmitted(UploadedFile editContext)
+    {
+        Console.WriteLine("OnInvalidSubmit was executed");
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > maxAllowedFiles)
+        {
+            await _Swal.FireAsync("Oops!", "File upload is limit to " + maxAllowedFiles, "info");
+            loadedFiles.Clear();
+            StateHasChanged();
+        }
+        else
+        {
+            loadedFiles.Clear();
+
+            foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+            {
+                try
+                {
+                    if (file.Size > maxFileSize)
+                    {
+                        await _Swal.FireAsync("Oops!", "A Filename : " + file.Name + " is over the limit of allow filesize for upload ", "info");
+                        return;
+                    }
+                    else
+                    {
+                        loadedFiles.Add(file);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            Message = $"{e.FileCount} file(s) selected";
+        }
+
+        //var files = e.GetMultipleFiles(maximumFileCount: 100);
+
+        //var startIndex = uploadedFiles.Count;
+        //selectedFiles = e.GetMultipleFiles(maximumFileCount: 100);
+        //// Add all files to the UI
+        //foreach (var file in files)
+        //{
+        //    var progress = new FileUploadProgress(file.Name, file.Size);
+        //    uploadedFiles.Add(progress);
+        //}
+
+        //Message = $"{uploadedFiles.Count} file(s) selected";
+
+        //StateHasChanged();
+
+        //// We don't want to refresh the UI too frequently,
+        //// So, we use a timer to update the UI every few hundred milliseconds
+        //await using var timer = new Timer(_ => InvokeAsync(() => StateHasChanged()));
+        //timer.Change(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(500));
+
+        //// Upload files
+        //byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(4096);
+        //try
+        //{
+        //    foreach (var file in files)
+        //    {
+        //        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        //        while (await stream.ReadAsync(buffer) is int read && read > 0)
+        //        {
+        //            uploadedFiles[startIndex].UploadedBytes += read;
+
+        //            // TODO Do something with the file chunk, such as save it
+        //            // to a database or a local file system
+        //            var readData = buffer.AsMemory().Slice(0, read);
+        //        }
+
+        //        startIndex++;
+        //    }
+        //}
+        //finally
+        //{
+        //    System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+
+        //    // Update the UI with the final progress
+        //    StateHasChanged();
+        //}
+    }
+
+    //Use the Meziantou.Framework.ByteSize NuGet package.
+    //You could also use Humanizer
+    //string FormatBytes(long value)
+    //    => ByteSize.FromByte(value).ToString("fi2", CultureInfo.CurrentCulture);
+
+    record FileUploadProgress(string FileName, long Size)
+    {
+        public long UploadedBytes { get; set; }
+        public double UploadedPercentage => (double)UploadedBytes / (double)Size * 100d;
+    }
+
+    //IFileListEntry[] selectedFiles;
+
+    //void HandleSelection(IFileListEntry[] files)
+    //{
+    //    selectedFiles = files;
+    //    StateHasChanged();
+    //}
+
+    //async Task LoadFile(IFileListEntry file)
+    //{
+    //    // So the UI updates to show progress
+    //    file.OnDataRead += (sender, eventArgs) => InvokeAsync(StateHasChanged);
+
+    //    // Just load into .NET memory to show it can be done
+    //    // Alternatively it could be saved to disk, or parsed in memory, or similar
+    //    var ms = new MemoryStream();
+    //    await file.Data.CopyToAsync(ms);
+    //}
+
+    async void Refresh()
+    {
+        _empCredentialsData = await _empCredentials.GetByView(employeeId);
+        this.StateHasChanged();
+    }
+
+    private async void OnSubmit()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(CredentialProperty))
+            {
+                SweetAlertResult temp = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Warning",
+                        Text = "You have to select credential type to proceed.",
+                        Icon = "warning",
+                        AllowOutsideClick = false,
+                        ShowCancelButton = false,
+                        ConfirmButtonText = "Ok"
+                    });
+                if (!string.IsNullOrEmpty(temp.Value))
+                {
+                    return;
+                }
+            }
+
+            // Create a mutlipart form data content which will hold the key value of the file that must be of type StreamContent
+            var content = new MultipartFormDataContent();
+
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            List<UploadedFile> uploadedFile = new List<UploadedFile>();
+
+            foreach (var file in loadedFiles)
+            {
+                // I used the value 5000000 bytes
+                Stream stream = file.OpenReadStream(5000000);
+                MemoryStream ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                stream.Close();
+                ms.Close();
+
+                var data = new UploadedFile
+                    {
+                        Id = employeeId,
+                        FileName = file.Name,
+                        FileContent = ms.ToArray(),
+                        Remarks = Remarks,
+                        TypeId = int.Parse(CredentialProperty),
+                        CreatedBy = userId,
+                    };
+                uploadedFile.Add(data);
+            }
+
+            if (uploadedFile.Count() == 0)
+            {
+                SweetAlertResult response = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Warning",
+                        Text = "Nothing to upload, please select file/s to upload.",
+                        Icon = "warning",
+                        AllowOutsideClick = false,
+                        ShowCancelButton = false,
+                        ConfirmButtonText = "Ok"
+                    });
+                if (!string.IsNullOrEmpty(response.Value))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                /* Confirm file upload */
+                SweetAlertResult res = await _Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Confirming",
+                        Text = "Do you wish to upload the file.",
+                        Icon = "question",
+                        AllowOutsideClick = false,
+                        ShowCancelButton = true,
+                        ConfirmButtonText = "Yes",
+                        CancelButtonText = "Cancel",
+                        CancelButtonColor = "#dc3741"
+                    });
+                if (!string.IsNullOrEmpty(res.Value))
+                {
+                    /* Call Interface */
+                    var result = await _empCredentials.UploadFile(uploadedFile);
+
+                    if (result.IsSuccessStatusCode)
+                    {
+                        SweetAlertResult ans = await _Swal.FireAsync(new SweetAlertOptions
+                            {
+                                Title = "Success",
+                                Text = "Files has been uploaded successfully.",
+                                Icon = "success",
+                                AllowOutsideClick = false,
+                                ShowCancelButton = false,
+                                ConfirmButtonText = "Ok"
+                            });
+                        if (!string.IsNullOrEmpty(ans.Value))
+                        {
+                            //Message = $"{selectedFiles.Count} total file(s) uploaded on server, {_totalCountSuccess} / {_totalCountFailed} ";
+                            _empCredentialsData = await _empCredentials.GetByView(employeeId);
+                            /* Clear List */
+                            loadedFiles.Clear();
+                            Remarks = string.Empty;
+                            Message = string.Empty;
+                            this.StateHasChanged();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
+        // Create an instance of ProgressiveStreamContent that we just created and we will pass the stream of the file for it
+        // and the 40096 which are 40KB per packet and the third argument which as a callback for the OnProgress event (u, p) are u = Uploaded bytes and P is the percentage
+        //var streamContent = new ProgressiveStreamContent(_fileStream, 40096, (u, p) =>
+        //{
+        //    // Set the values of the _uploaded & _percentage fields to the value provided from the event
+        //    _uploaded = u;
+        //    _percentage = p;
+
+        //    // Call StateHasChanged() to notify the component about this change to re-render the UI
+        //    StateHasChanged();
+        //});
+
+
+        // Add the streamContent with the name to the FormContent variable
+        //content.Add(streamContent, "File");
+
+        // Submit the request
+        //var response = await Client.PostAsync("/weatherforecast", streamContent);
+    }
+
+
+    async void ViewImage(string? _img_name)
+    {
+        if (_img_name != null)
+        {
+            string url = AppInfo.ApiUrl + $"Uploads/Employees/201/{employeeId}/{_img_name}";
+            await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+        }
+    }
+
+    async void DeleteImage(int id)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var httRes = await _empCredentials.Delete(id);
+
+            if (httRes.IsSuccessStatusCode)
+            {
+                _empCredentialsData = await _empCredentials.GetByView(employeeId);
+                StateHasChanged();
+                string resMsg = await httRes.Content.ReadAsStringAsync();
+                await _Swal.FireAsync("Success", "A record was successfully deleted.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+    async Task OnClickApprovedBy(int EmployeeCredentialId)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = "Confirming would you like to approved selected record.",
+                Icon = "question",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            EmployeeCredentialUpdate data = new EmployeeCredentialUpdate();
+
+            var user = (await _AutService.GetAuthenticationStateAsync()).User;
+            string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            data.ApprovedBy = userId;
+            data.EmployeeCredentialId = EmployeeCredentialId;
+
+            var res = await _empCredentials.Approved(data);
+
+            if (res.IsSuccessStatusCode)
+            {
+                await _Swal.FireAsync("Success", "Selected record has been successfully approved, status can no longer change.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops!", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops!", "Something went wrong!", "error");
+        }
+    }
+
+    private async Task OnClickDownload(string filename)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "Confirming download selected file.",
+                Icon = "question",
+                ShowCancelButton = true,
+                AllowOutsideClick = false,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            // Please imagine the situation that the API is protected by
+            // token-based authorization (non cookie-based authorization).
+            var uri = _navigation.ToAbsoluteUri(_navigation.BaseUri);
+            string abUrl = uri + "/Uploads/Employees/201/" + employeeId + "/";
+            //uri + "Uploads/Employees/201/" + employeeId
+            var bytes = await HttpClient.GetByteArrayAsync(abUrl);
+            await jsRuntime.InvokeVoidAsync(
+              "downloadFromByteArray",
+              new
+              {
+                  ByteArray = bytes,
+                  FileName = filename,
+                  ContentType = "image/jpeg"
+              });
+
+            //await jsRuntime.InvokeVoidAsync("downloadFromUrl",  new { Url = "Uploads/Employees/201/" + employeeId, FileName = filename });
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops!", "Nothing to download file", "error");
+        }
+    }
+}

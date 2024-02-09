@@ -1,0 +1,469 @@
+﻿@page "/masterdata-course"
+@using DevExpress.Blazor
+@using System.Linq.Dynamic.Core
+@using HRMSv4.Client.Helpers
+@inject ICourse service
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Courses" Text="Courses" Path="/masterdata/courses" />
+
+<div class="col-sm-12 col-xl-12 col-md-12 main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@HandleNewRecord" style="margin-bottom: 10px; width:200px"> Add Course </button>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                ShowFilterRow
+                KeyFieldName="CourseId"
+                PagerVisible="true"
+                ValidationEnabled="false"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                EditMode="GridEditMode.EditRow"
+                PageSize="20">
+            <Columns>
+                <DxGridDataColumn Width="20rem" FieldName="CourseName">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.Course)context.EditModel;
+                        }
+                        <DxTextBox @bind-Text="@record.CourseName" SizeMode="SizeMode.Medium" NullText="Enter course name"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="Level">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.Course)context.EditModel;
+                        }
+                        <DxComboBox Data=lvlArr @bind-Value="@record.Level" NullText="Select level" SizeMode="SizeMode.Medium" />
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="FieldOfStudy">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.Course)context.EditModel;
+                        }
+                        <DxComboBox Data=fieldArr
+                                    @bind-Value="@record.FieldOfStudy" SizeMode="SizeMode.Medium" NullText="Select field of study"/>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FilterRowEditorVisible="false" Width="8rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var dataItem = (context.DataItem as HRMSv4.Shared.OnBoarding.Course);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-dark" data-toggle="tooltip" data-placement="left" title="Edit course" @onclick="@(() => MyGrid.StartEditDataItemAsync(dataItem))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Delete" @onclick="@(() => DeleteRow(dataItem))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                    <CellEditTemplate>
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                            <i class="lnr-checkmark-circle"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="left" title="Cancel" data-bs-original-title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                            <i class="lnr-cross"></i>
+                        </button>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+        @*<RadzenDataGrid @ref="courseGrid" AllowFiltering="true" AllowPaging="true" PageSize="20" AllowSorting="false" EditMode="DataGridEditMode.Single"
+        Data="@courses" LoadData="@LoadData" Count="@count" IsLoading="@isLoading" TItem="HRMSv4.Shared.OnBoarding.Course" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow"
+        PagerAlwaysVisible="true" ShowPagingSummary="true" PagerHorizontalAlign="HorizontalAlign.Center"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.SimpleWithMenu">
+        <Columns>
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.Course" Property="CourseName" Title="Course">
+        <EditTemplate Context="course">
+        <RadzenTextBox @bind-Value="course.CourseName" Style="width:100%; display: block" Name="Course" Placeholder="Enter course name"/>
+        <RadzenStringEmptyNullValidator Component="Course" Popup="@isPopUp"/>
+        </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.Course" Property="Level" Title="Level">
+        <EditTemplate Context="course">
+        <RadzenDropDown @bind-Value="course.Level" Data="@list" Name="Level"  Style="width:100%; display: block;" Placeholder="Select level"/>
+        <RadzenCompareValidator Value="string.Empty" Component="Level" Popup="@isPopUp" Text="Level is required"  Operator="CompareOperator.NotEqual" ></RadzenCompareValidator>
+        </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.Course" Property="FieldOfStudy" Title="Field Of Study">
+        <EditTemplate Context="course">
+        <RadzenDropDown @bind-Value="course.FieldOfStudy" Data="@listField" Name="FieldOfStudy" Style="width:100%; display: block;" Placeholder="Select field of study"/>
+        <RadzenCompareValidator Value="string.Empty" Component="FieldOfStudy" Popup="@isPopUp" Text="Field of study is required"  Operator="CompareOperator.NotEqual" ></RadzenCompareValidator>
+        </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.Course" Context="category" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="200px">
+        <Template Context="course">
+        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit Course" @onclick="@(args => EditRow(course))">
+        <i class="lnr-pencil"></i>
+        </button>
+        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(args => SaveRow(course))">
+        <i class="lnr-checkmark-circle"></i>
+        </button>
+        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(args => CancelEdit(course))">
+        <i class="lnr-cross"></i>
+        </button>
+        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(args => DeleteRow(course))">
+        <i class="lnr-trash"></i>
+        </button>
+        </Template>
+        </RadzenDataGridColumn>
+        </Columns>
+        </RadzenDataGrid>*@
+    </div>
+</div>
+
+@code {
+    IGrid? MyGrid { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.Course> gridDevExtremeDataSource;
+    RadzenDataGrid<HRMSv4.Shared.OnBoarding.Course>? courseGrid;
+    object Data { get; set; }
+    string[] lvlArr = { "Bachelor", "Vocational", "Doctorate", "Masters" };
+    string[] fieldArr = {
+        "Administration",
+        "Agriculture",
+        "Aircraft & Aviation",
+        "Architecture and Design",
+        "Arts & Design",
+        "Business",
+        "Education",
+        "Engineering",
+        "Formal Sciences",
+        "Health Sciences",
+        "Humanities",
+        "IT, ComSci, Programming",
+        "Languange",
+        "Law",
+        "Maritime",
+        "Media & Communication",
+        "Medical & HealthCare",
+        "Music",
+        "Natural Sciences",
+        "Nutrition",
+        "Professional & Technical Courses",
+        "Public Administration",
+        "Religion & Theology Science",
+        "Social Sciences",
+        "Teacher Education",
+        "Transportation",
+        "Tourism, Hospitality & Culinary"
+    };
+    protected override async Task OnInitializedAsync()
+    {
+        GetData();
+    }
+    public async void GetData()
+    {
+        var queryList = await service.GetAll();
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.Course>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "CourseId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        HRMSv4.Shared.OnBoarding.Course targetItem = e.EditModel as HRMSv4.Shared.OnBoarding.Course;
+
+        if (!string.IsNullOrWhiteSpace(targetItem.CourseName))
+        {
+            var result = await service.GetCheckDuplicate(targetItem);
+            if (result.StatusCode == 400)
+            {
+                await _Swal.FireAsync("Oops...", result.Value, "warning");
+            }
+            if (result.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", result.Value, "success");
+            }
+            GetData();
+        }
+    }
+    async Task EditRow(HRMSv4.Shared.OnBoarding.Course course)
+    {
+                SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to edit this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, edit it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.OnBoarding.Course targetItem = course;
+            targetItem.CourseName = GetValidString(targetItem.CourseName);
+            targetItem.Level = GetValidString(targetItem.Level);
+            targetItem.FieldOfStudy = GetValidString(targetItem.FieldOfStudy);
+
+            if (!string.IsNullOrWhiteSpace(targetItem.CourseName))
+            {
+                var result1 = await service.GetCheckDuplicate(targetItem);
+                if (result1.StatusCode == 400)
+                {
+                    await _Swal.FireAsync("Oops...", result1.Value, "warning");
+                }
+                GetData();
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.Course course)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            res = await service.Delete(course.CourseId);
+            if (res.StatusCode == 200)
+            {
+                GetData();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+    string GetValidString(string str)
+    {
+        string validString = "";
+        if (str != null)
+        {
+            string[] newStr = str.Split(' ');
+            List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+            foreach (string str1 in validList)
+            {
+                if (validString != "") return validString += " " + str1;
+                validString = str1;
+            }
+        }
+        return validString;
+    }
+    async Task HandleNewRecord()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    //IEnumerable<HRMSv4.Shared.OnBoarding.Course> courses;
+    //IList<HRMSv4.Shared.OnBoarding.Course> courseList;
+
+    //HRMSv4.Shared.OnBoarding.Course courseToInsert;
+    //List<string> list = new List<string>();
+    //List<string> listField = new List<string>();
+    //string courseToEdit;
+    //string levelToEdit;
+    //string fieldOfStudyToEdit;
+    //bool isLoading;
+    //int count;
+    //bool isPopUp = false;
+
+    //async Task LoadData(LoadDataArgs args)
+    //{
+    //    isLoading = true;
+    //    await Task.Yield();
+
+    //    var data = await service.GetAll();
+    //    isPopUp = data.Count() > 1 ? true : false;
+    //    var query = data.AsQueryable();
+
+    //    if (!string.IsNullOrEmpty(args.Filter))
+    //    {
+    //        query = query.Where(args.Filter);
+    //    }
+
+    //    if (!string.IsNullOrEmpty(args.OrderBy))
+    //    {
+    //        query = query.OrderBy(args.OrderBy);
+    //    }
+
+    //    count = query.Count();
+
+    //    courses = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+    //    isLoading = false;
+    //}
+
+    //async Task Reset()
+    //{
+    //    courseGrid.Reset(true);
+    //    await courseGrid.FirstPage(true);
+    //}
+
+    //private void GetField()
+    //{
+    //    listField.Add("Administration");
+    //    listField.Add("Agriculture");
+    //    listField.Add("Aircraft & Aviation");
+    //    listField.Add("Architecture and Design");
+    //    listField.Add("Arts & Design");
+    //    listField.Add("Business");
+    //    listField.Add("Education");
+    //    listField.Add("Engineering");
+    //    listField.Add("Formal Sciences");
+    //    listField.Add("Health Sciences");
+    //    listField.Add("Humanities");
+    //    listField.Add("IT, ComSci, Programming");
+    //    listField.Add("Languange");
+    //    listField.Add("Law");
+    //    listField.Add("Maritime");
+    //    listField.Add("Media & Communication");
+    //    listField.Add("Medical & HealthCare");
+    //    listField.Add("Music");
+    //    listField.Add("Natural Sciences");
+    //    listField.Add("Nutrition");
+    //    listField.Add("Professional & Technical Courses");
+    //    listField.Add("Public Administration");
+    //    listField.Add("Religion & Theology Science");
+    //    listField.Add("Social Sciences");
+    //    listField.Add("Teacher Education");
+    //    listField.Add("Transportation");
+    //    listField.Add("Tourism, Hospitality & Culinary");
+    //}
+
+    //private void GetLevel()
+    //{
+    //    list.Add("Bachelor");
+    //    list.Add("Vocational");
+    //    list.Add("Doctorate");
+    //    list.Add("Masters");
+    //}
+
+    //async Task InsertRow()
+    //{
+    //    courseToInsert = new HRMSv4.Shared.OnBoarding.Course();
+    //    if (count == 0) { count++; }
+    //    await courseGrid.InsertRow(courseToInsert);
+    //    StateHasChanged();
+    //}
+
+    //async Task OnCreateRow(HRMSv4.Shared.OnBoarding.Course course)
+    //{
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //    string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    course.CreatedBy = userId;
+
+    //    var result = await service.Add(course);
+
+    //    if (result.StatusCode == 200)
+    //    {
+    //        await _Swal.FireAsync("Success", result.Value, "success");
+    //        await Reset();
+    //        StateHasChanged();
+    //    }
+    //    else
+    //    {
+    //        await _Swal.FireAsync("Oops...", result.Value, "error");
+    //    }
+
+    //}
+
+    //async void OnUpdateRow(HRMSv4.Shared.OnBoarding.Course course)
+    //{
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //    string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    course.UpdatedBy = userId;
+    //    //course.CreatedBy = userId;
+    //    if (course == courseToInsert)
+    //    {
+    //        courseToInsert = null;
+    //    }
+
+    //    var result = await service.Update(course);
+    //    if (result.StatusCode == 200)
+    //    {
+    //        await _Swal.FireAsync("Success", result.Value, "success");
+    //        await Reset();
+    //    }
+    //    else
+    //    {
+    //        await Reset();
+    //        await _Swal.FireAsync("Oops...", result.Value, "error");
+    //    }
+    //}
+
+    //async Task EditRow(HRMSv4.Shared.OnBoarding.Course course)
+    //{
+    //    courseToInsert = course;
+    //    courseToEdit = course.CourseName;
+    //    levelToEdit = course.Level;
+    //    fieldOfStudyToEdit = course.FieldOfStudy;
+    //    await courseGrid.EditRow(course);
+    //    StateHasChanged();
+    //}
+
+    //async Task SaveRow(HRMSv4.Shared.OnBoarding.Course course)
+    //{
+    //    if (course == courseToInsert)
+    //    {
+    //        courseToInsert = null;
+    //    }
+
+    //    course.CourseName = GetValidString(course.CourseName);
+    //    course.FieldOfStudy = GetValidString(course.FieldOfStudy);
+    //    course.Level = GetValidString(course.Level);
+    //    var result = await service.GetCheckDuplicate(course);
+    //    if (result.StatusCode == 200)
+    //    {
+    //        await courseGrid.UpdateRow(course);
+    //    }
+    //    else if (result.StatusCode == 400)
+    //    {
+    //        await _Swal.FireAsync("Oops...", result.Value, "warning");
+    //    }
+    //    else
+    //    {
+    //        await _Swal.FireAsync("Error", result.Value, "error");
+    //    }
+
+    //}
+
+    //async void CancelEdit(HRMSv4.Shared.OnBoarding.Course course)
+    //{
+
+    //    if (course == courseToInsert)
+    //    {
+    //        courseToInsert = null;
+    //    }
+    //    if (course.CourseName != courseToEdit || course.Level != courseToEdit)
+    //    {
+    //        course.CourseName = courseToEdit;
+    //        courseGrid.CancelEditRow(course);
+    //    }
+    //    else
+    //    {
+    //        courseGrid.CancelEditRow(course);
+    //    }
+    //    await Reset();
+    //    StateHasChanged();
+    //}
+}

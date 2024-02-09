@@ -1,0 +1,146 @@
+﻿@using HRMSv4.Shared.HrPolicy
+@inject IGeneralPolicy service
+
+<div class="" id="jobApplication">
+    <div class="row" id=viewGeneral hidden="@hideViewJa">
+        <div class="col-sm-12">
+            <div class="">
+                <div class="card-header">
+                    <h5 class="card-header-text">Job Application Policy</h5>
+                    <div class="btn-actions-pane-right text-capitalize">
+                        <button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-focus btn-sm" onclick="@ToEditJa"><i class="pe-7s-note"></i></button>
+                    </div>
+                </div>
+                <div class="card-block" style="padding:1.25rem">
+                    <div id="view-info" class="row col-12">
+                        <div class="col-6">
+                            <div class="row mb-2">
+                                <div class="col-md-6 align-items-center d-flex">
+                                    <RadzenLabel Text="Number of Exam Questions" />
+                                </div>
+                                <div class="col-md-6">
+                                    <RadzenLabel Text="@Jap.NumberOfExamQuestions.ToString()" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <EditForm class="row" id=editGeneral Model="@Jap" hidden="@hideEditJa">
+        <div class="col-sm-12">
+            <div class="">
+                <div class="card-header">
+                    <h5 class="card-header-text">Job Application Policy</h5>
+                    <div class="btn-actions-pane-right text-capitalize">
+                        @* <button class="btn-wide btn-outline-2x me-md-2 btn btn-outline-focus btn-sm">View All</button>*@
+                    </div>
+                </div>
+                <div class="card-block" style="padding:1.25rem">
+                    <div id="view-info" class="row col-12">
+                        <div class="col-6">
+                            <div class="row mb-2">
+                                <div class="col-md-6 align-items-center d-flex">
+                                    <RadzenLabel Text="Number of Exam Questions" />
+                                </div>
+                                <div class="col-md-6">
+                                    <RadzenNumeric @bind-Value="Jap.NumberOfExamQuestions" Class="w-100" style="width: 100%;" Min="1" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="" style="display: unset !important;">
+                    <div class="float-end">
+                        <button type="button" id="next-btn" class="btn-shadow btn-wide me-3 btn btn-outline-secondary" onclick="@CancelJa">Cancel</button>
+                        <button type="button" id="prev-btn" class="btn-shadow btn-wide btn btn-outline-primary" onclick="@SaveJa">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    bool hideEditJa { get; set; } = true;
+    bool hideViewJa { get; set; } = false;
+
+    string userId = string.Empty;
+    JobApplicationPolicy Jap = new JobApplicationPolicy();
+
+    GeneralPolicyListView gpView = new GeneralPolicyListView();
+
+    protected override async Task OnInitializedAsync(){
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        Jap = await service.GetJobApplicationView();
+
+        StateHasChanged();
+
+    }
+
+    async void ToEditJa()
+    {
+        hideEditJa = false;
+        hideViewJa = true;
+        //gp = await service.Get();
+        StateHasChanged();
+    }
+
+    void CancelJa()
+    {
+        hideEditJa = true;
+        hideViewJa = false;
+        StateHasChanged();
+    }
+
+    async void SaveJa()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        int yr = 0;
+        HttpResponseMessage res;
+        string msg = string.Empty;
+        // yr = yearTo != null && yearTo != "" ? int.Parse(yearTo) : 0;
+        if (Jap.JobApplicationPolicyId > 0)
+        {
+            Jap.UpdatedBy = userId;
+            res = await service.AddJobApplication(Jap);
+            msg = "Record was successfully updated.";
+        }
+        else
+        {
+            Jap.CreatedBy = userId;
+            res = await service.AddJobApplication(Jap);
+            msg = "Record was successfully updated.";
+        }
+
+
+
+        if (res.IsSuccessStatusCode)
+        {
+            CancelJa();
+            StateHasChanged();
+
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Success",
+                    Text = msg,
+                    Icon = "success",
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Ok",
+                });
+            gpView = await service.GetView();
+            StateHasChanged();
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", "Unable to insert new record!", "error");
+        }
+    }
+
+}

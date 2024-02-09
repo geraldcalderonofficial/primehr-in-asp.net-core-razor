@@ -1,0 +1,433 @@
+﻿@page "/module-nonplantilla"
+@using DevExpress.Blazor
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared
+@using System.Linq.Dynamic.Core
+@inject SweetAlertService Swal
+@inject ILevelOrganization _IlevelOrganization
+@inject IPlantilla plantillaService
+@inject INonPlantilla nonPlantillaService
+@inject ContextMenuService ContextMenuService
+@attribute [AllowAnonymous]
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Non-Plantilla" Text="Non-Plantilla" Path="/masterdata/nonplantilla" />
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-4">
+                        <label class="form-label" for="exampleEmail55">SORT BY</label>
+                        <DxComboBox Data="sortByData"
+                                    TextChanged="OnSortBySelect"
+                                    @bind-Value="sortBy"
+                                    SizeMode="SizeMode.Medium" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label" for="exampleEmail55">SELECT OFFICE</label>
+                        <DxComboBox Data="_highestLevel"
+                                    NullText="--Select Level--"
+                                    TextChanged="OnDeptSelect"
+                                    @bind-Value="department"
+                                    SizeMode="SizeMode.Medium" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-4" style="align-self: end;">
+                <div class="row justify-content-end">
+                    <button class="mb-2 mx-3 btn btn-outline-2x btn-outline-primary" style="width:200px;margin-top: 20px;" @onclick="@InsertRow"> Add Non-Plantilla </button>
+                </div>
+            </div>
+        </div>
+        <DxGrid @ref="MyGrid" Data="@Data"
+                ShowFilterRow
+                KeyFieldName="TravelOrderId"
+                PagerVisible="true"
+                PageSize="10">
+            <Columns>
+                <DxGridDataColumn FieldName="Fullname" />
+                <DxGridDataColumn FieldName="Position" />
+                <DxGridDataColumn FieldName="Department" />
+                <DxGridDataColumn FieldName="RateType" />
+                <DxGridDataColumn FieldName="ActualSalary" />
+                <DxGridDataColumn FieldName="DateAdded" />
+                <DxGridDataColumn FilterRowEditorVisible="false" Width="15rem" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.NonPlantillaRecordView);
+                        }
+                        <button data-toggle="tooltip" data-placement="left" title="Details" class="border-0 btn-transition btn btn-outline-warning" @onclick="() => ShowNonPlantillaDetailsModal(temp!)"><span class="lnr-eye"></span></button>
+                        @if (temp!.MovementType != "ABOLISHED ITEMS")
+                        {
+                            <button data-toggle="tooltip" data-placement="left" title="Edit" class="border-0 btn-transition btn btn-outline-dark" @onclick="() => EditItem(temp!.PositionItemId)"><span class="lnr-pencil"></span></button>
+                            if (temp!.EmployeeId == 0)
+                            {
+                                <button data-toggle="tooltip" data-placement="left" title="Abolish" class="border-0 btn-transition btn btn-outline-danger" @onclick="() => AbolishItem(temp.PositionItemId)"><span class="lnr-cross"></span></button>
+                            }
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+@code {
+    IGrid? MyGrid { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.NonPlantillaRecordView>? gridDevExtremeDataSource;
+    object? Data { get; set; }
+
+    [CascadingParameter] public IModalService? Modal { get; set; }
+    private List<SelectListItems> _highestLevel { get; set; } = new List<SelectListItems>();
+    string sortBy { get; set; } = "ACTIVE ITEMS";
+    string[] sortByData = {
+    "ALL RECORDS",
+    "ACTIVE ITEMS",
+    "AVAILABLE NON-PLANTILLA SLOT",
+    "OCCUPIED NON-PLANTILLA SLOT",
+    "ABOLISHED ITEMS"
+    };
+    public string arrangeBy { get; set; } = "Item Number";
+    string department { get; set; } = "0";
+    string userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value!;
+        _highestLevel = await _IlevelOrganization.GetHighestLevel();
+        var response = await plantillaService.PlantillaYear(userId);
+        var queryList = response.StatusCode == 200 ? await nonPlantillaService.GetNonPlantillaList(sortBy, arrangeBy, department) : new List<NonPlantillaRecordView>();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.NonPlantillaRecordView>(queryList.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "PositionItemId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+        };
+        Data = gridDevExtremeDataSource;
+    }
+    public async Task GetData()
+    {
+        try
+        {
+            var response = await plantillaService.PlantillaYear(userId);
+            var queryList = response.StatusCode == 200 ? await nonPlantillaService.GetNonPlantillaList(sortBy, arrangeBy, department) : new List<NonPlantillaRecordView>();
+
+            gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.NonPlantillaRecordView>(queryList.AsQueryable());
+            Data = gridDevExtremeDataSource;
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+    async Task ShowNonPlantillaDetailsModal(NonPlantillaRecordView item)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+        var parameters = new ModalParameters();
+
+        parameters.Add(nameof(NonPlantillaItemDetailModal.selectedPlantillaItem), item);
+        var formModal = Modal!.Show<NonPlantillaItemDetailModal>("Non-Plantilla Item Details", parameters, options);
+        var result = await formModal.Result;
+    }
+    async Task EditItem(int id)
+    {
+        await ShowNonPlantillaModal(id);
+    }
+    async Task AbolishItem(int id)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Do you want to abolish the selected item?",
+                Text = "Please check information before Submiting!",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes",
+                CancelButtonText = "No",
+                CancelButtonColor = "#999999"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            PositionItem positionItem = new PositionItem();
+            positionItem.PositionItemId = id;
+            positionItem.UpdatedBy = userId;
+            var response = await nonPlantillaService.AbolishItem(positionItem.PositionItemId, userId);
+            if (response.StatusCode == 200)
+            {
+                await GetData();
+                await Swal.FireAsync("Success", response.Value, "success");
+            }
+            else if (response.StatusCode == 404)
+            {
+                await Swal.FireAsync("Warning", response.Value, "warning");
+            }
+            else
+            {
+                await Swal.FireAsync("Error", response.Value, "error");
+            }
+        }
+    }
+    async Task ShowNonPlantillaModal(int id)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(NonPlantillaModal.positionItemId), id);
+        var formModal = id > 0 ? Modal!.Show<NonPlantillaModal>("Update Non-Plantilla ", parameters, options) : Modal!.Show<NonPlantillaModal>("Add Non-Plantilla ", options);
+        var result = await formModal.Result;
+        if (!result.Cancelled)
+        {
+            await GetData();
+        }
+    }
+    async Task OnSortBySelect(string item)
+    {
+        sortBy = item;
+        await GetData();
+    }
+    async Task OnDeptSelect(string item)
+    {
+        department = item;
+        await GetData();
+    }
+    async Task InsertRow()
+    {
+        HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+        res = await plantillaService.CheckPlantilla();
+        if (res.StatusCode == 200)
+        {
+            await GetData();
+            await ShowNonPlantillaModal(0);
+        }
+        else if (res.StatusCode == 404)
+        {
+            await Swal.FireAsync("Warning", res.Value, "warning");
+        }
+        else
+        {
+            await Swal.FireAsync("Error", "You have successfully deleted a record.", "success");
+        }
+    }
+    //=== Code Unused Due to Migration to DevExpress
+    //IEnumerable<HRMSv4.Shared.OnBoarding.NonPlantillaRecordView> plantillaListdata;
+    //    <RadzenCard class="m-3">
+    //    <div class="card-body">
+    //        <div class="row">
+    //            <div class="col-md-4">
+    //                <div class="position-relative mb-3">
+    //                    <label class="form-label" for="exampleEmail55">SORT BY</label>
+    //                    <select class="form-select form-control-sm form-control" @onchange="@OnSortBySelect" >
+    //                        <option value="ALL RECORDS">ALL RECORDS</option>
+    //                        <option value="ACTIVE ITEMS" selected>ACTIVE ITEMS</option>
+    //                        <option value="AVAILABLE NON-PLANTILLA SLOT">AVAILABLE PLANTILLA SLOT</option>
+    //                        <option value="OCCUPIED NON-PLANTILLA SLOT">OCCUPIED PLANTILLA SLOT</option>
+    //                        <option value="ABOLISHED ITEMS">ABOLISHED ITEMS</option>
+    //                    </select>
+    //                </div>
+    //            </div>
+    //            <div class="col-md-4">
+    //                <div class="position-relative mb-3">
+    //                    <label class="form-label" for="exampleEmail55">SELECT OFFICE</label>
+    //                    <select class="form-select form-control-sm form-control" @onchange="@OnDeptSelect">
+    //                        @foreach (var item in _highestLevel)
+    //                        {
+    //                            <option value="@item.Value">@item.Text</option>
+    //                        }
+    //                    </select>
+    //                </div>
+    //            </div>
+    //             <div class="col-md-4">
+    //              <div class="position-relative mb-3 pull-right">
+    //                  <label class="form-label" for="exampleEmail55"></label>
+    //                   <button class="mb-2 btn btn-outline-2x btn-outline-primary" style="width:200px;margin-top: 20px;" @onclick="@InsertRow"> Add Non-Plantilla </button>
+    //               </div>
+    //             </div>
+    //        </div>
+    //    </div>
+    //</RadzenCard>
+    //        <RadzenCard class="m-3">
+    //         <RadzenDataGrid @ref="grid" AllowColumnResize="true"  LoadData="@LoadData" Count="@count" IsLoading="@isLoading" Data="@plantillaListdata"
+    //            TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView"
+    //            Responsive="true" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="10" Render="@OnRender" AllowGrouping="true"
+    //            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
+    //            PagerAlwaysVisible="true" ShowPagingSummary="true" PagerHorizontalAlign="HorizontalAlign.Center"
+    //            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.SimpleWithMenu">
+    //             <Columns>
+    //                  <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="Fullname" Title="Full Name">
+    //                    <Template Context="data">
+    //                          <p style="white-space:normal">@data.Fullname</p>
+    //                    </Template>
+    //                </RadzenDataGridColumn>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="Position" Title="Position" Width="200px">
+    //                     <Template Context="data">
+    //                          <p style="white-space:normal" >@data.Position</p>
+    //                     </Template>
+    //                </RadzenDataGridColumn>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="Department" Title="Department" Width="200px">
+    //                    <Template Context="data">
+    //                          <p style="white-space:normal">@data.Department</p>
+    //                    </Template>
+    //                </RadzenDataGridColumn>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="RateType" Title="Rate Type"/>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="ActualSalary" Title="Salary Rate"/>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Property="DateAdded" Title="Date Added"/>
+    //                <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.NonPlantillaRecordView" Context="data" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="200px">
+    //                     <Template Context="data">
+    //                         <RadzenButton Text="Action" Click="@(args => ShowContextMenuWithItems(args, data.PositionItemId, data.EmployeeId, data))"  ButtonStyle="ButtonStyle.Secondary"  />
+    //                     </Template>
+    //                 </RadzenDataGridColumn>
+    //             </Columns>
+    //        </RadzenDataGrid>
+    //        </RadzenCard>
+    //RadzenDataGrid<HRMSv4.Shared.OnBoarding.NonPlantillaRecordView> grid;
+    //IList<HRMSv4.Shared.OnBoarding.HistoryEntry> plList;
+    //bool isLoading;
+    //bool frozen =true;
+    //int count;
+    //int totalCount=0;
+    //bool hasPlantillaYear = false;
+    //bool? groupsExpanded = true;
+    //async void ShowContextMenuWithItems(MouseEventArgs args, int id, int empId, NonPlantillaRecordView data)
+    //{
+    //    if (empId > 0)
+    //    {
+    //        ContextMenuService.Open(args,
+    //       new List<ContextMenuItem> {
+    //            new ContextMenuItem(){ Text = "Edit Non Plantilla", Value = id,  },
+    //            new ContextMenuItem(){ Text = "View Details", Value = data },
+    //     }, OnMenuItemClick);
+    //    }
+    //    else
+    //    {
+    //        if (data.MovementType == "ABOLISHED ITEMS")
+    //        {
+    //             ContextMenuService.Open(args,
+    //              new List<ContextMenuItem> {
+    //                   new ContextMenuItem(){ Text = "View Details", Value = data },
+    //            }, OnMenuItemClick);
+    //        }
+    //        else
+    //        {
+    //            ContextMenuService.Open(args,
+    //       new List<ContextMenuItem> {
+    //            new ContextMenuItem(){ Text = "Edit Non Plantilla", Value = id,  },
+    //            new ContextMenuItem(){ Text = "View Details", Value = data },
+    //            new ContextMenuItem(){ Text = "Abolish Item", Value = id},
+    //     }, OnMenuItemClick);
+    //        }
+    //    }
+    //}
+    //async void OnMenuItemClick(MenuItemEventArgs args)
+    //{
+    //    int id = 0;
+    //    switch (args.Text)
+    //    {
+    //        case "View Details":
+    //            var data = args.Value as NonPlantillaRecordView;
+    //            ContextMenuService.Close();
+    //            if (data != null)
+    //            {
+    //               await ShowNonPlantillaDetailsModal(data);
+    //            }
+    //            break;
+    //        case "Abolish Item":
+    //            ContextMenuService.Close();
+    //            id = args.Value != null ? Convert.ToInt32(args.Value)  : 0 ;
+    //            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+    //            {
+    //                Title = "Do you want to abolish the selected item?",
+    //                Text = "Please check information before Submiting!",
+    //                Icon = SweetAlertIcon.Question,
+    //                ShowCancelButton = true,
+    //                ConfirmButtonText = "Yes",
+    //                CancelButtonText = "No",
+    //                CancelButtonColor = "#999999"
+    //            });
+    //            if (!string.IsNullOrEmpty(result.Value))
+    //            {
+    //                var response = await nonPlantillaService.AbolishItem(id, userId);
+    //                if (response.StatusCode == 200)
+    //                {
+    //                    await Swal.FireAsync("Success", response.Value, "success");
+    //                    await Reset();
+    //                }
+    //                else if(response.StatusCode == 404)
+    //                {
+    //                    await Swal.FireAsync("Warning", response.Value, "warning");
+    //                }
+    //                else
+    //                {
+    //                    await Swal.FireAsync("Error", response.Value, "error");
+    //                }
+    //            }
+    //            break;
+    //        default:
+    //            id = args.Value != null ? Convert.ToInt32(args.Value)  : 0 ;
+    //            ContextMenuService.Close();
+    //            //edit non plantilla
+    //            await ShowNonPlantillaModal(id);
+    //            break;
+    //    }
+    //}
+    //async Task LoadData(LoadDataArgs args)
+    //{
+    //    isLoading = true;
+    //    await Task.Yield();
+    //    var user = (await _AutService.GetAuthenticationStateAsync()).User;
+    //     userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+    //    var response = await plantillaService.PlantillaYear(userId);
+    //    var data = response.StatusCode == 200 ? await nonPlantillaService.GetNonPlantillaList(sortBy,arrangeBy,department) : new List<NonPlantillaRecordView>();
+    //    totalCount = data.Count();
+    //    var query = data.AsQueryable();
+    //    if (!string.IsNullOrEmpty(args.Filter))
+    //    {
+    //        query = query.Where(args.Filter);
+    //    }
+    //    if (!string.IsNullOrEmpty(args.OrderBy))
+    //    {
+    //        query = query.OrderBy(args.OrderBy);
+    //    }
+    //    count = query.Count();
+    //    plantillaListdata = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+    //    StateHasChanged();
+    //    isLoading = false;
+    //}
+    //async Task Reset()
+    //{
+    //    grid.Reset(true);
+    //    await grid.FirstPage(true);
+    //}
+    //public async void OnSortBySelect(ChangeEventArgs e)
+    //{
+    //    sortBy = e.Value.ToString();
+    //    await Reset();
+    //}
+    //void OnRender(DataGridRenderEventArgs<NonPlantillaRecordView> args)
+    //{
+    //    //if(args.FirstRender)
+    //    //{
+    //    //    args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Position", SortOrder = SortOrder.Descending });
+    //    //    StateHasChanged();
+    //    //}
+    //}
+    //void OnGroupRowRender(GroupRowRenderEventArgs args)
+    //{
+    //}
+    //void OnGroupRowExpand(Group group)
+    //{
+    //}
+    //void OnGroupRowCollapse(Group group)
+    //{
+    //}
+    //void OnGroup(DataGridColumnGroupEventArgs<NonPlantillaRecordView> args)
+        //{
+    //}
+}

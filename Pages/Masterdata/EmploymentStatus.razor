@@ -1,0 +1,292 @@
+﻿@page "/masterdata-employmentstatus"
+@inject IEmploymentStatus service
+@using System.Linq.Dynamic.Core
+@using HRMSv4.Client.Helpers
+@using DevExpress.Blazor
+
+<style>
+    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: inherit;
+        height: inherit;
+    }
+</style>
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Employment Status
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Employment Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="main-card mb-3 card">
+    <div class="card-body" onbeforeunload="TestDataTablesRemove('#example')">
+        <div class="col-lg-16" align="right">
+            <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" onclick="@InsertRow" style="margin-bottom: 10px; width:200px"> Add Employment Status </button>
+        </div>
+
+        <DxGrid @ref="MyGrid" Data="@Statuses" ValidationEnabled="false"
+                SelectionMode="GridSelectionMode.Single"
+                AllowSelectRowByClick="true"
+                CustomizeEditModel="Grid_CustomizeEditModel"
+                EditModelSaving="Grid_EditModelSaving"
+                DataItemDeleting="Grid_DataItemDeleting"
+                PopupEditFormCssClass="pw-800"
+                EditMode="GridEditMode.EditRow"
+                PagerVisible="true"
+                PageSize="50" ShowFilterRow="true">
+            <Columns>
+                <DxGridDataColumn FieldName="EmploymentStatusName">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.EmploymentStatus)context.EditModel;
+                        }
+                        <DxTextBox CssClass="cw-320" NullText="Enter rate type name" @bind-Text="record.EmploymentStatusName" SizeMode="SizeMode.Medium" />
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="IsPlantilla">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.EmploymentStatus)context.EditModel;
+                        }
+                        <DxCheckBox CssClass="chkClass" CheckType="CheckType.Switch"
+                                    LabelPosition="LabelPosition.Left"
+                                    @bind-Checked="@record.IsPlantilla"
+                                    Alignment="CheckBoxContentAlignment.SpaceBetween">
+                        </DxCheckBox>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="WithBenefits">
+                    <CellEditTemplate>
+                        @{
+                            var record = (HRMSv4.Shared.OnBoarding.EmploymentStatus)context.EditModel;
+                        }
+                        <DxCheckBox CssClass="chkClass" CheckType="CheckType.Switch"
+                                    LabelPosition="LabelPosition.Left"
+                                    @bind-Checked="@record.WithBenefits"
+                                    Alignment="CheckBoxContentAlignment.SpaceBetween">
+                        </DxCheckBox>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                    <CellDisplayTemplate>
+                        @{
+                            var temp = (context.DataItem as HRMSv4.Shared.OnBoarding.EmploymentStatus);
+                        }
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(temp))">
+                            <i class="lnr-pencil"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteRow(temp))">
+                            <i class="lnr-trash"></i>
+                        </button>
+                    </CellDisplayTemplate>
+                    <CellEditTemplate>
+                        <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                            <i class="lnr-checkmark-circle"></i>
+                        </button>
+                        <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                            <i class="lnr-cross"></i>
+                        </button>
+                    </CellEditTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+</div>
+
+
+@code {
+    IEnumerable<HRMSv4.Shared.OnBoarding.EmploymentStatus> statuses;
+    //HRMSv4.Shared.OnBoarding.EmploymentStatus statusToInsert;
+    //string statusToEdit;
+    //bool isLoading;
+    //int count;
+    //bool isPopUp = false;
+
+    IGrid? MyGrid { get; set; }
+    string userId = "";
+
+    object Statuses { get; set; }
+    GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.EmploymentStatus> gridDevExtremeDataSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async Task InsertRow()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    async Task UpdateDataAsync()
+    {
+        statuses = await service.GetAll();
+        var tempList = statuses.AsQueryable();
+
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<HRMSv4.Shared.OnBoarding.EmploymentStatus>(tempList);
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            loadOptions.PrimaryKey = new[] { "EmploymentStatusId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        Statuses = gridDevExtremeDataSource;
+        StateHasChanged();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var temp = (HRMSv4.Shared.OnBoarding.EmploymentStatus)e.EditModel;
+        }
+        else
+        {
+            var temp = (HRMSv4.Shared.OnBoarding.EmploymentStatus)e.EditModel;
+        }
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var data = e.EditModel as HRMSv4.Shared.OnBoarding.EmploymentStatus;
+
+        Response result = new Response();
+
+        if (!string.IsNullOrWhiteSpace(data.EmploymentStatusName))
+        {
+            data.EmploymentStatusName = GetValidString(data.EmploymentStatusName);
+
+            if (e.IsNew)
+            {
+                data.CreatedBy = userId;
+                result = await service.Add(data);
+            }
+            else
+            {
+                var res = await service.GetCheckDuplicate(data);
+                if (res.StatusCode == 200)
+                {
+                    data.UpdatedBy = userId;
+                    result = await service.Update(data);
+                }
+                else if (res.StatusCode == 400)
+                {
+                    await _Swal.FireAsync("Oops...", result.Value, "warning");
+                }
+                else
+                {
+                    await _Swal.FireAsync("Error", result.Value, "error");
+                }
+
+            }
+
+
+            if (result.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", result.Value, "success");
+                await UpdateDataAsync();
+            }
+            else
+            {
+                await UpdateDataAsync();
+                await _Swal.FireAsync("Oops...", result.Value, "error");
+            }
+        }
+        else
+        {
+            await _Swal.FireAsync("Oops...", "Please enter employment status name", "error");
+            return;
+        }
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var temp = (HRMSv4.Shared.OnBoarding.EmploymentStatus)e.DataItem;
+        var result = await service.Delete(temp.EmploymentStatusId);
+        if (result.StatusCode == 200)
+        {
+            await _Swal.FireAsync("Success", result.Value, "success");
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Error", result.Value, "error");
+        }
+    }
+
+    async Task DeleteRow(HRMSv4.Shared.OnBoarding.EmploymentStatus status)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#414141"
+            });
+
+        if (!string.IsNullOrWhiteSpace(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+
+            res = await service.Delete(status.EmploymentStatusId);
+
+            if (res.StatusCode == 200)
+            {
+                //statuses = await service.GetAll();
+                await _Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+                await UpdateDataAsync();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+
+        }
+        else
+        {
+            await _Swal.FireAsync("Wew!", "Your record is safe.", "success");
+        }
+    }
+
+
+    string GetValidString(string str)
+    {
+        string validString = "";
+        if (str != null)
+        {
+            string[] newStr = str.Split(' ');
+            List<string> validList = newStr.Where(c => c != "" && c != "\t" && c != "\n").ToList();
+            foreach (string str1 in validList)
+            {
+                if (validString != "")
+                {
+                    validString += " " + str1;
+                }
+                else
+                {
+                    validString = str1;
+                }
+            }
+        }
+
+        return validString;
+    }
+
+
+}

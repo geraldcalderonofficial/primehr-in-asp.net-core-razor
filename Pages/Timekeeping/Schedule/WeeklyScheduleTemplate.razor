@@ -1,0 +1,359 @@
+﻿@page "/tk-weeklyscheduletemplate"
+@using HRMSv4.Client.Shared.Modals.TimeKeeping.Schedule
+@using HRMSv4.Shared.Timekeeping
+@using DevExpress.Blazor
+@inject ISchedule service
+
+<style>
+/*    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: unset !important;
+        height: unset !important;
+    }*/
+
+    .form-check-input {
+        position: unset !important;
+        margin-top: unset !important;
+        margin-left: unset !important;
+    }
+</style>
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Weekly Schedule Template
+            </h3>
+        </div>
+        <div class="page-title-actions">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/tk-employeeschedules">Employee Schedules</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Weekly Schedule Template</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <h5 class="card-header-text float-start">Template</h5>
+                    @*disabled=@(subjectToInsert != null)*@
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@AddTemplate" style="margin-bottom: 10px;"> + New</button>
+                </div>
+            </div>
+            <div class="card-body">
+                
+            </div><DxGrid @ref="MyGrid" Data="@templates" ValidationEnabled="false"
+                        SelectionMode="GridSelectionMode.Single"
+                        @bind-SelectedDataItem="SelectedTemplateItem"
+                        AllowSelectRowByClick="true"
+                        CustomizeEditModel="Grid_CustomizeEditModel"
+                        EditModelSaving="Grid_EditModelSaving"
+                        DataItemDeleting="Grid_DataItemDeleting"
+                        PopupEditFormCssClass="pw-800"
+                        EditMode="GridEditMode.EditRow"
+                        PagerVisible="true"
+                        SelectedDataItemsChanged="SelectedTemplate"
+                        PageSize="10">
+                    <Columns>
+                        <DxGridDataColumn FieldName="ScheduleTitle">
+                            <CellEditTemplate>
+                                @{
+                                    var record = (WeeklySchedule)context.EditModel;
+                                }
+                                <DxTextBox CssClass="cw-320" NullText="Enter template name" @bind-Text="record.ScheduleTitle" />
+                            </CellEditTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="IsDefault">
+                            <CellEditTemplate>
+                                @{
+                                    var record = (WeeklySchedule)context.EditModel;
+                                }
+                                <DxCheckBox CheckType="CheckType.Switch"
+                                            LabelPosition="LabelPosition.Left"
+                                            Checked="@isDefault"
+                                            CheckedChanged="@((bool t) => CheckedChanged(t))"
+                                            Alignment="CheckBoxContentAlignment.SpaceBetween">
+                                </DxCheckBox>
+                            </CellEditTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FieldName="" Width="100px">
+                            <CellDisplayTemplate>
+                                @{
+                                    var temp = (context.DataItem as WeeklySchedule);
+                                }
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => MyGrid.StartEditDataItemAsync(temp))">
+                                    <i class="lnr-pencil"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteRow(temp))">
+                                    <i class="lnr-trash"></i>
+                                </button>
+                            </CellDisplayTemplate>
+                            <CellEditTemplate>
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Save" @onclick="@(() => MyGrid.SaveChangesAsync())">
+                                    <i class="lnr-checkmark-circle"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Cancel" @onclick="@(() => MyGrid.CancelEditAsync())">
+                                    <i class="lnr-cross"></i>
+                                </button>
+                            </CellEditTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                <div class="col-12 mt-2">
+                    <h5 class="card-header-text float-start">Schedule for a Week</h5>
+                    @* disabled=@(subjectToInsert != null)*@
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary float-end" onclick="@AddDays" style="margin-bottom: 10px;"> + New</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <DxGrid Data="@weekList" ShowFilterRow="true">
+                    <Columns>
+                        <DxGridDataColumn FieldName="DayOfWeek" />
+                        <DxGridDataColumn FieldName="StartTime" />
+                        <DxGridDataColumn FieldName="EndTime" />
+                        <DxGridDataColumn FieldName="" AllowSort="false" Width="90px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                            <CellDisplayTemplate>
+                                @{
+                                     var temp = (context.DataItem as WeeklyScheduleDay);
+                                }
+                                <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit" @onclick="@(() => EditDay(temp))">
+                                    <i class="lnr-pencil"></i>
+                                </button>
+                                <button class="border-0 btn-transition btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(() => DeleteDay(temp))">
+                                    <i class="lnr-trash"></i>
+                                </button>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    List<WeeklySchedule> templates = new List<WeeklySchedule>();
+    List<WeeklyScheduleDay> weekList = new List<WeeklyScheduleDay>();
+    object SelectedTemplateItem { get; set; }
+    IGrid? MyGrid { get; set; }
+    string userId = "";
+
+    bool isDefault { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        await UpdateDataAsync();
+    }
+
+    async void AddTemplate()
+    {
+        await MyGrid.StartEditNewRowAsync();
+    }
+
+    async void AddDays()
+    {
+        var temp = SelectedTemplateItem as WeeklySchedule;
+
+        if (temp == null)
+        {
+            await _Swal.FireAsync("Oops", "Please select template", "warning");
+            return;
+        }
+
+
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = false,
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(WeekScheduleModal.WeekScheduleId), temp.WeeklyScheduleId);
+        var _modalStatus = Modal.Show<WeekScheduleModal>("New schedule", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            weekList = new List<WeeklyScheduleDay>();
+            weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+            this.StateHasChanged();
+        }
+    }
+
+    async Task EditDay(WeeklyScheduleDay wsd)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                ContentScrollable = false,
+            };
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(WeekScheduleModal.WeekScheduleId), wsd.WeeklyScheduleId);
+        parameters.Add(nameof(WeekScheduleModal.WeekScheduleDayId), wsd.WeeklyScheduleDayId);
+        var _modalStatus = Modal.Show<WeekScheduleModal>("Edit schedule", parameters, options);
+        var modalResult = await _modalStatus.Result;
+        if (modalResult.Cancelled == false)
+        {
+            weekList = new List<WeeklyScheduleDay>();
+            weekList = await service.GetAllDays(wsd.WeeklyScheduleId);
+            this.StateHasChanged();
+        }
+    }
+
+    async Task DeleteDay(WeeklyScheduleDay wsd)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var res = await service.DeleteDay(wsd.WeeklyScheduleDayId);
+
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", res.Value, "success");
+                await UpdateDataAsync();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+
+    }
+
+    async Task SelectedTemplate(object selected)
+    {
+        var temp = SelectedTemplateItem as WeeklySchedule;
+
+        weekList = new List<WeeklyScheduleDay>();
+        weekList = await service.GetAllDays(temp.WeeklyScheduleId);
+
+        this.StateHasChanged();
+    }
+
+    async void Grid_CustomizeCellDisplayText(GridCustomizeCellDisplayTextEventArgs e)
+    {
+        //if (e.FieldName == "WeeklyScheduleId")
+        //{
+        //    //e.DisplayText = Categories.Where(c => c.CategoryId == (int)e.Value).FirstOrDefault().CategoryName;
+        //    weekList = await service.GetAllDays((int)e.Value);
+        //}
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var newSched = (WeeklySchedule)e.EditModel;
+        }
+        else
+        {
+            var temp = (WeeklySchedule)e.EditModel;
+            isDefault = temp.IsDefault;
+        }
+    }
+
+    void CheckedChanged(bool value)
+    {
+        isDefault = value;
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var data = e.EditModel as WeeklySchedule;
+        data.IsDefault = isDefault;
+        data.CreatedBy = userId;
+
+        if (string.IsNullOrEmpty(data.ScheduleTitle))
+        {
+            await _Swal.FireAsync("Oops", "Please enter template name", "warning");
+            return;
+        }
+
+        var result = await service.AddTemplate(data);
+
+        if (result.StatusCode == 200)
+        {
+            await _Swal.FireAsync("Success", result.Value, "success");
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Error", result.Value, "error");
+        }
+
+    }
+
+    async Task DeleteRow(WeeklySchedule ws)
+    {
+        SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var res = await service.DeleteTemplate(ws.WeeklyScheduleId);
+
+            if (res.StatusCode == 200)
+            {
+                await _Swal.FireAsync("Success", res.Value, "success");
+                await UpdateDataAsync();
+            }
+            else
+            {
+                await _Swal.FireAsync("Oops...", "Something went wrong!", "error");
+            }
+        }
+
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var temp = (WeeklySchedule)e.DataItem;
+        var result = await service.DeleteTemplate(temp.WeeklyScheduleId);
+        if (result.StatusCode == 200)
+        {
+            await _Swal.FireAsync("Success", result.Value, "success");
+            await UpdateDataAsync();
+        }
+        else
+        {
+            await _Swal.FireAsync("Error", result.Value, "error");
+        }
+    }
+
+    async Task UpdateDataAsync()
+    {
+        templates = await service.GetAllTemplate();
+        isDefault = false;
+        StateHasChanged();
+    }
+}

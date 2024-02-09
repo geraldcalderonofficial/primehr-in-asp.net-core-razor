@@ -1,0 +1,192 @@
+﻿@using DevExpress.Blazor
+@using HRMSv4.Shared.Selection
+@inject IPositionCompetency _posCompetencyService
+@inject ICompetencyLevelIndicator _posIndCompetencyService
+@inject IApplicantCompetency _appCompetencyService
+
+<style>
+    .dxbs-grid-group-row {
+        font-weight: bold;
+    }
+</style>
+
+<DevExpress.Blazor.Internal.DxCard>
+    <DxGrid @ref="MyGrid" Data="@_competencyTbl"
+            ShowGroupPanel="false"
+            PageSizeSelectorAllRowsItemVisible="false"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            EditModelSaving="Grid_EditModelSaving"
+            EditMode="GridEditMode.EditRow"
+            CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText">
+        <Columns>
+            <DxGridDataColumn FieldName="CompetencyName" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" DisplayFormat="c" GroupIndex="0" GroupInterval="GridColumnGroupInterval.Custom">
+
+            </DxGridDataColumn>
+
+            @*<DxGridDataColumn FieldName="Level" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" DisplayFormat="c" GroupIndex="1" GroupInterval="GridColumnGroupInterval.Custom">
+
+            </DxGridDataColumn>*@
+
+            <DxGridDataColumn FieldName="LevelOrder" Caption="Level" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" GroupIndex="1" GroupInterval="GridColumnGroupInterval.Custom">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as CompetencyScoringView);
+                    }
+                    @temp.Level
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+
+            <DxGridDataColumn FieldName="Indicators" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" Width="70%">
+                <CellDisplayTemplate>
+                    @{
+                        var temp = (context.DataItem as CompetencyScoringView);
+                    }
+                    <textarea @bind="temp.Indicators" class="form-control" readonly/>
+                </CellDisplayTemplate>
+                <CellEditTemplate>
+                    @{
+                        var record = (CompetencyScoringView)context.EditModel;
+                    }
+                    <textarea @bind="record.Indicators" class="form-control" readonly />
+                </CellEditTemplate>
+            </DxGridDataColumn>
+
+            <DxGridDataColumn  FieldName="MaxPoints" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" Width="10%">
+                <CellEditTemplate>
+                    @{
+                        var temp = (context.DataItem as CompetencyScoringView);
+                    }    
+                    <DxTextBox Text="@(temp.MaxPoints.ToString())" ReadOnly="true" SizeMode="SizeMode.Medium"></DxTextBox>
+                   
+                </CellEditTemplate>
+            </DxGridDataColumn>
+
+            <DxGridDataColumn FieldName="EarnedPoints" TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" Width="10%">
+                <CellEditTemplate>
+                    @{
+                        var record = (CompetencyScoringView)context.EditModel;
+                    }
+                    <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.EarnedPoints"
+                                BindValueMode="BindValueMode.OnInput"
+                                NullText="Type a value..."
+                                CssClass="cw-320" MinValue="0" MaxValue="@record.MaxPoints"></DxSpinEdit>
+                </CellEditTemplate>
+            </DxGridDataColumn>
+            <DxGridCommandColumn Name="Action" DeleteButtonVisible="false" NewButtonVisible="false" Width="10%" />
+
+        </Columns>
+
+
+
+
+    </DxGrid>
+</DevExpress.Blazor.Internal.DxCard>
+
+
+
+@code {
+    [Parameter]
+    public int PositionId { get; set; } = 0;
+
+    [Parameter]
+    public int AssessmentId { get; set; } = 0;
+
+    IGrid? MyGrid { get; set; }
+    List<CompetencyScoringView>? _competencyTbl = new List<CompetencyScoringView>();
+    string userId = "";
+    protected override async Task OnInitializedAsync()
+    {       
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+        _competencyTbl = await _appCompetencyService.Get(AssessmentId, PositionId, "Core Competency");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        MyGrid?.ExpandAllGroupRows();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var modelData = e.EditModel as CompetencyScoringView;
+        CompetencyAssessmentItem assessmentItem = new CompetencyAssessmentItem();
+        assessmentItem.CompetencyAssessmentId = AssessmentId;
+        assessmentItem.CompetencyAssessmentItemId = modelData.CompetencyAssessmentItemId;
+        assessmentItem.CompetencyId = modelData.CompetencyId;
+        assessmentItem.BasicPoints = 0;
+        assessmentItem.IntermediatePoints = 0;
+        assessmentItem.AdvancedPoints = 0;
+        assessmentItem.SuperiorPoints = 0;
+        switch (modelData.Level)
+        {
+            case "Basic":
+                assessmentItem.BasicPoints = modelData.EarnedPoints.Value;
+                break;
+
+            case "Intermediate":
+                assessmentItem.IntermediatePoints = modelData.EarnedPoints.Value;
+                break;
+
+            case "Advanced":
+                assessmentItem.AdvancedPoints = modelData.EarnedPoints.Value;
+                break;
+
+            case "Superior":
+                assessmentItem.SuperiorPoints = modelData.EarnedPoints.Value;
+                break;
+
+        }
+        if (assessmentItem.CompetencyAssessmentItemId > 0)
+        {
+            assessmentItem.UpdatedBy = userId;
+        }
+        else
+        {
+            assessmentItem.CreatedBy = userId;
+        }
+        var result = await _appCompetencyService.Update(assessmentItem);
+        _competencyTbl = await _appCompetencyService.Get(AssessmentId, PositionId, "Core Competency");
+    }
+
+    void Grid_CustomizeGroupValueDisplayText(GridCustomizeGroupValueDisplayTextEventArgs e)
+    {
+        if (e.FieldName == "LevelOrder")
+        {
+
+            int val = int.Parse(e.Value.ToString());
+
+            e.DisplayText = GetOrder(val).ToString();
+        }
+    }
+
+    public string GetOrder(int lvl)
+    {
+        string orderName = "";
+        switch (lvl)
+        {
+            case 1:
+                orderName = "Basic";
+                break;
+
+            case 2:
+                orderName = "Intermediate";
+                break;
+
+            case 3:
+                orderName = "Advanced";
+                break;
+
+            case 4:
+                orderName = "Superior";
+                break;
+
+        }
+        return orderName;
+    }
+
+}

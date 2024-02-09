@@ -1,0 +1,412 @@
+﻿@page "/masterdata-organizationallevel"
+@using HRMSv4.Client.Shared.Modals
+@using HRMSv4.Shared
+@inject ICompanyProfile companyService
+@inject ILevel levelService
+@inject ILevelOrganization levelOrganizationService
+@inject SweetAlertService Swal
+@using System.Linq.Dynamic.Core
+
+<style>
+    .rz-treenode-content-selected .rz-treenode-label {
+    width: 100% !important;
+}
+</style>
+
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Organization Level
+            </h3>
+        </div>
+        <div class="page-title-actions">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Organizational Level</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+        <div class="col-md-4">
+            <RadzenCard class="m-1">
+                <h4>Select Level Title</h4>
+               <RadzenTree Data=@colAllTags Expand=@LoadTree Change=@OnChange @bind-Value=@selection  >
+                      <RadzenTreeLevel Text=@GetTextForNode Expanded="@(data => true)">                                
+                       </RadzenTreeLevel>                           
+               </RadzenTree>
+            </RadzenCard>
+        </div>
+        <div class="col-md-8">           
+            <RadzenCard class="m-1">
+                <div class="col-lg-16" align="right">
+                     <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" style="margin-bottom: 10px; width:200px" @onclick="@InsertRow"> Add @selectedNodeLevel.NodeName </button>     
+                </div>                        
+                     <RadzenDataGrid LoadData="@LoadData" Count="@count" IsLoading="@isLoading" Responsive="true"
+                         @ref="levelGrid" AllowFiltering="true" AllowPaging="true" PageSize="10" AllowSorting="true"
+                                 Data="@levelOrgModel" TItem="HRMSv4.Shared.OnBoarding.LevelOrganizationModelView" PagerAlwaysVisible="true" ShowPagingSummary="true" PagerHorizontalAlign="HorizontalAlign.Center"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.SimpleWithMenu">
+                         <Columns>      
+                             <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.LevelOrganizationModelView" Property="Name" Title="@selectedNodeLevel.NodeName"/>                
+                            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.LevelOrganizationModelView" Property="ParentName" Title="@selectedNodeLevel.ParentName" Visible="@IsVisibleParent"/>                                                               
+                             @*<RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.LevelOrganizationModelView" Context="lvl" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
+                                  <Template Context="lvl">
+                                       <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit Organization" @onclick="@(args => ShowOrganizationModal(lvl.LevelOrganizationId))">
+                                            <i class="lnr-pencil"></i>
+                                       </button>
+                                 </Template>
+                             </RadzenDataGridColumn>  *@                        
+                            <RadzenDataGridColumn TItem="HRMSv4.Shared.OnBoarding.LevelOrganizationModelView" Context="lvl" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
+                                  <Template Context="lvl">
+                                      <button class="border-0 btn-transition btn btn-outline-success" data-toggle="tooltip" data-placement="top" title="Edit Organization" @onclick="@(args => ShowOrganizationModal(lvl.LevelOrganizationId))">
+                                            <i class="lnr-pencil"></i>
+                                       </button> 
+                                      <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(args => DeleteRow(lvl))">
+                                        <i class="lnr-trash"></i>
+                                       </button>
+                                  </Template>
+                                  @*<EditTemplate Context="lvl">
+                                      <button class="border-0 btn-transition btn btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Delete" @onclick="@(args => DeleteRow(lvl))">
+                                        <i class="lnr-trash"></i>
+                                       </button>
+                                  </EditTemplate>*@
+                             </RadzenDataGridColumn>
+
+                         </Columns>
+                     </RadzenDataGrid>
+             </RadzenCard>
+        </div>
+</div>
+ 
+@code {
+    object selection;
+    IEnumerable<string> selectedParentFilter;
+    IEnumerable<HRMSv4.Shared.OnBoarding.LevelOrganizationModelView> levelOrgModel;
+    RadzenDataGrid<HRMSv4.Shared.OnBoarding.LevelOrganizationModelView> levelGrid;
+    private List<SelectListItems> listOfParents   { get; set; } = new List<SelectListItems>();
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+    private List<HRMSv4.Shared.OnBoarding.TreeNode> colAllTags { get; set; } = new List<HRMSv4.Shared.OnBoarding.TreeNode>();
+    HRMSv4.Shared.OnBoarding.TreeNode selectedNodeLevel = new HRMSv4.Shared.OnBoarding.TreeNode();
+    private List<HRMSv4.Shared.OnBoarding.Level> colDataNode { get; set; } = new List<HRMSv4.Shared.OnBoarding.Level>();
+    IEnumerable<HRMSv4.Shared.OnBoarding.Level> levels;
+
+    private bool IsVisibleParent {get;set;} = false;
+
+    List<Level> colTreelist = new List<Level>();
+    int SelectedTreeNodeParentId = 0;
+    bool isLoading;
+    int count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //string orgName = await levelOrganizationService.GetParentToChild(24);
+        await GetParentOrganizations();
+        selection = colAllTags.First();
+
+
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var data = await levelOrganizationService.GetByLevelTitle(SelectedTreeNodeParentId);
+        var query = data.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {           
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        levelOrgModel = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+         StateHasChanged();
+        isLoading = false;
+    }
+
+    async Task Reset()
+    {
+        levelGrid.Reset(true); 
+        await levelGrid.FirstPage(true);
+        //StateHasChanged();
+    }
+
+
+    void OnChange(TreeEventArgs args)
+    {
+        SelectNode((args.Value as TreeNode));
+    }
+
+    async Task GetParentOrganizations()
+    {
+        levels = await levelService.GetAll();
+        colDataNode = levels.ToList();
+        colAllTags = await GetTree(colDataNode);
+
+
+    }
+
+    void OnSelectedParentChange(object value)
+    {
+        if (selectedParentFilter != null && !selectedParentFilter.Any())
+        {
+            selectedParentFilter = null;  
+        }
+    }
+
+    async void SelectNode(TreeNode selectedNode)
+    {
+
+
+        //do something here // check if highest parent or child only
+        selectedNodeLevel.Children = selectedNode.Children;
+        selectedNodeLevel.LevelId = selectedNode.LevelId;
+        selectedNodeLevel.NodeName = selectedNode.NodeName;
+        selectedNodeLevel.Selected = selectedNode.Selected;
+
+        IsVisibleParent = selectedNode.ParentName != null && selectedNode.ParentName != "" ? true :  false ;
+        selectedNodeLevel.ParentName = selectedNode.ParentName;
+
+        selectedParentFilter = null;
+        //levelOrgModel = await levelOrganizationService.GetByLevelTitle(selectedNode.LevelId);
+
+        //listOfParents = selectedNode.LevelId > 0 ? await levelOrganizationService.ListofParentLevels(selectedNode.LevelId) : new List<HRMSv4.Shared.SelectListItems>();
+
+        // Get colTreelist
+        //colTreelist =
+        //    await GetTreeList(colAllTags, selectedNodeLevel);
+
+        //await levelGrid.FirstPage();      
+        //StateHasChanged();
+        SelectedTreeNodeParentId = selectedNode.LevelId;
+        //listOfParents = SelectedTreeNodeParentId > 0 ? await levelOrganizationService.ListofParentLevels(SelectedTreeNodeParentId) : new List<HRMSv4.Shared.SelectListItems>();
+        await Reset();
+    }
+
+    string GetTextForNode(object data)
+    {
+        return ((TreeNode)data).NodeName;
+    }
+
+    void LoadTree(TreeExpandEventArgs args)
+    {
+        var objTreeNode = args.Value as TreeNode;
+        args.Children.Data = objTreeNode.Children;
+        args.Children.Text = GetTextForNode;
+        args.Children.HasChildren = e => (e as TreeNode).Children.Any();
+    }
+
+    public static async Task<List<TreeNode>> GetTree(List<Level> DataNodes)
+    {
+        List<TreeNode> ColTreeNodes = new List<TreeNode>();
+        // Get all the top level nodes
+        foreach (var node in DataNodes.Where(x => x.ParentId == 0))
+        {
+            TreeNode objTreeNode = new TreeNode();
+            objTreeNode.LevelId = node.LevelId;
+            objTreeNode.NodeName = node.Name;
+            objTreeNode.Children = new List<TreeNode>();
+            ColTreeNodes.Add(objTreeNode);
+            //Recursively call the AddChildren method adding all children
+            AddChildren(DataNodes, ColTreeNodes, objTreeNode);
+        }
+        return ColTreeNodes;
+    }
+
+    private static void AddChildren( List<Level> colNodeItemCollection, List<TreeNode> colTreeNodeCollection, TreeNode paramTreeNode)
+    {
+        var ChildResults = from objNode in colNodeItemCollection
+                           where objNode.ParentId == paramTreeNode.LevelId
+                           select objNode;
+        // Loop thru each Child of the current Node
+        foreach (var objChild in ChildResults)
+        {
+            // Create a new Node
+            var objNewNode = new TreeNode();
+            objNewNode.LevelId = objChild.LevelId;
+            objNewNode.NodeName = objChild.Name;
+            objNewNode.Children = new List<TreeNode>();
+            objNewNode.ParentName = paramTreeNode.NodeName;
+            paramTreeNode.Children.Add(objNewNode);
+            AddChildren(colNodeItemCollection, colTreeNodeCollection, objNewNode);
+        }
+    }
+
+    public static async Task<List<Level>> GetTreeList(
+           List<TreeNode> TreeNodes, TreeNode CurrentSelectedNode)
+    {
+        List<Level> ColTreeNodes = new List<Level>();
+
+        // Create default
+        //ColTreeNodes.Add(
+        //    new Level()
+        //    {
+        //        LevelId = 0,
+        //        ParentId = 0,
+        //        Name = CurrentSelectedNode.NodeName
+        //    });
+
+        // Get all the top level nodes
+        foreach (var node in TreeNodes)
+        {
+            ColTreeNodes.Add(
+                new Level()
+                    {
+                        LevelId = node.LevelId,
+                        ParentId = 0,
+                        Name = node.NodeName
+                    });
+
+            // Recursively call the AddChildren method adding all children
+
+            AddTreeListChildren(TreeNodes, ColTreeNodes, node);
+        }
+
+        // Prepare final collection
+        List<Level> ColFinalTreeNodes = new List<Level>();
+
+        foreach (var item in ColTreeNodes)
+        {
+            // Do not add the currently selected node to the list
+            //if (item.LevelId != CurrentSelectedNode.LevelId)
+            //{
+            ColFinalTreeNodes.Add(item);
+            //}
+        }
+
+        return ColFinalTreeNodes;
+    }
+
+    private static void AddTreeListChildren(
+      List<TreeNode> colNodeItemCollection,
+      List<Level> colTreeNodeCollection,
+      TreeNode paramTreeNode)
+    {
+        // Get the children of the current item
+        // This method may be called from the top level 
+        // or recursively by one of the child items
+
+        // Loop thru each Child of the current Node
+        foreach (var objChild in paramTreeNode.Children)
+        {
+            // Get the Parent node
+            var ParentNode = 
+                colTreeNodeCollection
+                .Where(x => x.LevelId == paramTreeNode.LevelId).FirstOrDefault();
+
+            // See how many dots the Parent has
+            int CountOfParentDots = ParentNode.Name.Count(x => x == '.');
+
+            colTreeNodeCollection.Add(
+                new Level()
+                    {
+                        LevelId = objChild.LevelId,
+                        ParentId = ParentNode.LevelId,
+                        Name = $"{AddDots(CountOfParentDots + 1)}{objChild.NodeName}"
+                    });
+
+            // Recursively call the AddChildren method adding all children
+            AddTreeListChildren(colNodeItemCollection, colTreeNodeCollection, objChild);
+        }
+    }
+
+    private static string AddDots(int intDots)
+    {
+        String strDots = "";
+        for (int i = 0; i < intDots; i++)
+        {
+            strDots += ". ";
+        }
+        return strDots;
+    }
+
+    async Task InsertRow()
+    {
+        //HRMSv4.Shared.OnBoarding.OrganizationLevel newModel = new HRMSv4.Shared.OnBoarding.OrganizationLevel();
+        await  ShowOrganizationModal(0);
+    }
+
+
+    async Task ShowOrganizationModal(int id)
+    {
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+
+
+            };
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(OrganizationLevelModal.lvlId), selectedNodeLevel.LevelId);
+
+        var getParent = await levelService.Get(selectedNodeLevel.LevelId);
+
+        var getParentName = getParent.ParentId > 0 ? await levelService.Get(getParent.ParentId) : null ;
+
+        if (getParentName == null) { parameters.Add(nameof(OrganizationLevelModal.HideParent), true); }
+
+        if(getParentName != null)  { parameters.Add(nameof(OrganizationLevelModal.ParentName), "Select " + getParentName.Name); }
+
+        if(id > 0 )  { parameters.Add(nameof(OrganizationLevelModal.lvlOrgId), id); }
+
+        var formModal =  id > 0 ? Modal.Show<OrganizationLevelModal>( "Update "+ selectedNodeLevel.NodeName,parameters , options) : Modal.Show<OrganizationLevelModal>( "Add "+ selectedNodeLevel.NodeName,parameters , options);
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false)
+        {
+            await Reset();
+            //levelOrgModel = await levelOrganizationService.GetByLevelTitle(selectedNodeLevel.LevelId);
+            //await levelGrid.Reload();
+            //StateHasChanged();
+        }
+       //await levelGrid.Filter.InvokeAsync();
+       // await levelGrid.FirstPage();
+       // StateHasChanged();
+    }
+
+    async Task DeleteRow(LevelOrganizationModelView lvlOrg)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You are about to delete this record.",
+                Icon = "warning",
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "Cancel",
+                CancelButtonColor = "#dc3741"
+
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            HRMSv4.Shared.Response res = new HRMSv4.Shared.Response();
+            res = await levelOrganizationService.Delete(lvlOrg.LevelOrganizationId);
+
+             if(res.StatusCode == 200)
+             {
+                  await Swal.FireAsync("Success", "You have successfully deleted a record.", "success");
+                  levelOrgModel = await levelOrganizationService.GetByLevelTitle(selectedNodeLevel.LevelId);      
+                  StateHasChanged();                
+             }
+        }
+
+
+    }
+    
+}

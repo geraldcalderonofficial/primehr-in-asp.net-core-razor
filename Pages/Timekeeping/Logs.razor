@@ -1,0 +1,57 @@
+﻿@page "/tk-timelogs"
+@using DevExpress.Blazor
+
+<HRMSv4.Client.Shared.MainComponents.Breadcrumbs HeaderText="Time Keeping Logs" Text="Logs" Path="/tk-timelogs" />
+
+<div class="cw-480">
+    <DxTabs @bind-ActiveTabIndex="@ActiveTabIndex">
+        <DxTab Text="Face Scanner Logs" TabIconCssClass="lnr-smartphone"></DxTab>
+        <DxTab Text="Employee Logs" TabIconCssClass="lnr-users"></DxTab>
+        <DxTab Text="Approved Logs" TabIconCssClass="ion-android-done-all"></DxTab>
+    </DxTabs>
+    <div class="card dxbs-border-top-0 dxbs-border-radius-top-0" style="min-height: 190px; padding-left: 15px; padding-right: 15px; padding-bottom: 15px;">
+
+        @switch (ActiveTabIndex)
+        {
+            case 0:
+                <div class="tab-content">
+                    @GetRenderFragment(types[ActiveTabIndex])
+                </div>
+                break;
+            case 1:
+                <div class="tab-content">
+                    @GetRenderFragment(types[ActiveTabIndex])
+                </div>
+                break;
+            case 2:
+                <div class="tab-content">
+                    @GetRenderFragment(types[ActiveTabIndex])
+                </div>
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    int ActiveTabIndex { get; set; } = 0;
+
+    List<string> _tabs = new List<string>(new[] { "FaceScannerLogs", "EmployeeLogs", "ApprovedLogs" });
+
+    RenderFragment GetRenderFragment(Type type)
+    {
+        RenderFragment renderFragment = renderTreeBuilder =>
+        {
+            renderTreeBuilder.OpenComponent(0, type);
+            renderTreeBuilder.CloseComponent();
+        };
+        return renderFragment;
+    }
+
+    ComponentBase[] components = {
+        new HRMSv4.Client.Pages.Timekeeping.Fragment.FaceScannerLogs(),
+        new HRMSv4.Client.Pages.Timekeeping.Fragment.EmployeeLogs(),
+         new HRMSv4.Client.Pages.Timekeeping.Fragment.ApprovedLogs()
+    };
+
+    Type[] types => components.Select(c => c.GetType()).ToArray();
+}

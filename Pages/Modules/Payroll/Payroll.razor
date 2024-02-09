@@ -1,0 +1,1124 @@
+﻿@page "/module-payroll"
+@page "/module-payroll/{parameter}"
+@using HRMSv4.Client.Interface.Payroll
+@inject IPayrollDate service
+@inject IJSRuntime JSRuntime
+@inject ILevelOrganization _IlevelOrganization
+@inject IPayroll _payrollService
+@inject IDeductionTypes _deductionTypesService
+@inject IAllowancetype _allowanceTypeService
+@inject ILoanType _loanTypeService
+@inject IServiceRecord _serviceRecord
+@inject IPosition _position
+@using DevExpress.Blazor
+@using HRMSv4.Client.Shared.Modals.Payroll
+@using HRMSv4.Shared.Payroll
+
+<style>
+
+    .dxbs-checkbox .custom-control > .custom-control-input {
+        width: inherit !important;
+        height: inherit !important;
+    }
+
+    .dxbs-grid-header-content {
+        justify-content: center;
+    }
+
+    .form-check-input {
+        position: relative !important;
+        margin-top: 0.3rem;
+        margin-left: unset !important;
+    }
+</style>
+
+<div class="app-page-title">
+    <div class="page-title-wrapper">
+        <div class="page-title-heading">
+            <h3>
+                Payroll
+            </h3>
+        </div>
+        <div class="page-title-actions">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/module-payrolldate">Payroll Date</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payroll</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label">Payroll Date</label>
+                    <label class="form-label col mt-2"><b>@(payDateRange)</b></label>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="position-relative mb-3">
+                    <label class="form-label">Office</label>
+
+                    <DxComboBox SizeMode="SizeMode.Medium" Data="@_highestLevel"
+                                TextFieldName="@nameof(SelectListItems.Text)"
+                                NullText="Select Office"
+                                Value="@currentOffice"
+                                ValueChanged="@((SelectListItems selectedOffice) => FilterOffice(selectedOffice))" />
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="position-relative mb-3" style="margin-top: 20px;text-align:right">
+                    <button class="mb-2 me-2 btn btn-outline-2x btn-outline-primary" disabled="@(_selectedEmployeeList.Count() > 0  ? false : true)" style="margin-bottom: 10px; width:200px" @onclick="@GeneratePayroll"> Generate Payroll </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+
+    <div class="col-lg">
+        <div class="main-card mb-3 card">
+            <div class="col m-3" style="text-align: right;">
+                <DxButton Text="Column Chooser"
+                          RenderStyle="ButtonRenderStyle.Secondary"
+                          IconCssClass="btn-column-chooser"
+                          CssClass="column-chooser-button mr-3"
+                          Click="@OnClickColumnChooser" />
+                <DxButton Text="Toggle Payroll Profile"
+                          RenderStyle="ButtonRenderStyle.Secondary"
+                          IconCssClass="btn-column-chooser"
+                          CssClass="column-chooser-button mr-3"
+                          Click="@EditRow"
+                          Visible="@(_selectedEmployeeList.Count() == 1 ? true : false )" />
+                @* <DxButton Text="@selectButtonText"
+                IconCssClass="btn-column-chooser"
+                CssClass="column-chooser-button mr-3"
+                RenderStyle="ButtonRenderStyle.Secondary"
+                Click="@SelectAllEmployee" />*@
+            </div>
+            <DxGrid @ref="MyGrid" Data="@Data" SelectedDataItems="@_selectedEmployeeList" SelectionMode="GridSelectionMode.Multiple"
+                    AllowSelectRowByClick="true" SelectedDataItemsChanged="SelectedEmployee" PageSize="20" PagerNavigationMode="PagerNavigationMode.InputBox" PagerVisible="true" ShowFilterRow="true">
+                <Columns>
+                    <DxGridSelectionColumn Width="60px" ShowInColumnChooser="false" />
+                    <DxGridDataColumn FieldName="FullName" Caption="Name">
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="SalaryAmount" Caption="Salary">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.SalaryAmount != null && temp.SalaryAmount > 0 ? temp.SalaryAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="AllowancesAmount" Caption="Allowances">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.AllowancesAmount != null && temp.AllowancesAmount > 0 ? temp.AllowancesAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="LoansAmount" Caption="Loans">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.LoansAmount != null && temp.LoansAmount > 0 ? temp.LoansAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="OtherDeductionsAmount" Caption="Other Deductions">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.OtherDeductionsAmount != null && temp.OtherDeductionsAmount > 0 ? temp.OtherDeductionsAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="PremiumsAmount" Caption="Premiums">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.PremiumsAmount != null && temp.PremiumsAmount > 0 ? temp.PremiumsAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="WithholdingTaxAmount" Caption="Tax">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.WithholdingTaxAmount != null && temp.WithholdingTaxAmount > 0 ? temp.WithholdingTaxAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="NetPayAmount" Caption="Net Pay">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.NetPayAmount != null && (temp.NetPayAmount > 0 || temp.NetPayAmount < 0) ? temp.NetPayAmount.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="FirstCutoffValue" Visible="false" Caption="1 - 15">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.FirstCutoffValue != null && (temp.FirstCutoffValue > 0 || temp.FirstCutoffValue < 0) ? temp.FirstCutoffValue.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FilterRowEditorVisible="false" FieldName="SecondCutoffValue" Visible="false" Caption="16 - 30">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            @(temp.SecondCutoffValue != null && (temp.SecondCutoffValue > 0 || temp.SecondCutoffValue < 0) ? temp.SecondCutoffValue.Value.ToString("n2") : "0.00")
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+                    <DxGridDataColumn TextAlignment="DevExpress.Blazor.GridTextAlignment.Center" FilterRowEditorVisible="false" AllowSort="false" FieldName="" Caption="Action">
+                        <CellDisplayTemplate>
+                            @{
+                                var temp = (context.DataItem as EmployeePayrollDetailView);
+                            }
+                            <button data-bs-toggle="tooltip" data-bs-placement="left" title="Print" data-bs-original-title="Print" class="border-0 btn-transition btn btn-outline-primary" @onclick="()=> PrintPaySlip(temp)"><span class="lnr-printer"></span></button>
+                        </CellDisplayTemplate>
+
+                    </DxGridDataColumn>
+
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="FullName" />
+
+                </TotalSummary>
+            </DxGrid>
+        </div>
+
+    </div>
+    <div class="col-xl-4" hidden="@isHidden">
+        <div class="main-card mb-3 card">
+            <DxAccordion ExpandMode="ExpandMode" disabled ExpandCollapseAction="ExpandCollapseAction">
+                <Items>
+                    <DxAccordionItem Enabled="@isDisabled" Text="Logs & Leaves">
+                        <ContentTemplate>
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <form class="">
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleEmail" class="form-label col-sm-5 col-form-label">Generation Type</label>
+                                            <div class="col-sm-7">
+                                                <DxComboBox SizeMode="SizeMode.Medium" Data="@generateTypeList"
+                                                            NullText="Select generation type"
+                                                            @bind-Value="@logsAndLeavesModel.GenerationType" />
+
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="examplePassword" class="form-label col-sm-5 col-form-label">Regular Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.RegularDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Special Non-Working Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.SpecialNonWorkingDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Regular Holiday Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.RegularHolidayDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Overtime Value</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.OvertimeValue"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Night Diff. Hours</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.NightDiffHours"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Undertime Value</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.UndertimeValue"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Required Days to Attend</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.RequiredDaysToAttend"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Absent Value</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.AbsentValue"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Leave Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.LeaveDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Leave WO Pay Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.LeaveWoPayDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+
+                                        <div class="position-relative row mb-3">
+                                            <label for="exampleSelect" class="form-label col-sm-5 col-form-label">Absent WO Leave Days</label>
+                                            <div class="col-sm-7">
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@logsAndLeavesModel.AbsentWoLeaveDays"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            MinValue="0" Mask="n2">
+                                                </DxSpinEdit>
+                                            </div>
+                                        </div>
+                                        <div class="position-relative ml-3 mt-3 row form-check">
+                                            <div class="col-sm-10 offset-sm-2">
+                                                <DxButton class="float-end btn btn-outline-2x btn-outline-primary" Click="@(() => RecomputePayroll(0))" SubmitFormOnClick="false" Text="Save And Recompute" />
+                                            </div>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </DxAccordionItem>
+                    <DxAccordionItem Enabled="@isDisabled" Text="Allowances">
+                        <ContentTemplate Context="contextEdit">
+                            <div class="container row mt-3 mb-3 ml-1">
+                                <DxGrid @ref="MyGridAllowance" Data="@allowanceDetailsList.Where(c => c.ForDeleting == false).ToList()"
+                                        ShowGroupPanel="false"
+                                        PageSizeSelectorAllRowsItemVisible="false"
+                                        EditModelSaving="AllowanceGrid_EditModelSaving"
+                                        EditMode="GridEditMode.EditRow">
+                                    <Columns>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="Amount" Caption="Allowance Amount">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (AllowanceDetailView)context.EditModel;
+                                                }
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.Amount"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            CssClass="cw-320" MinValue="0" Mask="n2"></DxSpinEdit>
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="AllowanceTypeString" TextAlignment="GridTextAlignment.Center" Caption="Allowance Type">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (AllowanceDetailView)context.EditModel;
+                                                }
+                                                <DxComboBox SizeMode="SizeMode.Medium" Data="@allowanceTypes"
+                                                            TextFieldName="@nameof(HRMSv4.Shared.Payroll.AllowanceType.AllowanceTypeName)"
+                                                            ValueFieldName="@nameof(HRMSv4.Shared.Payroll.AllowanceType.AllowanceTypeId)"
+                                                            NullText="Select deduction type"
+                                                            @bind-Value="@record.AllowanceTypeId" />
+                                            </CellEditTemplate>
+
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="Period" Caption="Period">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (AllowanceDetailView)context.EditModel;
+                                                }
+                                                <DxComboBox SizeMode="SizeMode.Medium" Data="@allowancePeriodList"
+                                                            NullText="Select generation type"
+                                                            @bind-Value="record.Period" />
+                                            </CellEditTemplate>
+
+                                        </DxGridDataColumn>
+                                        <DxGridCommandColumn />
+                                    </Columns>
+                                </DxGrid>
+                                <div class="position-relative ml-3 mt-3 row form-check">
+                                    <div class="col-sm-10 offset-sm-2">
+                                        <DxButton class="float-end btn btn-outline-2x btn-outline-primary" Click="@(() => RecomputePayroll(1))" SubmitFormOnClick="false" Text="Save And Recompute" />
+                                    </div>
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </DxAccordionItem>
+
+                    <DxAccordionItem Enabled="@isDisabled" Text="Loans">
+                        <ContentTemplate Context="contextEdit">
+                            <div class="container row mt-3 mb-3 ml-1">
+                                <DxGrid @ref="MyGridLoans" Data="@loanDetailsList.Where(c => c.ForDeleting == false).ToList()"
+                                        ShowGroupPanel="false"
+                                        PageSizeSelectorAllRowsItemVisible="false"
+                                        EditModelSaving="EmployeeLoansGrid_EditModelSaving"
+                                        EditMode="GridEditMode.EditRow">
+                                    <Columns>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="LoanBreakdownAmount" Caption="Loan Amortization">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (LoanDetailView)context.EditModel;
+                                                }
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.LoanBreakdownAmount"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            CssClass="cw-320" MinValue="0" Mask="n2"></DxSpinEdit>
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="BreakdownName" Caption="Loan Type">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (LoanDetailView)context.EditModel;
+                                                }
+                                                <DxComboBox SizeMode="SizeMode.Medium" Data="@loanTypes"
+                                                            TextFieldName="@nameof(HRMSv4.Shared.Payroll.LoanType.LoanTypeName)"
+                                                            ValueFieldName="@nameof(HRMSv4.Shared.Payroll.LoanType.LoanTypeId)"
+                                                            NullText="Select deduction type"
+                                                            @bind-Value="@record.LoanTypeId" />
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridCommandColumn />
+                                    </Columns>
+                                </DxGrid>
+                                <div class="position-relative ml-3 mt-3 row form-check">
+                                    <div class="col-sm-10 offset-sm-2">
+                                        <DxButton class="float-end btn btn-outline-2x btn-outline-primary" Click="@(() => RecomputePayroll(2))" SubmitFormOnClick="false" Text="Save And Recompute" />
+                                    </div>
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </DxAccordionItem>
+                    <DxAccordionItem Enabled="@isDisabled" Text="Other Deductions">
+                        <ContentTemplate Context="contextEdit">
+                            <div class="container row mt-3 mb-3 ml-1">
+                                <DxGrid @ref="MyGridDeductions" Data="@otherDeductionDetailsList.Where(c => c.ForDeleting == false).ToList()"
+                                        ShowGroupPanel="false"
+                                        PageSizeSelectorAllRowsItemVisible="false"
+                                        EditModelSaving="OtherDeductionGrid_EditModelSaving"
+                                        DataItemDeleting="OtherDeductionItemDeleting"
+                                        EditMode="GridEditMode.EditRow">
+                                    <Columns>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="Amount" Caption="Deduction Amount">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (OtherDeductionDetailView)context.EditModel;
+                                                }
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.Amount"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            CssClass="cw-320" MinValue="0" Mask="n2"></DxSpinEdit>
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="DeductionTypeString" TextAlignment="GridTextAlignment.Center" Caption="Deduction Type">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (OtherDeductionDetailView)context.EditModel;
+                                                }
+                                                <DxComboBox SizeMode="SizeMode.Medium" Data="@deductionTypes"
+                                                            TextFieldName="@nameof(HRMSv4.Shared.Payroll.DeductionType.DeductionTypeName)"
+                                                            ValueFieldName="@nameof(HRMSv4.Shared.Payroll.DeductionType.DeductionTypeId)"
+                                                            NullText="Select deduction type"
+                                                            @bind-Value="@record.DeductionTypeId" />
+                                            </CellEditTemplate>
+
+                                        </DxGridDataColumn>
+                                        <DxGridCommandColumn />
+                                    </Columns>
+                                </DxGrid>
+                                <div class="position-relative ml-3 mt-3 row form-check">
+                                    <div class="col-sm-10 offset-sm-2">
+                                        <DxButton class="float-end btn btn-outline-2x btn-outline-primary" Click="@(() => RecomputePayroll(3))" SubmitFormOnClick="false" Text="Save And Recompute" />
+                                    </div>
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </DxAccordionItem>
+                    <DxAccordionItem Enabled="@isDisabled" Text="Premiums">
+                        <ContentTemplate Context="contextEdit">
+                            <div class="container row mt-3 mb-3 ml-1">
+                                <h4>Employee Share</h4>
+                                <DxGrid style="margin:10px" @ref="MyGridEEPremiums" Data="@employeePremiumDetailsList"
+                                        ShowGroupPanel="false"
+                                        PageSizeSelectorAllRowsItemVisible="false"
+                                        EditModelSaving="EmployeePremiumGrid_EditModelSaving"
+                                        EditMode="GridEditMode.EditRow">
+                                    <Columns>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="Amount" Caption="Amount">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (PayrollPremiumDetailView)context.EditModel;
+                                                }
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.Amount"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            CssClass="cw-320" MinValue="0" Mask="n2"></DxSpinEdit>
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="PremiumName" Caption="Premium">
+                                        </DxGridDataColumn>
+                                        <DxGridCommandColumn Name="Action" DeleteButtonVisible="false" NewButtonVisible="false" />
+                                    </Columns>
+                                </DxGrid>
+                            </div>
+
+
+                            <div class="container row mt-3 mb-3 ml-1">
+                                <h4>Employer Share</h4>
+                                <DxGrid style="margin:10px" @ref="MyGridERPremiums" Data="@employerPremiumDetailsList"
+                                        ShowGroupPanel="false"
+                                        PageSizeSelectorAllRowsItemVisible="false"
+                                        EditModelSaving="EmployerPremiumGrid_EditModelSaving"
+                                        EditMode="GridEditMode.EditRow">
+                                    <Columns>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="Amount" Caption="Amount">
+                                            <CellEditTemplate>
+                                                @{
+                                                    var record = (PayrollPremiumDetailView)context.EditModel;
+                                                }
+                                                <DxSpinEdit SizeMode="SizeMode.Medium" @bind-Value="@record.Amount"
+                                                            BindValueMode="BindValueMode.OnInput"
+                                                            NullText="Type a value..."
+                                                            CssClass="cw-320" MinValue="0" Mask="n2"></DxSpinEdit>
+                                            </CellEditTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn FilterRowEditorVisible="false" FieldName="PremiumName" Caption="Premium">
+                                        </DxGridDataColumn>
+                                        <DxGridCommandColumn Name="Action" DeleteButtonVisible="false" NewButtonVisible="false" />
+                                    </Columns>
+                                </DxGrid>
+
+                                <div class="position-relative ml-3 mt-3 row form-check">
+                                    <div class="col-sm-10 offset-sm-2">
+                                        <DxButton class="float-end btn btn-outline-2x btn-outline-primary" Click="@(() => RecomputePayroll(4))" SubmitFormOnClick="false" Text="Save And Recompute" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ContentTemplate>
+                    </DxAccordionItem>
+                </Items>
+            </DxAccordion>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string? parameter { get; set; } = "0";
+    [CascadingParameter] public IModalService Modal { get; set; }
+    DxDataGrid<EmployeePayrollDetailView> _gridRef;
+    IGrid? MyGrid { get; set; }
+    IGrid? MyGridAllowance { get; set; }
+    IGrid? MyGridAdjustments { get; set; }
+    IGrid? MyGridLoans { get; set; }
+    IGrid? MyGridDeductions { get; set; }
+    IGrid? MyGridEEPremiums { get; set; }
+    IGrid? MyGridERPremiums { get; set; }
+    object Data { get; set; }
+    object DataS { get; set; }
+    //List<PayrollDateListView> dates = new List<PayrollDateListView>();
+    List<SelectListItems> _highestLevel = new List<SelectListItems>();
+
+    DateTime defaultNewDate = DateTime.Parse("1900-01-01 00:00:00");
+    int dateId = 0;
+    PayrollDateListView currentDate { get; set; } = new PayrollDateListView();
+    SelectListItems currentOffice { get; set; } = new SelectListItems();
+    string payDateRange = "";
+    bool isHidden = true;
+    bool isDisabled = false;
+    decimal value1 = decimal.Round(0, 2, MidpointRounding.AwayFromZero);
+    string value2 = "";
+
+    List<string> generateTypeList = new List<string>() { "Actual Logs", "Perfect Attendance", "Manual Entry" };
+    List<string> allowancePeriodList = new List<string>() { "None", "1-15", "16-30" };
+
+    GridDevExtremeDataSource<EmployeePayrollDetailView> gridDevExtremeDataSource;
+    AccordionExpandMode ExpandMode { get; set; } = AccordionExpandMode.SingleOrNone;
+    AccordionExpandCollapseAction ExpandCollapseAction { get; set; } = AccordionExpandCollapseAction.HeaderClick;
+    EmployeePayrollDetailView _selectedEmployee;
+    List<EmployeePayrollDetailView> _selectedEmployeeList = new List<EmployeePayrollDetailView>();
+
+    LogsAndLeavesDetailView logsAndLeavesModel = new LogsAndLeavesDetailView();
+    IEnumerable<AllowanceDetailView> allowanceDetailsList;
+    IEnumerable<AdjustmentDetailView> adjustmentDetailsList;
+    IEnumerable<LoanDetailView> loanDetailsList;
+    IEnumerable<OtherDeductionDetailView> otherDeductionDetailsList;
+    List<PayrollPremiumDetailView> employeePremiumDetailsList = new List<PayrollPremiumDetailView>();
+    List<PayrollPremiumDetailView> employerPremiumDetailsList = new List<PayrollPremiumDetailView>();
+    string selectButtonText = "Select All";
+    List<HRMSv4.Shared.Payroll.DeductionType> deductionTypes = new List<HRMSv4.Shared.Payroll.DeductionType>();
+    IEnumerable<HRMSv4.Shared.Payroll.LoanType> loanTypes;
+    IEnumerable<HRMSv4.Shared.Payroll.AllowanceType> allowanceTypes;
+    string userId = "";
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        _selectedEmployee = null;
+        int decryptedParam = int.Parse(_crypto.ConvertHexToString(parameter, System.Text.Encoding.Unicode));
+
+        int selectedParameter = decryptedParam != null && decryptedParam > 0 ? decryptedParam : 0;
+
+        var datesList = await service.GetPayrollDates(defaultNewDate, "none");
+
+        var selectedDate = datesList.FirstOrDefault(c => c.PayrollDateId == selectedParameter);
+
+        if (selectedDate != null)
+        {
+            currentDate = selectedDate;
+        }
+
+        payDateRange = $"{selectedDate.Name}({selectedDate.StartDate} to {selectedDate.EndDate})";
+
+        _highestLevel = await _IlevelOrganization.GetHighestLevel();
+        currentOffice = _highestLevel.FirstOrDefault();
+
+        var empPayroll = await _payrollService.GetEmployeesPayroll(currentDate.PayrollDateId, "0");
+        _selectedEmployeeList = empPayroll.ToList();
+        //devexpress server side - iqueryable
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<EmployeePayrollDetailView>(empPayroll.AsQueryable());
+        gridDevExtremeDataSource.CustomizeLoadOptions = (loadOptions) =>
+        {
+            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            // This can make SQL execution plans more efficient.
+            loadOptions.PrimaryKey = new[] { "PayrollId" };
+            loadOptions.PaginateViaPrimaryKey = true;
+
+        };
+
+        Data = gridDevExtremeDataSource;
+    }
+
+    async Task EditRow()
+    {
+        isHidden = isHidden ? false : true;
+    }
+
+    async Task PrintPaySlip(EmployeePayrollDetailView selectedEmpPay)
+    {
+        var empId = selectedEmpPay.EmployeeId.ToString();
+
+
+        var psgcCode = localStorage.GetItem<string>("AdminPsgcCode");
+
+        var user = (await _AutService.GetAuthenticationStateAsync()).User;
+        string userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        string arrayOfParemeters = string.Format("{0};{1};{2}", psgcCode, userId, empId);
+        string _encryptedParameter = _crypto.ConvertStringToHex(arrayOfParemeters, System.Text.Encoding.Unicode);
+
+        string url = $"/viewer/Payslip/{_encryptedParameter}";
+        await JSRuntime.InvokeAsync<object>("open", url, "_blank");
+    }
+
+    async Task RecomputePayroll(int particular)
+    {
+        try
+        {
+            SweetAlertResult result = await _Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Do you really want to proceed?",
+                    Text = "",
+                    Icon = SweetAlertIcon.Question,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Yes",
+                    CancelButtonText = "No",
+                    CancelButtonColor = "#999999"
+                });
+
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                PayrollRecomputeView recomputeView = new PayrollRecomputeView();
+                recomputeView.otherDeductionsDetailView = new List<OtherDeductionDetailView>();
+                recomputeView.loansDetailView = new List<LoanDetailView>();
+                recomputeView.allowancesDetailView = new List<AllowanceDetailView>();
+                switch (particular)
+                {
+                    case 0:
+                        //logs and leaves
+                        recomputeView.PayrollId = _selectedEmployeeList.Count() == 1 ? _selectedEmployeeList.FirstOrDefault().PayrollId : 0;
+                        recomputeView.RecomputedBy = userId;
+                        recomputeView.logsAndLeavesDetailView = logsAndLeavesModel;
+                        recomputeView.ValuesToRecompute = 0;
+                        if (recomputeView.PayrollId > 0)
+                        {
+                            var result0 = await _payrollService.RecomputePayroll(recomputeView);
+
+                            if (result0.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", result0.Value, "success");
+                                await RefreshMainGrid();
+                            }
+                        }
+
+                        break;
+
+                    case 1:
+                        //allowances
+                        recomputeView.PayrollId = _selectedEmployeeList.Count() == 1 ? _selectedEmployeeList.FirstOrDefault().PayrollId : 0;
+                        recomputeView.RecomputedBy = userId;
+                        recomputeView.allowancesDetailView = allowanceDetailsList.ToList();
+                        recomputeView.ValuesToRecompute = 1;
+                        if (recomputeView.PayrollId > 0)
+                        {
+                            var result1 = await _payrollService.RecomputePayroll(recomputeView);
+                            if (result1.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", result1.Value, "success");
+                                await RefreshMainGrid();
+                            }
+                        }
+
+                        break;
+                    case 2:
+                        //loans
+                        recomputeView.PayrollId = _selectedEmployeeList.Count() == 1 ? _selectedEmployeeList.FirstOrDefault().PayrollId : 0;
+                        recomputeView.RecomputedBy = userId;
+                        recomputeView.loansDetailView = loanDetailsList.ToList();
+                        recomputeView.ValuesToRecompute = 2;
+                        if (recomputeView.PayrollId > 0)
+                        {
+                            var result3 = await _payrollService.RecomputePayroll(recomputeView);
+                            if (result3.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", result3.Value, "success");
+                                await RefreshMainGrid();
+                            }
+                        }
+
+                        break;
+                    case 3:
+                        //deductions
+                        recomputeView.PayrollId = _selectedEmployeeList.Count() == 1 ? _selectedEmployeeList.FirstOrDefault().PayrollId : 0;
+                        recomputeView.RecomputedBy = userId;
+                        recomputeView.otherDeductionsDetailView = otherDeductionDetailsList.ToList();
+                        recomputeView.ValuesToRecompute = 3;
+                        if (recomputeView.PayrollId > 0)
+                        {
+                            var result4 = await _payrollService.RecomputePayroll(recomputeView);
+                            if (result4.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", result4.Value, "success");
+                                await RefreshMainGrid();
+                            }
+                        }
+
+                        break;
+                    case 4:
+                        //premiums
+                        recomputeView.PayrollId = _selectedEmployeeList.Count() == 1 ? _selectedEmployeeList.FirstOrDefault().PayrollId : 0;
+                        recomputeView.RecomputedBy = userId;
+                        recomputeView.payrollEEPremiumDetailView = employeePremiumDetailsList.ToList();
+                        recomputeView.payrollERPremiumDetailView = employerPremiumDetailsList.ToList();
+                        recomputeView.ValuesToRecompute = 4;
+                        if (recomputeView.PayrollId > 0)
+                        {
+                            var result5 = await _payrollService.RecomputePayroll(recomputeView);
+                            if (result5.StatusCode == 200)
+                            {
+                                await _Swal.FireAsync("Success", result5.Value, "success");
+                                await RefreshMainGrid();
+                            }
+                        }
+                        break;
+
+                }
+
+            }
+
+
+
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+
+
+    }
+
+    async Task OtherDeductionGrid_EditModelSaving(GridEditModelSavingEventArgs item)
+    {
+        var newmodelData = item.EditModel as OtherDeductionDetailView;
+        var previousmodelData = item.DataItem != null ? item.DataItem as OtherDeductionDetailView : null;
+
+        var selectedPrevious = previousmodelData != null ? otherDeductionDetailsList.FirstOrDefault(c => c.DeductionTypeId == previousmodelData.DeductionTypeId) : null;
+
+        if (selectedPrevious != null)
+        {
+            var IsExisting = otherDeductionDetailsList.FirstOrDefault(c => c.DeductionTypeId != previousmodelData.DeductionTypeId && c.DeductionTypeId == newmodelData.DeductionTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate deduction type", "warning");
+                return;
+            }
+            selectedPrevious.Amount = newmodelData.Amount;
+            selectedPrevious.DeductionTypeId = newmodelData.DeductionTypeId;
+            selectedPrevious.DeductionTypeString = newmodelData.DeductionTypeId.HasValue ? deductionTypes.FirstOrDefault(c => c.DeductionTypeId == newmodelData.DeductionTypeId.Value).DeductionTypeName : "";
+        }
+        else
+        {
+            var list = otherDeductionDetailsList.ToList();
+            var IsExisting = otherDeductionDetailsList.FirstOrDefault(c => c.DeductionTypeId == newmodelData.DeductionTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate deduction type", "warning");
+                return;
+            }
+            newmodelData.DeductionTypeString = newmodelData.DeductionTypeId.HasValue ? deductionTypes.FirstOrDefault(c => c.DeductionTypeId == newmodelData.DeductionTypeId.Value).DeductionTypeName : "";
+            list.Add(newmodelData);
+
+            otherDeductionDetailsList = list;
+        }
+
+        StateHasChanged();
+    }
+
+    async Task AllowanceGrid_EditModelSaving(GridEditModelSavingEventArgs item)
+    {
+        var newmodelData = item.EditModel as AllowanceDetailView;
+        var previousmodelData = item.DataItem != null ? item.DataItem as AllowanceDetailView : null;
+
+        var selectedPrevious = previousmodelData != null ? allowanceDetailsList.FirstOrDefault(c => c.AllowanceTypeId == previousmodelData.AllowanceTypeId) : null;
+
+        if (selectedPrevious != null)
+        {
+            var IsExisting = allowanceDetailsList.FirstOrDefault(c => c.AllowanceTypeId != previousmodelData.AllowanceTypeId && c.AllowanceTypeId == newmodelData.AllowanceTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate allowance type", "warning");
+                return;
+            }
+            selectedPrevious.Amount = newmodelData.Amount;
+            selectedPrevious.AllowanceTypeId = newmodelData.AllowanceTypeId;
+            selectedPrevious.AllowanceTypeString = newmodelData.AllowanceTypeId.HasValue ? allowanceTypes.FirstOrDefault(c => c.AllowanceTypeId == newmodelData.AllowanceTypeId.Value).AllowanceTypeName : "";
+        }
+        else
+        {
+            var list = allowanceDetailsList.ToList();
+            var IsExisting = allowanceDetailsList.FirstOrDefault(c => c.AllowanceTypeId == newmodelData.AllowanceTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate allowance type", "warning");
+                return;
+            }
+            newmodelData.AllowanceTypeString = newmodelData.AllowanceTypeId.HasValue ? allowanceTypes.FirstOrDefault(c => c.AllowanceTypeId == newmodelData.AllowanceTypeId.Value).AllowanceTypeName : "";
+            list.Add(newmodelData);
+
+            allowanceDetailsList = list;
+        }
+
+        StateHasChanged();
+    }
+
+    async Task EmployeePremiumGrid_EditModelSaving(GridEditModelSavingEventArgs item)
+    {
+        var newmodelData = item.EditModel as PayrollPremiumDetailView;
+        var previousmodelData = item.DataItem != null ? item.DataItem as PayrollPremiumDetailView : null;
+
+        var selectedPrevious = previousmodelData != null ? employeePremiumDetailsList.FirstOrDefault(c => c.PremiumName == previousmodelData.PremiumName) : null;
+        if (selectedPrevious != null)
+        {
+            selectedPrevious.Amount = newmodelData.Amount;
+        }
+
+        StateHasChanged();
+    }
+
+    async Task EmployeeLoansGrid_EditModelSaving(GridEditModelSavingEventArgs item)
+    {
+        var newmodelData = item.EditModel as LoanDetailView;
+        var previousmodelData = item.DataItem != null ? item.DataItem as LoanDetailView : null;
+
+        var selectedPrevious = previousmodelData != null ? loanDetailsList.FirstOrDefault(c => c.LoanTypeId == previousmodelData.LoanTypeId) : null;
+
+        if (selectedPrevious != null)
+        {
+            var IsExisting = loanDetailsList.FirstOrDefault(c => c.LoanTypeId != previousmodelData.LoanTypeId && c.LoanTypeId == newmodelData.LoanTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate loan type", "warning");
+                return;
+            }
+            selectedPrevious.LoanBreakdownAmount = newmodelData.LoanBreakdownAmount;
+            selectedPrevious.LoanTypeId = newmodelData.LoanTypeId;
+            selectedPrevious.BreakdownName = newmodelData.LoanTypeId.HasValue ? loanTypes.FirstOrDefault(c => c.LoanTypeId == newmodelData.LoanTypeId.Value).LoanTypeName : "";
+        }
+        else
+        {
+            var list = loanDetailsList.ToList();
+            var IsExisting = loanDetailsList.FirstOrDefault(c => c.LoanTypeId == newmodelData.LoanTypeId);
+            if (IsExisting != null)
+            {
+                await _Swal.FireAsync("Warning", "Cannot enter duplicate loan type", "warning");
+                return;
+            }
+            newmodelData.BreakdownName = newmodelData.LoanTypeId.HasValue ? loanTypes.FirstOrDefault(c => c.LoanTypeId == newmodelData.LoanTypeId.Value).LoanTypeName : "";
+            list.Add(newmodelData);
+
+            loanDetailsList = list;
+        }
+
+
+        StateHasChanged();
+    }
+
+    async Task EmployerPremiumGrid_EditModelSaving(GridEditModelSavingEventArgs item)
+    {
+        var newmodelData = item.EditModel as PayrollPremiumDetailView;
+        var previousmodelData = item.DataItem != null ? item.DataItem as PayrollPremiumDetailView : null;
+
+        var selectedPrevious = previousmodelData != null ? employerPremiumDetailsList.FirstOrDefault(c => c.PremiumName == previousmodelData.PremiumName) : null;
+        if (selectedPrevious != null)
+        {
+            selectedPrevious.Amount = newmodelData.Amount;
+        }
+        StateHasChanged();
+    }
+
+    async Task OtherDeductionItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var dataToDelete = e.DataItem as OtherDeductionDetailView;
+        var selectedPrevious = dataToDelete != null ? otherDeductionDetailsList.FirstOrDefault(c => c.DeductionTypeId == dataToDelete.DeductionTypeId) : null;
+        if (selectedPrevious != null)
+        {
+            selectedPrevious.ForDeleting = true;
+        }
+    }
+
+    async Task AllowanceItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var dataToDelete = e.DataItem as AllowanceDetailView;
+        var selectedPrevious = dataToDelete != null ? allowanceDetailsList.FirstOrDefault(c => c.AllowanceTypeId == dataToDelete.AllowanceTypeId) : null;
+        if (selectedPrevious != null)
+        {
+            selectedPrevious.ForDeleting = true;
+        }
+    }
+
+    async Task LoansItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var dataToDelete = e.DataItem as LoanDetailView;
+        var selectedPrevious = dataToDelete != null ? loanDetailsList.FirstOrDefault(c => c.LoanTypeId == dataToDelete.LoanTypeId) : null;
+        if (selectedPrevious != null)
+        {
+            selectedPrevious.ForDeleting = true;
+        }
+    }
+
+    async Task FilterPayrollDates(PayrollDateListView payrollDate)
+    {
+        currentDate = payrollDate;
+        await _gridRef.Refresh();
+    }
+
+    void OnClickColumnChooser()
+    {
+        MyGrid.ShowColumnChooser(".column-chooser-button");
+    }
+
+    async Task FilterOffice(SelectListItems office)
+    {
+        currentOffice = office;
+        await RefreshMainGrid();
+    }
+
+    async Task GeneratePayroll()
+    {
+        //save employee assessment
+        var options = new ModalOptions()
+            {
+                DisableBackgroundCancel = true,
+                Animation = ModalAnimation.FadeIn(0.2),
+                ContentScrollable = true
+
+            };
+
+        List<int>? _EmployeeIdList = new List<int>();
+        List<int>? _PayrollIdList = new List<int>();
+
+        _EmployeeIdList = _selectedEmployeeList.Select(c => c.EmployeeId).Distinct().ToList();
+        _PayrollIdList = _selectedEmployeeList.Select(c => c.PayrollId).ToList();
+
+
+        int decryptedParamDateId = int.Parse(_crypto.ConvertHexToString(parameter, System.Text.Encoding.Unicode));
+        int selectedParameterDateId = decryptedParamDateId != null && decryptedParamDateId > 0 ? decryptedParamDateId : 0;
+        var _selectedDate = await service.GetPayrollDateDetail(selectedParameterDateId);
+
+        PayrollGenerationView _payrollView = new PayrollGenerationView();
+        _payrollView.EmployeeIdList = _EmployeeIdList;
+        _payrollView.PayrollIdList = _PayrollIdList;
+        _payrollView.GeneratedBy = userId;
+        _payrollView.PayrollDateId = selectedParameterDateId;
+        _payrollView.IsPlantilla = _selectedDate.IsPlantilla;
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(PayrollGenerationModal.payrollParams), _payrollView);
+
+        var formModal = Modal.Show<PayrollGenerationModal>("Generate Payroll", parameters, options);
+        var result = await formModal.Result;
+
+        if (result.Cancelled == false)
+        {
+            await RefreshMainGrid();
+        }
+    }
+
+    async Task RefreshMainGrid()
+    {
+
+        _selectedEmployeeList = new List<EmployeePayrollDetailView>();
+        var empPayroll = await _payrollService.GetEmployeesPayroll(currentDate.PayrollDateId, currentOffice.Value);
+        gridDevExtremeDataSource = new GridDevExtremeDataSource<EmployeePayrollDetailView>(empPayroll.AsQueryable());
+        Data = gridDevExtremeDataSource;
+        MyGrid.ClearSelection();
+        MyGrid.Reload();
+    }
+
+    async Task<IEnumerable<EmployeePayrollDetailView>> LoadDataAsync(CancellationToken token)
+    {
+        IEnumerable<EmployeePayrollDetailView> empPayroll;
+
+        try
+        {
+            int decryptedParam = int.Parse(_crypto.ConvertHexToString(parameter, System.Text.Encoding.Unicode));
+
+            int selectedParameter = decryptedParam != null && decryptedParam > 0 ? decryptedParam : 0;
+
+            var datesList = await service.GetPayrollDates(defaultNewDate, "none");
+
+            var selectedDate = datesList.FirstOrDefault(c => c.PayrollDateId == selectedParameter);
+            if (selectedDate != null)
+            {
+                currentDate = selectedDate;
+            }
+
+            empPayroll = await _payrollService.GetEmployeesPayroll(currentDate.PayrollDateId, "0");
+
+            return empPayroll;
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+
+    }
+
+    async Task SelectedEmployee(object selected)
+    {
+        _selectedEmployeeList = new List<EmployeePayrollDetailView>();
+        DevExpress.Blazor.Internal.GridSelectedDataItemsCollection gridSelectedDataItemsCollection;
+        gridSelectedDataItemsCollection = selected as DevExpress.Blazor.Internal.GridSelectedDataItemsCollection;
+        _selectedEmployeeList = gridSelectedDataItemsCollection.Cast<EmployeePayrollDetailView>().ToList();
+
+
+        if (_selectedEmployeeList.Count() > 1 || _selectedEmployeeList.Count() == 0)
+        {
+            isDisabled = false;
+            isHidden = true;
+            StateHasChanged();
+        }
+        else
+        {
+            otherDeductionDetailsList = new List<OtherDeductionDetailView>();
+            allowanceDetailsList = new List<AllowanceDetailView>();
+            var selectedEmp = _selectedEmployeeList.FirstOrDefault();
+            deductionTypes = await _deductionTypesService.All();
+            allowanceTypes = await _allowanceTypeService.GetAll();
+            loanTypes = await _loanTypeService.GetLoanTypes();
+
+            otherDeductionDetailsList = await _payrollService.GetEmployeePayrollDeductions(selectedEmp.PayrollId);
+            allowanceDetailsList = await _payrollService.GetEmployeePayrollAllowances(selectedEmp.PayrollId);
+            loanDetailsList = await _payrollService.GetEmployeePayrollLoans(selectedEmp.PayrollId);
+            logsAndLeavesModel = await _payrollService.GetEmployeeLogsAndLeaves(selectedEmp.PayrollId);
+            var listPrems = await _payrollService.GetEmployeePayrollPremiums(selectedEmp.PayrollId);
+
+            employeePremiumDetailsList = listPrems.Where(c => c.IsEmployeeShare == true).ToList();
+            employerPremiumDetailsList = listPrems.Where(c => c.IsEmployeeShare == false).ToList();
+
+            isHidden = false;
+            isDisabled = true;
+        }
+
+    }
+
+
+}

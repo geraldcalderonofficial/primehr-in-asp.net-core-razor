@@ -1,9 +1,0 @@
-﻿@*@inject NavigationManager navigation
-@using Microsoft.AspNetCore.Components.Authorization;
-
-@code {
-    protected override void OnInitialized()
-    {
-        navigation.NavigateTo($"authentication/login?returnUrl={Navigation.Uri}");
-    }
-}*@

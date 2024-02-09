@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="description" content="">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="/MainLayout/images/favicon.png" />
+    <title>PrimeHR v4 ® Build : 1.0.0.0</title>
+    <base href="/" />
+
+    <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/jbox/vendors/uicons-regular-rounded.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jbox/vendors/fontawesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jbox/vendors/ionicons.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jbox/vendors/linearicons.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jbox/vendors/pe-icon-7-stroke.css" type="text/css" />
+    <!--Other CSS-->
+    <link rel="stylesheet" href="_content/Blazored.Modal/blazored-modal.css" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" type="text/css" />
+    <!--<link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.css" rel="stylesheet" />-->
+    <link rel="stylesheet" href="/css/bootsnav/bootsnav.css" type="text/css" />
+    <link rel="stylesheet" href="/css/all/fullcalendar.css" type="text/css" />
+    <link rel="stylesheet" href="/css/all/daterangepicker.min.css" type="text/css" />
+    <!--Main CSS-->
+    <link rel="stylesheet" href="/css/base.css" type="text/css" />
+    <link rel="stylesheet" href="/css/style-admin.css" type="text/css" />
+    <!--  <link rel="stylesheet" href="/css/style.css" type="text/css" />-->
+    <link rel="stylesheet" href="/css/custom.css" type="text/css" />
+
+    <!--Javascript-->
+    <!--Link DevExtreme resources-->
+    <link href="Scripts/dx.common.css" rel="stylesheet" type="text/css" />
+    <link href="Scripts/dx.light.css" rel="stylesheet" type="text/css" />
+    <script src="Scripts/script.js"></script>
+
+    <style>
+
+        body {
+            color: #05264E !important;
+            font-family: "Plus Jakarta Sans", sans-serif !important;
+            /* font-size: 14px;
+            line-height: 24px !important; */
+            font-style: normal !important;
+            font-weight: 400 !important;
+            background-color: #F2F4FA !important;
+        }
+
+        a:hover {
+            color: #3C65F5 !important;
+        }
+
+
+        .spinner {
+            border: 16px solid silver;
+            border-top: 16px solid #337AB7;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 700ms linear infinite;
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            margin-left: -4em;
+            margin-bottom: 3em;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg)
+            }
+
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        @media only screen and (max-width: 800px) {
+            #arvinHeader {
+                background: #FFFFFF;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app" style="height: 100vh; overflow-x: hidden; overflow-y:auto">
+        <div class="page_preloader"></div>
+        <!--<div class="spinner"></div>-->
+    </div>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="Scripts/knockout-latest.js"></script>
+    <script src="Scripts/js/Script.js"></script>
+
+    <script src="_content/Blazored.Modal/blazored.modal.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_content/CurrieTechnologies.Razor.SweetAlert2/sweetAlert2.min.js"></script>
+    <script src="_content/PSC.Blazor.Components.Chartjs/lib/Chart.js/chart.js"></script>
+    <script src="_content/PSC.Blazor.Components.Chartjs/Chart.js"></script>
+
+    <script src="Scripts/dx.all.js"></script>
+    <!-- Link the Reporting resources -->
+    <script src="Scripts/dx-analytics-core.min.js"></script>
+    <script src="Scripts/dx-webdocumentviewer.min.js"></script>
+    <link href="Scripts/dx-analytics.common.css" rel="stylesheet" type="text/css" />
+    <link href="Scripts/dx-analytics.light.css" rel="stylesheet" type="text/css" />
+    <link href="Scripts/dx-webdocumentviewer.css" rel="stylesheet" type="text/css" />
+
+    <script src="Scripts/index.js"></script>
+    <script src="Scripts/js/clickAndPositionHandler.js"></script>
+
+
+    <!--<script src="inputfile.js"></script>-->
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <script src="_content/BlockUI.Blazor/jquery.blockUI.Blazor.min.js"></script>
+    <script type="text/javascript">
+        function timeOutCall(dotnethelper) {
+            document.onmousemove = resetTimeDelay;
+            document.onkeypress = resetTimeDelay;
+
+            function resetTimeDelay() {
+                dotnethelper.invokeMethodAsync("TimerInterval");
+            }
+        }
+
+        function changePasswordVisibility(cssClass, showPassword) {
+            var passInput = document.querySelector("." + cssClass + " input");
+            if (passInput) {
+                passInput.type = showPassword ? "text" : "password";
+            }
+        }
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 50) {
+                $('#arvinHeader').addClass("sticky");
+            }
+            else {
+                $('#arvinHeader').removeClass("sticky");
+            }
+        });
+
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+
+        function focusInput(id) {
+            document.getElementById(id).focus();
+        }
+
+    </script>
+
+
+
+
+</body>
+</html>
